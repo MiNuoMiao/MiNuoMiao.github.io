@@ -702,14 +702,14 @@ aside:
   hide: false
   button: true
   mobile: true # display on mobile
-  position: right # left or right
+  position: left # left or right
   display:
     archive: true
     tag: true
     category: false
   card_author:
     enable: true
-    type: 1 # 1为使用头像card 2为不使用头像card
+    type: 2 # 1为使用头像card 2为不使用头像card
     description: # 默认为站点描述
     info_background: /img/bg.jpg # type为1时有效
     button:
