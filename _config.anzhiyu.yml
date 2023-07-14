@@ -689,7 +689,7 @@ preloader:
   # 1. fullpage-loading
   # 2. pace (progress bar)
   # else all
-  source: 1
+  source: 4
   # pace theme (see https://codebyzach.github.io/pace/)
   pace_css_url:
   avatar: # 自定义头像

@@ -1,4 +1,4 @@
-if hexo-config('preloader')
+if hexo-config('preloader.source') == 1
   .loading-bg
     display: flex;
     width: 100%;
@@ -60,3 +60,8 @@ if hexo-config('preloader')
     100% {
         opacity: .4;
     }
+
+else if hexo-config('preloader.source') == 4
+    @import './_load_style/spincat'
+else
+    @import './_load_style/anzhiyu'
