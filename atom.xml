@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>NuoMiao</title>
+  
+  
+  <link href="http://minuomiao.github.io/atom.xml" rel="self"/>
+  
+  <link href="http://minuomiao.github.io/"/>
+  <updated>2023-07-13T09:21:06.247Z</updated>
+  <id>http://minuomiao.github.io/</id>
+  
+  <author>
+    <name>Nuo Miao</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MIAO MIAO</title>
+    <link href="http://minuomiao.github.io/2023/07/10/hello%20Miao/"/>
+    <id>http://minuomiao.github.io/2023/07/10/hello%20Miao/</id>
+    <published>2023-07-10T13:00:00.000Z</published>
+    <updated>2023-07-13T09:21:06.247Z</updated>
+    
+    
+    
+    
+    
+  </entry>
+  
+</feed>
