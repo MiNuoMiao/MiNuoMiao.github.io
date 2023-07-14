@@ -709,7 +709,7 @@ aside:
     category: false
   card_author:
     enable: true
-    type: 2 # 1为使用头像card 2为不使用头像card
+    type: 1 # 1为使用头像card 2为不使用头像card
     description: # 默认为站点描述
     info_background: /img/bg.jpg # type为1时有效
     button:
