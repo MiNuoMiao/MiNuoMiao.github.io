@@ -715,7 +715,7 @@ aside:
     button:
       enable: true
       icon: anzhiyu-icon-arrow-circle-right
-      text: 了解更多
+      text: 喵喵!!!
       link: /about/
   card_announcement:
     enable: false
