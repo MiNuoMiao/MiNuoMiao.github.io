@@ -524,7 +524,7 @@ if hexo-config('aside.enable')
     $card_info_background = hexo-config('aside.card_author.info_background') 
     #aside-content
       > .card-widget.card-info
-          background: #fff url($card_info_background) top -24% center no-repeat;
+          background: #fff url($card_info_background) center no-repeat;
           position: relative;
           .author-info__name 
             line-height: 1.5em;
@@ -581,7 +581,7 @@ if hexo-config('aside.enable')
   display: block
 
 [data-theme="dark"] #aside-content > .card-info
-  background: var(--anzhiyu-card-bg)
+  background: url($card_info_background) center no-repeat;
 
 @media screen and (max-width: 992px)
   #aside-content > .card-info

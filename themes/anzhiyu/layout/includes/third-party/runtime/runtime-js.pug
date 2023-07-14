@@ -1,6 +1,7 @@
 - let launch_time = theme.footer.runtime.launch_time
 - let offduty_img = theme.footer.runtime.offduty_img
 - let offduty_description = theme.footer.runtime.offduty_description
+
 script(async=true).
   (function () {
     var grt = new Date("#{launch_time}"); //设置网站上线时间
@@ -41,7 +42,7 @@ script(async=true).
       let currentTimeHtml = "";
       if (nowHour < 18 && nowHour >= 9) {
         // 如果是上班时间，默认就是"安知鱼-上班摸鱼中.svg"图片，不需要更改
-        currentTimeHtml = `本站居然运行了 ${dnum} 天<span id='runtime'> ${hnum} 小时 ${mnum} 分 ${snum} 秒 </span><i class='anzhiyufont anzhiyu-icon-heartbeat' style='color:red'></i>`;
+        currentTimeHtml = `<p style="color: #A7B5E9;">小破站已破壳 <span id="span_dt_dt" style="color: #A7B5E9;"><font style="color:#D3A0E7"> ${dnum} </font> 天 <span id='runtime'><font style="color:#f391a9"> ${hnum} </font> 时 <font style="color:#fdb933"> ${mnum} </font> 分 <font style="color:#a3cf62"> ${snum} </font> 秒</span></span>&emsp;<i class='anzhiyufont anzhiyu-icon-heartbeat' style='color:red'></i></p>`;
       } else {
         // 如果是下班时间，插入"安知鱼-下班啦.svg"图片
         let img = document.querySelector("#workboard .workSituationImg");
@@ -49,7 +50,7 @@ script(async=true).
         img.title = "#{offduty_description}";
         img.alt = "#{offduty_description}";
 
-        currentTimeHtml = `本站居然运行了 ${dnum} 天<span id='runtime'> ${hnum} 小时 ${mnum} 分 ${snum} 秒 </span><i class='anzhiyufont anzhiyu-icon-heartbeat' style='color:red'></i>`;
+        currentTimeHtml = `<p style="color: #A7B5E9;">小破站已破壳 <span id="span_dt_dt" style="color: #A7B5E9;"><font style="color:#D3A0E7"> ${dnum} </font> 天 <span id='runtime'><font style="color:#f391a9"> ${hnum} </font> 时 <font style="color:#fdb933"> ${mnum} </font> 分 <font style="color:#a3cf62"> ${snum} </font> 秒</span></span>&emsp;<i class='anzhiyufont anzhiyu-icon-heartbeat' style='color:red'></i></p>`;
       }
 
       if (document.getElementById("runtimeTextTip")) {
