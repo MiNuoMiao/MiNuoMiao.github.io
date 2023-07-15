@@ -2239,8 +2239,8 @@ blockquote > :last-child {
   margin: auto;
   border: 4px solid #f0f0f2;
   position: absolute;
-  top: 32.5%;
-  left: 32.5%;
+  top: 35%;
+  left: 35%;
   z-index: 100;
   -webkit-animation-duration: 0.3s;
   -moz-animation-duration: 0.3s;
@@ -2270,8 +2270,8 @@ blockquote > :last-child {
   position: absolute;
   border-radius: 50%;
   border: 6px solid #fff;
-  top: 44%;
-  left: 47%;
+  top: 47%;
+  left: 50%;
   z-index: 100;
   -webkit-transform: translate(18px, 24px);
   -moz-transform: translate(18px, 24px);
