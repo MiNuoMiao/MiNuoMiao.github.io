@@ -133,7 +133,7 @@ cover:
   archives_enable: true
   # the position of cover in home page (封面显示的位置)
   # left/right/both
-  position: left
+  position: both
   # When cover is not set, the default cover is displayed (当没有设置cover时，默认的封面显示)
   default_cover:
     - /img/default_cover.jpg
@@ -201,18 +201,18 @@ post_copyright:
   enable: true
   decode: false
   author_href:
-  location: 长沙
+  location: 成都
   license: CC BY-NC-SA 4.0
   license_url: https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-# Sponsor/reward
+# Sponsor/reward 文章打赏
 reward:
   enable: true
   QR_code:
-    - img: https://npm.elemecdn.com/anzhiyu-blog@1.1.6/img/post/common/qrcode-weichat.png
+    - img: /img/miao.png
       link:
       text: wechat
-    - img: https://npm.elemecdn.com/anzhiyu-blog@1.1.6/img/post/common/qrcode-alipay.png
+    - img: /img/miao.png
       link:
       text: alipay
 
@@ -385,9 +385,9 @@ footer:
   runtime:
     enable: true
     launch_time: 2023/07/10 09:00:00 # 网站上线时间
-    work_img: https://npm.elemecdn.com/anzhiyu-blog@2.0.4/img/badge/安知鱼-上班摸鱼中.svg
-    work_description: 距离月入25k也就还差一个大佬带我~
-    offduty_img: https://npm.elemecdn.com/anzhiyu-blog@2.0.4/img/badge/安知鱼-下班啦.svg
+    work_img: /img/上班摸鱼.svg
+    work_description: 距离月入10k也就还差一个大佬带我~
+    offduty_img: /img/下班啦.svg
     offduty_description: 下班了就该开开心心的玩耍，嘿嘿~
   # 徽标部分配置项 https://shields.io/
   # https://img.shields.io/badge/CDN-jsDelivr-orange?style=flat&logo=jsDelivr
@@ -525,21 +525,22 @@ site_verification:
 
 # Theme color for customize
 # Notice: color value must in double quotes like "#000" or may cause error!
+# 自定义主题色
 
 theme_color:
   enable: true
   cover_change: false # 整篇文章跟随cover修改主色调
-  main: "#3b70fc"
-  dark_main: "#0084ff"
-  paginator: "#3b70fc"
-  #   button_hover: "#FF7242"
-  text_selection: "#2128bd"
+  main: "#ff98a2"
+  dark_main: "#FFB2B9"
+  paginator: "#ff98a2"
+  button_hover: "#FF7280"
+  text_selection: "#ff98a2"
   link_color: "var(--anzhiyu-fontcolor)"
   meta_color: "var(--anzhiyu-fontcolor)"
   hr_color: "#4259ef23"
   code_foreground: "#fff"
   code_background: "var(--anzhiyu-code-stress)"
-  toc_color: "#3b70fc"
+  toc_color: "#ff98a2"
   #   blockquote_padding_color: "#3b70fc"
   #   blockquote_background_color: "#3b70fc"
   scrollbar_color: "var(--anzhiyu-scrollbar)"
@@ -645,14 +646,14 @@ beautify:
 font:
   global-font-size: 17px
   code-font-size:
-  font-family:
-  code-font-family: consolas, Menlo, "PingFang SC", "Microsoft JhengHei", "Microsoft YaHei", sans-serif
+  font-family: ZhuZiAYuanJWD
+  code-font-family: ZhuZiAYuanJWD, consolas, Menlo, "PingFang SC", "Microsoft JhengHei", "Microsoft YaHei", sans-serif
 
 # Font settings for the site title and site subtitle
 # 左上角网站名字 主页居中网站名字
 blog_title_font:
-  font_link:
-  font-family: PingFang SC, 'Hiragino Sans GB', 'Microsoft JhengHei', 'Microsoft YaHei', sans-serif
+  font_link: "https://npm.elemecdn.com/anzhiyu-blog@1.1.6/fonts/ZhuZiAWan.woff2"
+  font-family: ZhuZiAYuanJWD, PingFang SC, 'Hiragino Sans GB', 'Microsoft JhengHei', 'Microsoft YaHei', sans-serif
 
 # The setting of divider icon (水平分隔线图标设置)
 hr_icon:
@@ -718,12 +719,12 @@ aside:
       text: 喵喵!!!
       link: /about/
   card_announcement:
-    enable: false
-    content: 欢迎来看我的博客鸭~
+    enable: true
+    content: 公告? 没有公告! # 公告
   card_weixin:
     enable: true
     face: https://bu.dusays.com/2023/01/13/63c02edf44033.png
-    backFace: https://bu.dusays.com/2023/05/13/645fa415e8694.png
+    backFace: https://bu.dusays.com/2023/01/13/63c02edf44033.png # https://bu.dusays.com/2023/05/13/645fa415e8694.png
   card_recent_post:
     enable: true
     limit: 5 # if set 0 will show all
@@ -758,9 +759,9 @@ aside:
 # busuanzi count for PV / UV in site
 # 访问人数
 busuanzi:
-  site_uv: false
-  site_pv: false
-  page_pv: false
+  site_uv: true
+  site_pv: true
+  page_pv: true
 
 # Time difference between publish date and now (网页运行时间)
 # Formal: Month/Day/Year Time or Year/Month/Day Time
@@ -942,7 +943,7 @@ home_top:
   timemode: date #date/updated
   title: 生活明朗
   subTitle: 万物可爱。
-  siteText: anheyu.com
+  siteText: minuomiao.github.io
   category:
     - name: 前端
       path: /categories/前端开发/
@@ -965,10 +966,10 @@ home_top:
     swiper_css: https://npm.elemecdn.com/anzhiyu-theme-static@1.0.0/swiper/swiper.min.css #swiper css依赖
     swiper_js: https://npm.elemecdn.com/anzhiyu-theme-static@1.0.0/swiper/swiper.min.js #swiper js依赖
   banner:
-    tips: 新品主题
-    title: Theme-AnZhiYu
+    tips: 更多推荐
+    title: 更多!!
     image: https://bu.dusays.com/2023/05/13/645fa3cf90d70.webp
-    link: https://blog.anheyu.com/docs
+    link: # 网址
 
 # 朋友圈配置
 friends_vue:
@@ -1018,10 +1019,9 @@ comment_barrage_config:
 nav_music:
   enable: true
   console_widescreen_music: false # 宽屏状态控制台显示音乐而不是标签 enable为true 控制台依然会显示
-  id: 8152976493
+  id: 8560567666
   server: netease
-  all_playlist: https://y.qq.com/n/ryqq/playlist/8802438608
-
+  all_playlist: https://music.163.com/#/my/m/music/playlist?id=8560567666
 # 评论匿名邮箱
 visitorMail:
   enable: true
@@ -1038,7 +1038,7 @@ ptool:
 
 # 欢迎语配置
 greetingBox:
-  enable: false
+  enable: true
   default: 晚上好👋
   list:
     - greeting: 晚安😴
@@ -1096,12 +1096,18 @@ inject:
   head:
     # 自定义css
     # - <link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'">
-
+    # 鼠标样式
+    - <link rel="stylesheet" href="/css/mouse.css">
+    # 自定义样式
+    - <link rel="stylesheet" href="/css/MyStyle.css">
   bottom:
     # 自定义js
     # - <script src="/js/xxx"></script>
     - <script src="/js/jquery.js"></script> # jQuery
-    - <script src="/js/foot.js"></script> # 页脚文字
+    - <script src="/js/sakura.js"></script> # 樱花特效
+    # 页脚养鱼
+    - <script src="/js/fish.js"></script>
+    # - <script src="https://cdn.jsdelivr.net/gh/xiabo2/CDN@latest/fish.js"></script>
 
 # CDN
 # Don't modify the following settings unless you know how they work
