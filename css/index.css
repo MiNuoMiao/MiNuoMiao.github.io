@@ -8212,7 +8212,12 @@ h1.page-title + .tag-cloud-list {
 }
 @media screen and (max-width: 768px) {
   .card-widget .author-info-top {
-    display: none;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: box;
+    display: flex;
   }
 }
 .card-widget .card-info-avatar {
@@ -18200,6 +18205,7 @@ body:has(.post-bg) #he-plugin-simple .s-sticker div {
   list-style: none;
   counter-reset: li 0;
 }
+
 #article-container code {
   padding: 0.2rem 0.4rem;
   border-radius: 4px;
@@ -18207,22 +18213,27 @@ body:has(.post-bg) #he-plugin-simple .s-sticker div {
   line-height: 2;
   box-shadow: var(--anzhiyu-shadow-border);
 }
+
 #article-container.post-content li::marker {
   content: none;
 }
+
 #article-container ol li:not(.tab),
 #article-container ul li:not(.tab) {
   position: relative;
   margin: 0.2rem 0px;
 }
-#article-container ul > li:not(.tab) {
+
+#article-container ul>li:not(.tab) {
   padding: 0.2em 0.2em 0.2em 1.4em;
 }
-#article-container ul > li:not(.tab):before {
+
+#article-container ul>li:not(.tab):before {
   border: 0.21em solid var(--anzhiyu-lighttext);
   background: var(--anzhiyu-lighttext);
 }
-#article-container ul > li:not(.tab)::before {
+
+#article-container ul>li:not(.tab)::before {
   top: 0.78em;
   width: 0.42em;
   height: 0.42em;
@@ -18240,7 +18251,8 @@ body:has(.post-bg) #he-plugin-simple .s-sticker div {
   color: rgb(255, 255, 255);
   transition: all 0.3s ease-out 0s;
 }
-#article-container ol > li::before {
+
+#article-container ol>li::before {
   margin-top: 0.65em;
   width: 1.45em;
   height: 1.45em;
@@ -18251,15 +18263,18 @@ body:has(.post-bg) #he-plugin-simple .s-sticker div {
   font-size: 0.85em;
   line-height: 1.45em;
 }
+
 #article-container ol[start] {
   counter-reset: unset;
 }
+
 #article-container ol li:not(.tab),
 #article-container ul li:not(.tab) {
   position: relative;
   margin: 0.2rem 0px;
 }
-#article-container ol > li:not(.tab) {
+
+#article-container ol>li:not(.tab) {
   padding: 0.2em 0.2em 0.2em 1.8em;
 }
 
@@ -18267,27 +18282,33 @@ body:has(.post-bg) #he-plugin-simple .s-sticker div {
 #article-container .tabs {
   border: 3px solid var(--anzhiyu-secondbg) !important;
 }
+
 #article-container .tabs {
   margin: 1rem 0 !important;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: var(--anzhiyu-shadow-border);
 }
-#article-container .tabs > .nav-tabs > .tab button {
+
+#article-container .tabs>.nav-tabs>.tab button {
   border-bottom: 2px solid var(--tab-border-color);
   border-top: none !important;
 }
-#article-container .tabs > .nav-tabs > .tab.active button {
+
+#article-container .tabs>.nav-tabs>.tab.active button {
   border-bottom: 2px solid #3b70fc;
   border-top: none !important;
 }
+
 .tab-item-content {
   background: var(--anzhiyu-card-bg);
 }
+
 /* 代码框主题 */
 #article-container figure.highlight {
   border-radius: 10px;
 }
+
 #post-comment blockquote {
   background: var(--anzhiyu-secondbg);
   border: var(--style-border);
@@ -18297,7 +18318,6 @@ body:has(.post-bg) #he-plugin-simple .s-sticker div {
   color: var(--anzhiyu-secondtext);
   border-radius: 8px;
 }
-
 details.folding-tag[open] {
   border-radius: 15px !important;
   border-color: var(--anzhiyu-main) !important;
