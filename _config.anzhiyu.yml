@@ -1,11 +1,11 @@
 menu:
-  # 文章:
+  文章:
   #   隧道: /archives/ || anzhiyu-icon-box-archive
   #   分类: /categories/ || anzhiyu-icon-shapes
-  #   标签: /tags/ || anzhiyu-icon-tags
+    标签: /tags/index.html || anzhiyu-icon-tags
 
-  # 友链:
-  #   友人帐: /link/ || anzhiyu-icon-link
+  友链:
+    友人帐: /link/index.html || anzhiyu-icon-link
   #   朋友圈: /fcircle/ || anzhiyu-icon-artstation
   #   留言板: /comments/ || anzhiyu-icon-envelope
 
@@ -950,12 +950,12 @@ home_top:
       shadow: var(--anzhiyu-shadow-blue)
       class: blue
       icon: anzhiyu-icon-dove
-    - name: 大学
-      path: /categories/大学生涯/
+    - name: 未想好
+      path: /categories/未定义/
       shadow: var(--anzhiyu-shadow-red)
       class: red
       icon: anzhiyu-icon-fire
-    - name: 生活
+    - name: 日常
       path: /categories/生活日常/
       shadow: var(--anzhiyu-shadow-green)
       class: green
@@ -1105,7 +1105,7 @@ inject:
     # - <script src="/js/xxx"></script>
     - <script src="/js/jquery.js"></script> # jQuery
     - <script src="/js/sakura.js"></script> # 樱花特效
-    # 页脚养鱼
+    # 页脚养鱼--F5刷新
     - <script src="/js/fish.js"></script>
     # - <script src="https://cdn.jsdelivr.net/gh/xiabo2/CDN@latest/fish.js"></script>
 
