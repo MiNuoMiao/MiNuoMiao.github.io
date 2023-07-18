@@ -2389,9 +2389,9 @@ blockquote > :last-child {
   -ms-transform-origin: 0% 0%;
   transform-origin: 0% 0%;
 }
-#loading-box #loading-percentage {
+#loading-box .cat__scene #loading-percentage {
   position: absolute;
-  top: 75%;
+  bottom: -1%;
   left: 50%;
   color: #a7b5e9;
   -webkit-transform: translateX(-50%);
@@ -2400,15 +2400,15 @@ blockquote > :last-child {
   -ms-transform: translateX(-50%);
   transform: translateX(-50%);
 }
-#loading-box #loading-percentage::before {
+#loading-box .cat__scene #loading-percentage::before {
   content: "「";
   margin-right: 10px;
 }
-#loading-box #loading-percentage::after {
+#loading-box .cat__scene #loading-percentage::after {
   content: "」";
   margin-left: 10px;
 }
-#loading-box.loaded .loading-bg {
+#loading-box .cat__scene.loaded .loading-bg {
   opacity: 0;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
   filter: alpha(opacity=0);
@@ -6276,7 +6276,7 @@ body[data-type="link"] #page .page-title {
   margin: 0 !important;
 }
 body[data-type="music"] {
-  background: #0d0d0d;
+  background: #e2d2d2;
 }
 body[data-type="music"] .layout {
   -webkit-box-orient: horizontal;
@@ -6303,7 +6303,13 @@ body[data-type="music"] #page-header #nav {
 }
 body[data-type="music"] #page-header #nav a,
 body[data-type="music"] #page-header #nav .back-home-button {
-  color: var(--anzhiyu-white);
+  color: var(--anzhiyu-white) !important;
+}
+body[data-type="music"] #page-header #nav #center-console + label i {
+  background: var(--anzhiyu-white) !important;
+}
+body[data-type="music"] #page-header #nav .menus_items .menus_item .menus_item_child li {
+  background: #ffc0cb;
 }
 body[data-type="music"] #footer,
 body[data-type="music"] #nav-music {
@@ -6318,8 +6324,20 @@ body[data-type="music"] #web_bg {
 body[data-type="music"] .s-sticker div {
   color: var(--anzhiyu-white) !important;
 }
+body[data-type="music"] #console .button-group .console-btn-item a {
+  background: #ffc0cb;
+}
+body[data-type="music"] #center-console:checked + label::after {
+  background: #ffc0cb !important;
+}
+[data-theme="dark"] body[data-type="music"] {
+  background: #0d0d0d;
+}
 [data-theme="dark"] body[data-type="music"] .page #page-header:before {
   background-color: transparent;
+}
+[data-theme="dark"] body[data-type="music"] .page #page-header #nav .menus_items .menus_item .menus_item_child li {
+  background: transparent;
 }
 #an_music_bg {
   display: none;
@@ -6403,13 +6421,15 @@ body:has(#console.show) #nav-music {
   z-index: 2;
 }
 #anMusic-page #anMusicBtnGetSong {
-  right: 11vw;
+  right: 3.5vw;
 }
 #anMusic-page #anMusicRefreshBtn {
-  right: 7vw;
+  right: 3.5vw;
+  bottom: 29vh;
 }
 #anMusic-page #anMusicSwitching {
-  right: 15vw;
+  right: 3.5vw;
+  bottom: 21vh;
 }
 @media screen and (max-width: 768px) {
   #anMusic-page div#anMusicBtnGetSong {
@@ -6574,6 +6594,7 @@ body:has(#console.show) #nav-music {
 #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-controller .aplayer-time .aplayer-time-inner {
   margin-right: 18px;
   margin-top: -8px;
+  color: #fff;
 }
 #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-controller .aplayer-time .aplayer-icon-back {
   position: absolute;
@@ -6605,11 +6626,11 @@ body:has(#console.show) #nav-music {
   font-size: 14px;
 }
 #anMusic-page meting-js .aplayer ol > li:hover {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,225,228,0.839);
   border-radius: 6px;
 }
 #anMusic-page meting-js .aplayer ol > li.aplayer-list-light {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,225,228,0.702);
   border-radius: 6px;
   padding: 20px 15px;
 }
@@ -6620,12 +6641,12 @@ body:has(#console.show) #nav-music {
   display: none;
 }
 #anMusic-page meting-js .aplayer ol > li span {
-  color: var(--anzhiyu-white);
+  color: #fff;
 }
 #anMusic-page meting-js .aplayer ol > li span.aplayer-list-author {
-  opacity: 0.6;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=60)";
-  filter: alpha(opacity=60);
+  opacity: 0.8;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+  filter: alpha(opacity=80);
 }
 @media screen and (max-width: 768px) {
   body[data-type="music"] #rightside {
