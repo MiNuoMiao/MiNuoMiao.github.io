@@ -13,7 +13,7 @@
 #       siteshot: https://npm.elemecdn.com/anzhiyu-blog@1.1.6/img/post/common/anzhiy.cn.jpg
 
 # 会根据 flink_style 产生两种效果，可选值有flexcard或者anzhiyu
-# 当友链数目超过 50 以后会触发，与博主共同进步板块，可以自行配置 hundredSuffix: "!w120",
+# 当友链数目超过 20 以后会触发，与博主共同进步板块，可以自行配置 hundredSuffix: "!w120",
 # 该参数可以解决共同进步板块头像质量问题，配置后共同进步板块的头像会添加该后缀。
 
 - class_name: 小伙伴

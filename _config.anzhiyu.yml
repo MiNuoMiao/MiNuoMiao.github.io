@@ -10,7 +10,7 @@ menu:
   #   留言板: /comments/ || anzhiyu-icon-envelope
 
   我的:
-  #   音乐馆: /music/ || anzhiyu-icon-music
+    音乐馆: /music/?id=8560567666&server=netease || anzhiyu-icon-music
     追番页: /bangumis/index.html || anzhiyu-icon-bilibili
   #   相册集: /album/ || anzhiyu-icon-images
   #   小空调: /air-conditioner/ || anzhiyu-icon-fan
@@ -1096,18 +1096,15 @@ inject:
   head:
     # 自定义css
     # - <link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'">
-    # 鼠标样式
-    - <link rel="stylesheet" href="/css/mouse.css">
-    # 自定义样式
-    - <link rel="stylesheet" href="/css/MyStyle.css">
+    - <link rel="stylesheet" href="/css/mouse.css">    # 鼠标样式
+    - <link rel="stylesheet" href="/css/MyStyle.css">    # 自定义样式
+    # - <link rel="stylesheet" href="/css/music.css">    # 音乐css
   bottom:
     # 自定义js
     # - <script src="/js/xxx"></script>
     - <script src="/js/jquery.js"></script> # jQuery
     - <script src="/js/sakura.js"></script> # 樱花特效
-    # 页脚养鱼--F5刷新
-    - <script src="/js/fish.js"></script>
-    # - <script src="https://cdn.jsdelivr.net/gh/xiabo2/CDN@latest/fish.js"></script>
+    - <script src="/js/fish.js"></script> # 页脚养鱼--F5刷新
 
 # CDN
 # Don't modify the following settings unless you know how they work
@@ -1171,7 +1168,7 @@ CDN:
     # flickr_justified_gallery_css:
     # aplayer_css:
     # aplayer_js:
-    # meting_js:
+    meting_js: https://npm.elemecdn.com/hexo-anzhiyu-music@1.0.1/assets/js/Meting2.min.js
     # meting_api:
     # prismjs_js:
     # prismjs_lineNumber_js:

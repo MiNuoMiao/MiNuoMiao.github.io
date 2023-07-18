@@ -1,5 +1,5 @@
 body[data-type="music"]
-  background rgb(13, 13, 13)
+  background #e2d2d2
   .layout
     flex-direction: row;
   #page
@@ -15,7 +15,15 @@ body[data-type="music"]
       background 0 0 !important
       border-bottom none !important
       a, .back-home-button
-        color var(--anzhiyu-white)
+        color var(--anzhiyu-white) !important
+      #center-console + label i
+        background var(--anzhiyu-white) !important
+      .menus_items
+        .menus_item 
+          .menus_item_child 
+            li
+              background pink
+
   #footer, #nav-music
     display none
   #an_music_bg
@@ -25,13 +33,27 @@ body[data-type="music"]
   .s-sticker
     div
       color var(--anzhiyu-white) !important
+  #console
+    .button-group 
+      .console-btn-item 
+        a
+          background pink
+  #center-console:checked + label::after
+    background pink !important
 
 [data-theme="dark"]
   body[data-type="music"]
+    background #0d0d0d
     .page
       #page-header
         &:before
           background-color transparent
+        #nav
+          .menus_items
+            .menus_item 
+              .menus_item_child 
+                li
+                  background transparent
 
 
 #an_music_bg
@@ -95,11 +117,13 @@ if hexo-config('nav_music.enable') == false
     cursor: pointer;
     z-index 2
   #anMusicBtnGetSong
-    right: 11vw;
+    right: 3.5vw;
   #anMusicRefreshBtn
-    right: 7vw;
+    right: 3.5vw;
+    bottom: 29vh;
   #anMusicSwitching
-    right: 15vw;
+    right: 3.5vw;
+    bottom: 21vh;
   +maxWidth768()
     div#anMusicBtnGetSong
       right: 80px;
@@ -206,6 +230,7 @@ if hexo-config('nav_music.enable') == false
               .aplayer-time-inner
                 margin-right 18px
                 margin-top -8px
+                color white
               .aplayer-icon-back
                 position absolute
                 left 0
@@ -231,10 +256,10 @@ if hexo-config('nav_music.enable') == false
             border-top 1px solid transparent
             font-size 14px
             &:hover
-              background #ffffff33
+              background #ffe1e4d6
               border-radius 6px
             &.aplayer-list-light
-              background #ffffff33
+              background #ffe1e4b3
               border-radius 6px
               padding 20px 15px
               span.aplayer-list-title
@@ -242,9 +267,9 @@ if hexo-config('nav_music.enable') == false
               .aplayer-list-cur
                 display none
             span
-              color var(--anzhiyu-white)
+              color white
               &.aplayer-list-author
-                opacity 0.6
+                opacity 0.8
 
 
 @media screen and (max-width: 768px)

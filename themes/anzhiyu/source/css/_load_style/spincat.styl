@@ -119,22 +119,22 @@
           bottom 0
           background-position 100% 100%
           transform-origin 0% 0%
-  #loading-percentage
-    position: absolute;
-    top: 75%;
-    left: 50%;
-    color #A7B5E9
-    transform: translateX(-50%);
-    &::before
-      content: "「"
-      margin-right: 10px
-    &::after
-      content: "」"
-      margin-left: 10px
-  &.loaded
-    .loading-bg
-      opacity: 0;
-      z-index: -1000;
+     #loading-percentage
+       position: absolute;
+       bottom: -1%;
+       left: 50%;
+       color #A7B5E9
+       transform: translateX(-50%);
+       &::before
+         content: "「"
+         margin-right: 10px
+       &::after
+         content: "」"
+         margin-left: 10px
+     &.loaded
+       .loading-bg
+         opacity: 0;
+         z-index: -1000;
 
 
 @keyframes loadingAction
