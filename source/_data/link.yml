@@ -30,6 +30,12 @@
       link: https://banxia2333.github.io/
       avatar: https://banxia2333.github.io/img/logo.jpg
       descr: "xxx:我鸟大大"
+    - name: 阿豪の博客
+      hundredSuffix: ""
+      link: https://ahao.ah.cn
+      avatar: https://image.ahao.ah.cn/3cccc50598660ee1cece6e10be840f2.jpg
+      descr: 人间值得，未来可期
+      siteshot: https://image.ahao.ah.cn/b4f3987b256a963bd96cf48d75068e5.png
 
 - class_name: 推荐博客
   flink_style: flexcard
