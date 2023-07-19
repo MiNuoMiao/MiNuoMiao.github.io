@@ -79,7 +79,7 @@ if hexo-config('nav_music.console_widescreen_music') == false
       #nav-music
         display: none !important
 if hexo-config('nav_music.enable') == false
-  #nav-music
+  #nav-musicanMusicSwitching
     display: none !important
   body
     &:has(#console.show)
@@ -89,14 +89,30 @@ if hexo-config('nav_music.enable') == false
 @media screen and (max-width: 1400px)
   body
     #anMusic-page
+      meting-js 
+        .aplayer
+          .aplayer-list
+            ol
+              & > li
+                span
+                  &.aplayer-list-title
+                    width auto
+                    max-width 55%
+                    display inline-flex
+                    overflow:hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
       #anMusicSwitching, #anMusicRefreshBtn, #anMusicBtnGetSong
-        right 7vw
+        right .7vw
+        width 35px
+        height 35px
       #anMusicSwitching
-        bottom: 100px
+        bottom: 186px
       #anMusicRefreshBtn
-        bottom: 160px
+        bottom: 267px
       #anMusicBtnGetSong
-        bottom: 220px
+        bottom: 227px
+
 
 #anMusic-page
   #anMusicRefreshBtn, #anMusicBtnGetSong, #anMusicSwitching
@@ -120,19 +136,23 @@ if hexo-config('nav_music.enable') == false
     right: 3.5vw;
   #anMusicRefreshBtn
     right: 3.5vw;
-    bottom: 29vh;
+    bottom: 220px;
   #anMusicSwitching
     right: 3.5vw;
-    bottom: 21vh;
+    bottom: 160px;
   +maxWidth768()
+    #anMusicRefreshBtn, #anMusicBtnGetSong, #anMusicSwitching
+      width: 35px;
+      height: 35px;
+      opacity: .7;
     div#anMusicBtnGetSong
-      right: 80px;
-      bottom: 150px;
+      right: 21px;
+      bottom: 191px;
     div#anMusicRefreshBtn
-      right: 20px;
-      bottom: 150px;
+      right: 21px;
+      bottom: 231px;
     div#anMusicSwitching
-      right: 140px;
+      right: 21px;
       bottom: 150px;
   meting-js
     .aplayer
@@ -270,6 +290,13 @@ if hexo-config('nav_music.enable') == false
               color white
               &.aplayer-list-author
                 opacity 0.8
+                position absolute
+                right 10px
+                width auto
+                max-width 35%
+                overflow:hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
 
 
 @media screen and (max-width: 768px)
@@ -278,6 +305,10 @@ if hexo-config('nav_music.enable') == false
       display none
     #content-inner,#page
       z-index auto
+    #page-header
+      #nav
+        #site-name
+          color var(--anzhiyu-white) !important
   #anMusic-page
     meting-js 
       .aplayer
@@ -319,7 +350,7 @@ if hexo-config('nav_music.enable') == false
                   overflow hidden
                   -webkit-box-orient vertical
               &.aplayer-list-light
-                background #33a673
+                background #ffe1e4b3
                 padding 5px 20px
                 border-radius 10px
                 span
@@ -341,8 +372,10 @@ if hexo-config('nav_music.enable') == false
               min-height 100%
               mask-image linear-gradient(to bottom, #000, #000, #000, #000, #0000, #0000)
               p
+                font-size 17px
                 &.aplayer-lrc-current
-                  color #33a673
+                  color white
+                  min-height 45px
             .aplayer-controller
               width 100%
               bottom 100px
@@ -390,4 +423,3 @@ if hexo-config('nav_music.enable') == false
                   right 25px
                   top -90px
 
-      
