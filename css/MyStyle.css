@@ -51,3 +51,12 @@ h1.post-title,
 #aside-content>.card-widget.card-info .banner-button-group .banner-button:hover {
   background: #FF7280;
 }
+
+/* 手机控制台开启后的背景 */
+#sidebar #sidebar-menus.open {
+  background: #ffc7cd;
+}
+
+[data-theme='dark'] #sidebar #sidebar-menus.open {
+  background: #ffe4e600;
+}
