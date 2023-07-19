@@ -87,31 +87,18 @@ if hexo-config('nav_music.enable') == false
         display: flex !important;
 
 @media screen and (max-width: 1400px)
-  body
-    #anMusic-page
-      meting-js 
-        .aplayer
-          .aplayer-list
-            ol
-              & > li
-                span
-                  &.aplayer-list-title
-                    width auto
-                    max-width 55%
-                    display inline-flex
-                    overflow:hidden;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-      #anMusicSwitching, #anMusicRefreshBtn, #anMusicBtnGetSong
-        right .7vw
-        width 35px
-        height 35px
-      #anMusicSwitching
-        bottom: 186px
-      #anMusicRefreshBtn
-        bottom: 267px
-      #anMusicBtnGetSong
-        bottom: 227px
+  body[data-type="music"]
+  #anMusic-page
+    #anMusicSwitching, #anMusicRefreshBtn, #anMusicBtnGetSong
+      right .7vw
+      width 35px
+      height 35px
+    #anMusicSwitching
+      bottom: 186px
+    #anMusicRefreshBtn
+      bottom: 267px
+    #anMusicBtnGetSong
+      bottom: 227px
 
 
 #anMusic-page
@@ -263,7 +250,6 @@ if hexo-config('nav_music.enable') == false
                 position absolute
                 left 80px
                 display inline
-
               .aplayer-icon-menu
                 display none
 
@@ -275,6 +261,7 @@ if hexo-config('nav_music.enable') == false
           & > li
             border-top 1px solid transparent
             font-size 14px
+            display flex
             &:hover
               background #ffe1e4d6
               border-radius 6px
@@ -288,15 +275,23 @@ if hexo-config('nav_music.enable') == false
                 display none
             span
               color white
+              &.aplayer-list-title
+                  width auto
+                  max-width 55%
+                  overflow hidden
+                  display -webkit-inline-box
+                  -webkit-line-clamp 1
+                  -webkit-box-orient vertical
               &.aplayer-list-author
                 opacity 0.8
                 position absolute
                 right 10px
                 width auto
                 max-width 35%
-                overflow:hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
+                display -webkit-inline-box
+                -webkit-line-clamp 1
+                overflow hidden
+                -webkit-box-orient vertical
 
 
 @media screen and (max-width: 768px)
