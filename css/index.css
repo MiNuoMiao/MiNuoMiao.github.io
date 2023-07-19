@@ -6370,34 +6370,26 @@ body:has(#console.show) #nav-music {
   display: none !important;
 }
 @media screen and (max-width: 1400px) {
-  body #anMusic-page meting-js .aplayer .aplayer-list ol > li span.aplayer-list-title {
-    width: auto;
-    max-width: 55%;
-    display: -webkit-inline-box;
-    display: -moz-inline-box;
-    display: -webkit-inline-flex;
-    display: -ms-inline-flexbox;
-    display: inline-box;
-    display: inline-flex;
-    overflow: hidden;
-    white-space: nowrap;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-  }
-  body #anMusic-page #anMusicSwitching,
-  body #anMusic-page #anMusicRefreshBtn,
-  body #anMusic-page #anMusicBtnGetSong {
+  body[data-type="music"] #anMusicSwitching,
+  #anMusic-page #anMusicSwitching,
+  body[data-type="music"] #anMusicRefreshBtn,
+  #anMusic-page #anMusicRefreshBtn,
+  body[data-type="music"] #anMusicBtnGetSong,
+  #anMusic-page #anMusicBtnGetSong {
     right: 0.7vw;
     width: 35px;
     height: 35px;
   }
-  body #anMusic-page #anMusicSwitching {
+  body[data-type="music"] #anMusicSwitching,
+  #anMusic-page #anMusicSwitching {
     bottom: 186px;
   }
-  body #anMusic-page #anMusicRefreshBtn {
+  body[data-type="music"] #anMusicRefreshBtn,
+  #anMusic-page #anMusicRefreshBtn {
     bottom: 267px;
   }
-  body #anMusic-page #anMusicBtnGetSong {
+  body[data-type="music"] #anMusicBtnGetSong,
+  #anMusic-page #anMusicBtnGetSong {
     bottom: 227px;
   }
 }
@@ -6649,6 +6641,12 @@ body:has(#console.show) #nav-music {
 #anMusic-page meting-js .aplayer ol > li {
   border-top: 1px solid transparent;
   font-size: 14px;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: box;
+  display: flex;
 }
 #anMusic-page meting-js .aplayer ol > li:hover {
   background: rgba(255,225,228,0.839);
@@ -6668,6 +6666,14 @@ body:has(#console.show) #nav-music {
 #anMusic-page meting-js .aplayer ol > li span {
   color: #fff;
 }
+#anMusic-page meting-js .aplayer ol > li span.aplayer-list-title {
+  width: auto;
+  max-width: 55%;
+  overflow: hidden;
+  display: -webkit-inline-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
 #anMusic-page meting-js .aplayer ol > li span.aplayer-list-author {
   opacity: 0.8;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
@@ -6676,10 +6682,10 @@ body:has(#console.show) #nav-music {
   right: 10px;
   width: auto;
   max-width: 35%;
+  display: -webkit-inline-box;
+  -webkit-line-clamp: 1;
   overflow: hidden;
-  white-space: nowrap;
-  -o-text-overflow: ellipsis;
-  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
 }
 @media screen and (max-width: 768px) {
   body[data-type="music"] #rightside {
