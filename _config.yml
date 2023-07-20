@@ -118,7 +118,7 @@ live2d:
   tagMode: false # 标签模式, 是否仅替换 live2d tag标签而非插入到所有页面中
   debug: false # 调试, 是否在控制台输出日志
   model:
-    use: live2d-widget-model-koharu # npm-module package name
+    use: live2d-widget-model-tororo # npm-module package name
     # use: https://unpkg.com/live2d-widget-model-koharu@1.0.5/assets/koharu.model.json # 你的自定义 url
   display:
     position: left # 控制看板娘位置
