@@ -1,28 +1,43 @@
 hexo.extend.generator.register("random", function (locals) {
-  const config = hexo.config.random || {};
-  const themeConfig = hexo.theme.config;
-  const randomNumberFriend = themeConfig.footer.list.randomFriends || 0;
-  const posts = [];
-  const link = locals.data.link || [];
+  const config = hexo.config.random || {}
+  const themeConfig = hexo.theme.config
+  const randomNumberFriend = themeConfig.footer.list.randomFriends || 0
+  const posts = []
+  const link = locals.data.link || []
   for (const post of locals.posts.data) {
-    if (post.random !== false) posts.push(post.path);
+    if (post.random !== false) posts.push(post.path)
   }
 
-  const link_list = [];
+  const link_list = []
 
   link.forEach(element => {
     element.link_list.forEach(link_list_item => {
-      link_list.push(link_list_item);
-    });
-  });
+      link_list.push(link_list_item)
+    })
+  })
 
   let result = `var posts=${JSON.stringify(
     posts
-  )};function toRandomPost(){pjax.loadUrl('/'+posts[Math.floor(Math.random() * posts.length)]);};`;
+  )};function toRandomPost(){pjax.loadUrl('/'+posts[Math.floor(Math.random() * posts.length)]);};`
 
   if (themeConfig.footer.list.enable && randomNumberFriend > 0) {
     result += `var friend_link_list=${JSON.stringify(link_list)};
     var refreshNum = 1;
+    function friendChainRandomTransmission() {
+      const randomIndex = Math.floor(Math.random() * friend_link_list.length);
+      const { name, link } = friend_link_list.splice(randomIndex, 1)[0];
+      Snackbar.show({
+        text:
+          "点击前往按钮进入随机一个友链，不保证跳转网站的安全性和可用性。本次随机到的是本站友链：「" + name + "」",
+        duration: 8000,
+        pos: "top-center",
+        actionText: "前往",
+        onActionClick: function (element) {
+          element.style.opacity = 0;
+          window.open(link, "_blank");
+        },
+      });
+    }
     function addFriendLinksInFooter() {
       var footerRandomFriendsBtn = document.getElementById("footer-random-friends-btn");
       if(!footerRandomFriendsBtn) return;
@@ -59,10 +74,10 @@ hexo.extend.generator.register("random", function (locals) {
       setTimeout(()=>{
         footerRandomFriendsBtn.style.opacity = "1";
       }, 300)
-    };`;
+    };`
   }
   return {
     path: config.path || "anzhiyu/random.js",
     data: result,
-  };
-});
+  }
+})
