@@ -15,7 +15,7 @@ var RENDERER = {
   setParameters: function () {
     this.$window = $(window)
     this.$container = $('#jsi-flying-fish-container')
-    this.$canvas = $('<canvas />')
+    this.$canvas = $('<canvas id="fish" />')
     this.context = this.$canvas.appendTo(this.$container).get(0).getContext('2d')
     this.points = []
     this.fishes = []
@@ -143,11 +143,12 @@ var RENDERER = {
     requestAnimationFrame(this.render)
     this.controlStatus()
     this.context.clearRect(0, 0, this.width, this.height)
-    if (this.htmlValue === 'dark') {
-      this.context.fillStyle = '#30343f'
-    } else if (this.htmlValue === 'light') {
-      this.context.fillStyle = '#f1f3f8'
-    }
+    this.context.fillStyle = '#f1f3f8'
+    // if (this.htmlValue === 'dark') {
+    //   this.context.fillStyle = '#30343f'
+    // } else if (this.htmlValue === 'light') {
+    //   this.context.fillStyle = '#f1f3f8'
+    // }
 
     for (var i = 0, count = this.fishes.length; i < count; i++) {
       this.fishes[i].render(this.context)
