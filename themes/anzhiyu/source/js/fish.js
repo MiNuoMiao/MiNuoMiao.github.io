@@ -20,6 +20,7 @@ var RENDERER = {
     this.points = []
     this.fishes = []
     this.watchIds = []
+    this.htmlValue = $('html').data('theme')
   },
   createSurfacePoints: function () {
     var count = Math.round(this.width / this.POINT_INTERVAL)
@@ -142,7 +143,11 @@ var RENDERER = {
     requestAnimationFrame(this.render)
     this.controlStatus()
     this.context.clearRect(0, 0, this.width, this.height)
-    this.context.fillStyle = 'hsl(0, 0%, 95%)'
+    if (this.htmlValue === 'dark') {
+      this.context.fillStyle = '#30343f'
+    } else if (this.htmlValue === 'light') {
+      this.context.fillStyle = '#f1f3f8'
+    }
 
     for (var i = 0, count = this.fishes.length; i < count; i++) {
       this.fishes[i].render(this.context)

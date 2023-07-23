@@ -383,7 +383,7 @@ footer:
     since: 2023
   custom_text:
   runtime:
-    enable: false
+    enable: true
     launch_time: 2023/07/10 09:00:00 # 网站上线时间
     work_img: /img/上班摸鱼.svg
     work_description: 距离月入10k也就还差一个大佬带我~
@@ -392,7 +392,7 @@ footer:
   # 徽标部分配置项 https://shields.io/
   # https://img.shields.io/badge/CDN-jsDelivr-orange?style=flat&logo=jsDelivr
   bdageitem:
-    enable: false
+    enable: true
     list:
       - link: https://hexo.io/ #徽标指向网站链接
         shields: https://npm.elemecdn.com/anzhiyu-blog@2.1.5/img/badge/Frame-Hexo.svg #徽标API
@@ -1118,9 +1118,9 @@ inject:
   bottom:
     # 自定义js
     # - <script src="/js/xxx"></script>
-    - <script src="/js/jquery.js"></script> # jQuery
+    # - <script src="/js/jquery.js"></script> # jQuery
     - <script src="/js/sakura.js"></script> # 樱花特效
-    - <script src="/js/fish.js"></script> # 页脚养鱼--F5刷新
+    # - <script src="/js/fish.js"></script> # 页脚养鱼--F5刷新
 
 # CDN
 # Don't modify the following settings unless you know how they work
