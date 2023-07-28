@@ -76,7 +76,7 @@
   --anzhiyu-blue-main: #3b70fc;
   --style-border-hover: 1px solid var(--anzhiyu-main);
   --style-border-dashed: 1px dashed var(--anzhiyu-theme-op);
-  --style-border-avatar: 4px solid var(--anzhiyu-background);
+  --style-border-avatar: 5px solid var(--anzhiyu-white);
   --style-border-always: 1px solid var(--anzhiyu-card-border);
   --style-border-none: 1px solid transparent;
   --style-border-deep-ash: 1px solid #d0d7de;
@@ -332,6 +332,7 @@ if hexo-config('lazyload.enable') && hexo-config('lazyload.blur') && !hexo-confi
 
     &[data-lazy-src].error
       filter: none
+      opacity 1 !important
 
 // lazyload progressive
 if hexo-config('lazyload.enable') && hexo-config('lazyload.progressive') && !hexo-config('lazyload.placeholder')

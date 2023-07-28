@@ -6,6 +6,16 @@ instantsearch_v4:
   name: instantsearch.js
   file: dist/instantsearch.production.min.js
   version: 4.46.1
+docsearch_js:
+  name: '@docsearch/js'
+  other_name: docsearch-js
+  file: dist/umd/index.js
+  version: 3.5.1
+docsearch_css:
+  name: '@docsearch/css'
+  other_name: docsearch-css
+  file: dist/style.css
+  version: 3.5.1
 pjax:
   name: pjax
   file: pjax.min.js
@@ -21,7 +31,7 @@ valine:
 twikoo:
   name: twikoo
   file: dist/twikoo.all.min.js
-  version: 1.6.16
+  version: 1.6.17
 waline_js:
   name: "@waline/client"
   file: dist/waline.js
@@ -208,7 +218,7 @@ waterfall:
 ali_iconfont_css:
   name: anzhiyu-theme-static
   file: icon/ali_iconfont_css.css
-  version: 1.1.8
+  version: 1.1.9
 accesskey_js:
   name: anzhiyu-theme-static
   file: accesskey/accesskey.js

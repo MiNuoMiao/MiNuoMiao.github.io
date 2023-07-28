@@ -6,13 +6,13 @@
 
 预览: 👍 [AnZhiYu](https://blog.anheyu.com/) || 🤞 [AnZhiYu](https://index.anheyu.com/)
 
-文档: 📖 [anzhiyu Docs](https://blog.anheyu.com/docs/)
+文档: 📖 [anzhiyu Docs](https://docs.anheyu.com/)
 
 一款基于[hexo-theme-butterfly](https://github.com/jerryc127/hexo-theme-butterfly)修改的主題
 
 # hexo-theme-anzhiyu
 
-![](https://img02.anheyu.com/adminuploads/1/2023/04/12/64367c8fdcc7f.webp)
+![](https://bu.dusays.com/2023/07/24/64bdcbfe96762.webp)
 
 ## 💻 安裝
 

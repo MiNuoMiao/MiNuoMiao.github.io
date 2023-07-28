@@ -1,5 +1,7 @@
 // 第一次播放音乐
 var anzhiyu_musicFirst = false
+// 快捷键
+var anzhiyu_keyboard = null
 // 音乐播放状态
 var anzhiyu_musicPlaying = false
 var $web_container = document.getElementById("web_container")
@@ -1237,60 +1239,116 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   //封面纯色
-  const coverColor = () => {
+  const coverColor = async () => {
     const root = document.querySelector(":root")
     const path = document.getElementById("post-top-bg")?.src
-
     if (!path) {
+      // 非文章情况，直接设置不需要请求了
       root.style.setProperty("--anzhiyu-bar-background", "var(--anzhiyu-meta-theme-color)")
       anzhiyu.initThemeColor()
 
-      if (GLOBAL_CONFIG.changeMainColorPost) {
-        document.documentElement.style.setProperty(
-          "--anzhiyu-main",
-          getComputedStyle(document.documentElement).getPropertyValue("--anzhiyu-theme")
-        )
+      // 要改回来默认主色
+      document.documentElement.style.setProperty(
+        "--anzhiyu-main",
+        getComputedStyle(document.documentElement).getPropertyValue("--anzhiyu-theme")
+      )
+      document.documentElement.style.setProperty(
+        "--anzhiyu-theme-op",
+        getComputedStyle(document.documentElement).getPropertyValue("--anzhiyu-main") + "23"
+      )
+      document.documentElement.style.setProperty(
+        "--anzhiyu-theme-op-deep",
+        getComputedStyle(document.documentElement).getPropertyValue("--anzhiyu-main") + "dd"
+      )
+
+
+      return
+    }
+
+    // 文章内
+    if (GLOBAL_CONFIG.mainTone) {
+      const fallbackValue = "var(--anzhiyu-theme)"
+      let fetchPath = ""
+      if (GLOBAL_CONFIG.mainTone.mode == "cdn" || GLOBAL_CONFIG.mainTone.mode == "both") {
+        fetchPath = path + "?imageAve"
+      } else if (GLOBAL_CONFIG.mainTone.mode == "api") {
+        fetchPath = GLOBAL_CONFIG.mainTone.api + path
       }
-
-      return
-    }
-
-    if (!GLOBAL_CONFIG.changeMainColorPost) {
-      root.style.setProperty("--anzhiyu-bar-background", "var(--anzhiyu-theme)")
-      anzhiyu.initThemeColor()
-      return
-    }
-    const httpRequest = new XMLHttpRequest()
-    httpRequest.open("GET", `${path}?imageAve`, true)
-    httpRequest.send()
-
-    httpRequest.onreadystatechange = () => {
-      const isRequestCompleted = httpRequest.readyState === 4
-      const isSuccess = isRequestCompleted && httpRequest.status === 200
-
-      let value
-
-      if (isSuccess) {
-        try {
-          const obj = JSON.parse(httpRequest.responseText)
-          value = "#" + obj.RGB.slice(2)
-
+      // cdn/api模式请求
+      try {
+        const response = await fetch(fetchPath)
+        if (response.ok && response.headers.get("content-type")?.includes("application/json")) {
+          const obj = await response.json()
+          let value =
+            GLOBAL_CONFIG.mainTone.mode == "cdn" || GLOBAL_CONFIG.mainTone.mode == "both"
+              ? "#" + obj.RGB.slice(2)
+              : obj.RGB
           if (getContrastYIQ(value) === "light") {
             value = LightenDarkenColor(colorHex(value), -40)
           }
-        } catch (err) {
-          value = "var(--anzhiyu-theme)"
-        }
-      } else if (isRequestCompleted) {
-        value = "var(--anzhiyu-theme)"
-      }
 
-      if (value) {
-        root.style.setProperty("--anzhiyu-bar-background", value)
-        anzhiyu.initThemeColor()
-        if (GLOBAL_CONFIG.changeMainColorPost) {
-          document.documentElement.style.setProperty("--anzhiyu-main", value)
+          root.style.setProperty("--anzhiyu-bar-background", value)
+          anzhiyu.initThemeColor()
+
+          if (GLOBAL_CONFIG.mainTone.cover_change) {
+            document.documentElement.style.setProperty("--anzhiyu-main", value)
+            document.documentElement.style.setProperty(
+              "--anzhiyu-theme-op",
+              getComputedStyle(document.documentElement).getPropertyValue("--anzhiyu-main") + "23"
+            )
+            document.documentElement.style.setProperty(
+              "--anzhiyu-theme-op-deep",
+              getComputedStyle(document.documentElement).getPropertyValue("--anzhiyu-main") + "dd"
+            )
+          }
+        } else {
+          if (GLOBAL_CONFIG.mainTone.mode == "both") {
+            // both继续请求
+            try {
+              const response = await fetch(GLOBAL_CONFIG.mainTone.api + path)
+              if (response.ok && response.headers.get("content-type")?.includes("application/json")) {
+                const obj = await response.json()
+                let value = obj.RGB
+
+                if (getContrastYIQ(value) === "light") {
+                  value = LightenDarkenColor(colorHex(value), -40)
+                }
+
+                root.style.setProperty("--anzhiyu-bar-background", value)
+                anzhiyu.initThemeColor()
+
+                if (GLOBAL_CONFIG.mainTone.cover_change) {
+                  document.documentElement.style.setProperty("--anzhiyu-main", value)
+                  document.documentElement.style.setProperty(
+                    "--anzhiyu-theme-op",
+                    getComputedStyle(document.documentElement).getPropertyValue("--anzhiyu-main") + "23"
+                  )
+                  document.documentElement.style.setProperty(
+                    "--anzhiyu-theme-op-deep",
+                    getComputedStyle(document.documentElement).getPropertyValue("--anzhiyu-main") + "dd"
+                  )
+                }
+              } else {
+                root.style.setProperty("--anzhiyu-bar-background", fallbackValue)
+                anzhiyu.initThemeColor()
+                document.documentElement.style.setProperty("--anzhiyu-main", fallbackValue)
+              }
+            } catch {
+              root.style.setProperty("--anzhiyu-bar-background", fallbackValue)
+              anzhiyu.initThemeColor()
+              document.documentElement.style.setProperty("--anzhiyu-main", fallbackValue)
+            }
+          } else {
+            root.style.setProperty("--anzhiyu-bar-background", fallbackValue)
+            anzhiyu.initThemeColor()
+            document.documentElement.style.setProperty("--anzhiyu-main", fallbackValue)
+          }
         }
+      } catch (err) {
+        console.error("Error fetching data:", err)
+        root.style.setProperty("--anzhiyu-bar-background", fallbackValue)
+        anzhiyu.initThemeColor()
+        document.documentElement.style.setProperty("--anzhiyu-main", fallbackValue)
       }
     }
   }
@@ -1430,7 +1488,6 @@ document.addEventListener("DOMContentLoaded", function () {
       anzhiyu.isHidden(document.getElementById("toggle-menu")) && mobileSidebarOpen && sidebarFn.close()
     })
 
-
     anzhiyu.darkModeStatus()
 
     document.getElementById("menu-mask").addEventListener("click", e => {
@@ -1439,6 +1496,11 @@ document.addEventListener("DOMContentLoaded", function () {
     GLOBAL_CONFIG.islazyload && lazyloadImg()
     GLOBAL_CONFIG.copyright !== undefined && addCopyright()
     GLOBAL_CONFIG.navMusic && listenNavMusicPause()
+    if (GLOBAL_CONFIG.shortcutKey && document.getElementById("consoleKeyboard")) {
+      localStorage.setItem("keyboardToggle", "true")
+      document.getElementById("consoleKeyboard").classList.add("on")
+      anzhiyu_keyboard = true
+    }
     clickFnOfSubMenu()
   }
 

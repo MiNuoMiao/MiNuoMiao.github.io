@@ -60,10 +60,7 @@ copy:
 #   name: link || icon
 social:
   # Github: https://github.com/anzhiyu-c || anzhiyu-icon-github
-  # Email: https://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=2268025923@qq.com || anzhiyu-icon-envelope
-  # RSS: atom.xml || anzhiyu-icon-rss
   # BiliBili: https://space.bilibili.com/372204786 || anzhiyu-icon-bilibili
-  # QQ: tencent://Message/?Uin=2268025923&amp;websiteName=local.edu.com:8888=&amp;Menu=yes || anzhiyu-icon-qq
 
 author_status:
   enable: false
@@ -81,6 +78,53 @@ algolia_search:
   enable: false
   hits:
     per_page: 6
+
+# Docsearch
+# Apply and Docs: see https://docsearch.algolia.com/
+# Crawler Admin Console: see https://crawler.algolia.com/
+# Settings: https://www.algolia.com/
+docsearch:
+  enable: false
+  appId:  # see email
+  apiKey:  # see email
+  indexName:  # see email
+  option:
+    placeholder: 'Ctrl/⌘ + K 唤醒搜索服务'
+    maxResultsPerGroup: 7
+    translations:
+      button:
+        buttonText: '搜索'
+        buttonAriaLabel: '搜索'
+      modal:
+        searchBox:
+          resetButtonTitle: '清空'
+          resetButtonAriaLabel: '清空'
+          cancelButtonText: '取消'
+          cancelButtonAriaLabel: '取消'
+        startScreen:
+          recentSearchesTitle: '最近搜索历史'
+          noRecentSearchesText: '搜索历史为空'
+          saveRecentSearchButtonTitle: '保存搜索记录'
+          removeRecentSearchButtonTitle: '清除搜索记录'
+          favoriteSearchesTitle: '收藏夹'
+          removeFavoriteSearchButtonTitle: '移出收藏夹'
+        errorScreen:
+          titleText: '未能获取搜索结果'
+          helpText: '您可能需要检查您的网络连接'
+        footer:
+          selectText: '选择'
+          selectKeyAriaLabel: '回车键'
+          navigateText: '切换'
+          navigateUpKeyAriaLabel: '方向键上'
+          navigateDownKeyAriaLabel: '方向键下'
+          closeText: '关闭'
+          closeKeyAriaLabel: '退出键'
+          searchByText: '搜索服务提供: DocSearch by'
+        noResultsScreen:
+          noResultsText: '未搜索到相关内容'
+          suggestedQueryText: '您可尝试搜索'
+          reportMissingResultsText: '确认搜索结果是正确的？'
+          reportMissingResultsLinkText: '反馈给Algolia'
 
 # Local search
 local_search:
@@ -110,7 +154,7 @@ katex:
 # --------------------------------------
 
 # Favicon（网站图标）
-favicon: /img/miao.ico
+favicon: /miao.ico
 
 # Avatar (头像)
 avatar:
@@ -136,7 +180,7 @@ cover:
   position: both
   # When cover is not set, the default cover is displayed (当没有设置cover时，默认的封面显示)
   default_cover:
-    - /img/default_cover.jpg
+    # - /img/default_cover.jpg
 
 # Replace Broken Images (替换无法显示的图片)
 error_img:
@@ -162,8 +206,15 @@ post_meta:
     categories: true # true or false 文章页是否显示分类
     tags: true # true or false 文章页是否显示标籤
     label: true # true or false 显示描述性文字
-    mainTone: false # true or false 文章顶部图片是否使用主色调
     unread: false # true or false 文章未读功能
+
+# 主色调相关配置
+mainTone:
+  enable: false # true or false 文章是否启用获取图片主色调
+  mode: api # cdn/api/both cdn模式为图片url+imageAve参数获取主色调，api模式为请求API获取主色调，both模式会先请求cdn参数，无法获取的情况下将请求API获取
+  # 项目地址：https://github.com/anzhiyu-c/img2color-go
+  api: https://img2color-go.vercel.app/api?img= # mode为api时可填写
+  cover_change: true # 整篇文章跟随cover修改主色调
 
 # wordcount (字数统计)
 # see https://butterfly.js.org/posts/ceeb73f/#字数统计
@@ -204,6 +255,10 @@ post_copyright:
   location: 成都
   license: CC BY-NC-SA 4.0
   license_url: https://creativecommons.org/licenses/by-nc-sa/4.0/
+  avatarSinks: false # hover时头像下沉
+  copyright_author_img_back:
+  copyright_author_img_front:
+  copyright_author_link: /
 
 # Sponsor/reward 文章打赏
 reward:
@@ -251,12 +306,6 @@ noticeOutdate:
 
 # Share System (分享功能)
 # --------------------------------------
-
-# AddThis
-# https://www.addthis.com/
-addThis:
-  enable: false
-  pubid:
 
 # Share.js
 # https://github.com/overtrue/share.js
@@ -363,12 +412,6 @@ daovoice:
   enable: false
   app_id:
 
-# gitter
-# https://gitter.im/
-gitter:
-  enable: false
-  room:
-
 # crisp
 # https://crisp.chat/en/
 crisp:
@@ -415,23 +458,29 @@ footer:
     left:
       # - title: email
       #   link: mailto:anzhiyu-c@qq.com
-      #   icon: anzhiyufont anzhiyu-icon-envelope
+      #   icon: anzhiyu-icon-envelope
       # - title: 微博
       #   link: https://weibo.com/u/6378063631
-      #   icon: anzhiyufont anzhiyu-icon-weibo
+      #   icon: anzhiyu-icon-weibo
       # - title: facebook
       #   link: https://www.facebook.com/profile.php?id=100092208016287&sk=about
-      #   icon: anzhiyufont anzhiyu-icon-facebook1
+      #   icon: anzhiyu-icon-facebook1
+      # - title: RSS
+      #   link: atom.xml
+      #   icon: anzhiyu-icon-rss
     right:
       # - title: Github
       #   link: https://github.com/anzhiyu-c
-      #   icon: anzhiyufont anzhiyu-icon-github
+      #   icon: anzhiyu-icon-github
       # - title: Bilibili
       #   link: https://space.bilibili.com/372204786
-      #   icon: anzhiyufont anzhiyu-icon-bilibili
+      #   icon: anzhiyu-icon-bilibili
       # - title: 抖音
       #   link: https://v.douyin.com/DwCpMEy/
-      #   icon: anzhiyufont anzhiyu-icon-tiktok
+      #   icon: anzhiyu-icon-tiktok
+      # - title: CC
+      #   link: /copyright
+      #   icon: anzhiyu-icon-copyright-line
   list:
     enable: false
     randomFriends: 3
@@ -480,6 +529,16 @@ footer:
       #   text: 图床
       - link: https://beian.miit.gov.cn/
         text: 湘ICP备-xxxxxxx号
+    typing:
+      enable: false
+      strings:
+        - "愿岁并谢，与友长兮。"
+        - "Forever friends, always grateful."
+      startDelay: 200
+      backDelay: 2000
+      typeSpeed: 100
+      loop: true
+      backSpeed: 20
 # Analysis
 # --------------------------------------
 
@@ -540,7 +599,6 @@ site_verification:
 
 theme_color:
   enable: true
-  cover_change: false # 整篇文章跟随cover修改主色调
   main: "#ff98a2"
   dark_main: "#FFB2B9"
   paginator: "#ff98a2"
@@ -655,7 +713,7 @@ beautify:
 # Global font settings
 # Don't modify the following settings unless you know how they work (非必要不要修改)
 font:
-  global-font-size: 17px
+  global-font-size: 16px
   code-font-size:
   font-family: ZhuZiAYuanJWD
   code-font-family: ZhuZiAYuanJWD, consolas, Menlo, "PingFang SC", "Microsoft JhengHei", "Microsoft YaHei", sans-serif
@@ -715,20 +773,28 @@ aside:
   button: true
   mobile: true # display on mobile
   position: left # left or right
-  display:
+  display: # 控制对应详情页面是否显示侧边栏
     archive: true
     tag: true
-    category: false
+    category: true
   card_author:
     enable: true
-    type: 1 # 1为使用头像card 2为不使用头像card
-    description: # 默认为站点描述
-    info_background: /img/bg.jpg # type为1时有效
-    button:
+    # type: 1 # 1为使用头像card 2为不使用头像card
+    # description: # 默认为站点描述
+    # info_background: /img/bg.jpg # type为1时有效
+    # button:
+    description: # <div style="line-height:1.38;margin:0.6rem 0;text-align:justify;color:rgba(255, 255, 255, 0.8);">这有关于<b style="color:#fff">产品、设计、开发</b>相关的问题和看法，还有<b style="color:#fff">文章翻译</b>和<b style="color:#fff">分享</b>。</div><div style="line-height:1.38;margin:0.6rem 0;text-align:justify;color:rgba(255, 255, 255, 0.8);">相信你可以在这里找到对你有用的<b style="color:#fff">知识</b>和<b style="color:#fff">教程</b>。</div> # 默认为站点描述
+    author_status:
       enable: true
-      icon: anzhiyu-icon-arrow-circle-right
-      text: 喵喵!!!
-      link: /about/
+      status: ✍️
+      alias: writing_hand
+      fallback_src: https://img02.anheyu.com/adminuploads/1/2023/02/18/63f0281af0c8c.png
+      text: on Studying
+    name_link: /
+      # icon: anzhiyu-icon-arrow-circle-right
+      # text: 喵喵!!!
+      # link: /about/
+
   card_announcement:
     enable: true
     content: 公告? 没有公告! # 公告
@@ -980,7 +1046,7 @@ home_top:
     tips: 更多推荐
     title: 更多!!
     image: https://bu.dusays.com/2023/05/13/645fa3cf90d70.webp
-    link: # 网址
+    link: # 网址 https://docs.anheyu.com/
 
 # 朋友圈配置
 friends_vue:
@@ -1105,6 +1171,9 @@ linkPageTop:
   enable: false
   title: 与数百名博主无限进步
 
+# 缩略图后缀 archive/tag/category 页面单独开启后缀
+pageThumbnailSuffix: ''
+
 # Inject
 # Insert the code to head (before '</head>' tag) and the bottom (before '</body>' tag)
 # 插入代码到头部 </head> 之前 和 底部 </body> 之前
@@ -1127,20 +1196,20 @@ inject:
 # 非必要请不要修改
 CDN:
   # The CDN provider of internal scripts (主题内部 js 的 cdn 配置)
-  # option: local/elemecdn/jsdelivr/unpkg/cdnjs/custom
+  # option: local/elemecdn/jsdelivr/unpkg/cdnjs/onmicrosoft/cbd/custom
   # Dev version can only choose. ( dev版的主题只能设置为 local )
-  internal_provider: elemecdn
+  internal_provider: local
 
   # The CDN provider of third party scripts (第三方 js 的 cdn 配置)
-  # option: elemecdn/jsdelivr/unpkg/cdnjs/custom
-  third_party_provider: elemecdn
+  # option: local/elemecdn/jsdelivr/unpkg/cdnjs/onmicrosoft/cbd/custom
+  third_party_provider: cbd
 
   # Add version number to CDN, true or false
   version: true
 
   # Custom format
   # For example: https://cdn.staticfile.org/${cdnjs_name}/${version}/${min_cdnjs_file}
-  custom_format: https://npm.elemecdn.com/${name}@latest/${file}
+  custom_format: # https://npm.elemecdn.com/${name}@latest/${file}
 
   option:
     # main_css:
