@@ -24,6 +24,10 @@ h1.post-title,
   font-family: 'ZhuZiAYuanJWD';
 } */
 
+
+
+/* 外置特效 */
+
 /* 樱花特效 */
 #canvas_sakura {
   z-index: 2;
@@ -39,11 +43,16 @@ h1.post-title,
   pointer-events: none;
 }
 
-/* 页底字体 */
-#workboard {
-  font-size: 16px;
+/* live 2d */
+#live2d-widget {
+  bottom: -8px !important;
 }
 
+/* ... */
+
+
+
+/* 侧边栏 */
 
 /* 侧边栏标签及标题字体更改及顶部打字特效字体 */
 .author-info__name,
@@ -53,10 +62,28 @@ h1.post-title,
   color: var(--anzhiyu-white);
 }
 
-/* 侧边栏按钮hover */
-#aside-content>.card-widget.card-info .banner-button-group .banner-button:hover {
-  background: #FF7280;
+/* 作者页卡片背景 */
+#aside-content>.card-widget.card-info {
+  background: url(https://cdn.jsdelivr.net/gh/MiNuoMiao/MaoMi@main/img/bg.webp) center / cover no-repeat;
 }
+
+/* ... */
+
+
+
+
+/* 页底 */
+
+/* 页底字体 */
+#workboard {
+  font-size: 16px;
+}
+
+/* ... */
+
+
+
+/* 手机 */
 
 /* 手机控制台开启后的背景 */
 #sidebar #sidebar-menus.open {
@@ -67,7 +94,4 @@ h1.post-title,
   background: #ffe4e600;
 }
 
-/* live 2d */
-#live2d-widget {
-  bottom: -8px !important;
-}
+/* ... */
