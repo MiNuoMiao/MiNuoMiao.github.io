@@ -59,15 +59,25 @@ copy:
 # formal:
 #   name: link || icon
 social:
-  # Github: https://github.com/anzhiyu-c || anzhiyu-icon-github
-  # BiliBili: https://space.bilibili.com/372204786 || anzhiyu-icon-bilibili
+  Github: https://github.com/anzhiyu-c || anzhiyu-icon-github
+  BiliBili: https://space.bilibili.com/372204786 || anzhiyu-icon-bilibili
 
+# 作者卡片 状态
 author_status:
   enable: false
   status: ✍️
   alias: writing_hand
   fallback_src: https://github.githubassets.com/images/icons/emoji/unicode/270d.png
   text: on Studying
+  skills:
+    # - 🤖️ 数码科技爱好者
+    # - 🔍 分享与热心帮助
+    # - 🏠 智能家居小能手
+    # - 🔨 设计开发一条龙
+    # - 🤝 专修交互与设计
+    # - 🏃 脚踏实地行动派
+    # - 🧱 团队小组发动机
+    # - 💢 壮汉人狠话不多
 
 # search (搜索)
 # see https://butterfly.js.org/posts/ceeb73f/#搜索系统
@@ -528,7 +538,7 @@ footer:
       # - link: https://image.anheyu.com
       #   text: 图床
       - link: https://beian.miit.gov.cn/
-        text: 湘ICP备-xxxxxxx号
+        text: 粤ICP备-xxxxxxx号
     typing:
       enable: false
       strings:
@@ -779,21 +789,17 @@ aside:
     category: true
   card_author:
     enable: true
-    # type: 1 # 1为使用头像card 2为不使用头像card
-    # description: # 默认为站点描述
-    # info_background: /img/bg.jpg # type为1时有效
-    # button:
-    description: # <div style="line-height:1.38;margin:0.6rem 0;text-align:justify;color:rgba(255, 255, 255, 0.8);">这有关于<b style="color:#fff">产品、设计、开发</b>相关的问题和看法，还有<b style="color:#fff">文章翻译</b>和<b style="color:#fff">分享</b>。</div><div style="line-height:1.38;margin:0.6rem 0;text-align:justify;color:rgba(255, 255, 255, 0.8);">相信你可以在这里找到对你有用的<b style="color:#fff">知识</b>和<b style="color:#fff">教程</b>。</div> # 默认为站点描述
+    # info_background: /img/bg.jpg # type为1时有效 (已删改)
+    description: <div style="line-height:1.38;margin:0.6rem 0;text-align:justify;color:rgba(255, 255, 255, 0.8);">这有关于<b style="color:#fff">产品、设计、开发</b>相关的问题和看法，还有<b style="color:#fff">文章翻译</b>和<b style="color:#fff">分享</b>。</div><div style="line-height:1.38;margin:0.6rem 0;text-align:justify;color:rgba(255, 255, 255, 0.8);">相信你可以在这里找到对你有用的<b style="color:#fff">知识</b>和<b style="color:#fff">教程</b>。</div> # 默认为站点描述
     author_status:
       enable: true
       status: ✍️
       alias: writing_hand
       fallback_src: https://img02.anheyu.com/adminuploads/1/2023/02/18/63f0281af0c8c.png
-      text: on Studying
-    name_link: /
-      # icon: anzhiyu-icon-arrow-circle-right
-      # text: 喵喵!!!
-      # link: /about/
+      text: 喵喵!!!
+    name_link: /about/
+      # icon: anzhiyu-icon-arrow-circle-right (已删改)
+      # text: 喵喵!!! (已删改)
 
   card_announcement:
     enable: true
@@ -1187,8 +1193,8 @@ inject:
   bottom:
     # 自定义js
     # - <script src="/js/xxx"></script>
-    # - <script src="/js/jquery.js"></script> # jQuery
     - <script src="/js/sakura.js"></script> # 樱花特效
+    - <script async data-pjax src="/js/txmap.js"></script> # 腾讯地图定位 - API
     # - <script src="/js/fish.js"></script> # 页脚养鱼--F5刷新
 
 # CDN

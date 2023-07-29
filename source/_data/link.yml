@@ -36,6 +36,11 @@
       avatar: https://image.ahao.ah.cn/3cccc50598660ee1cece6e10be840f2.jpg
       descr: 人间值得，未来可期
       siteshot: https://image.ahao.ah.cn/b4f3987b256a963bd96cf48d75068e5.png
+    - name: 铭心石刻
+      link: https://blog.kouseki.cn/
+      avatar: https://blog.kouseki.cn/imgs/avatar.webp
+      descr: 愿岁并谢，与友长兮
+      siteshot: https://blog.kouseki.cn/imgs/siteshot.webp
 
 - class_name: 推荐博客
   flink_style: flexcard
