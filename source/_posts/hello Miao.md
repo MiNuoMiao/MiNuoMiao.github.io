@@ -74,3 +74,8 @@ tags:
 希望能跟喵友们一起学习共同进步(本喵很菜,请喵友们多多包涵)
 
 **<p style="font-size: 1.5em; text-align: center;">感谢喵友们耐心的看完本篇文章 bye~</p>**
+
+
+{% folding 封面图片%}
+![Miku](https://cdn.jsdelivr.net/gh/MiNuoMiao/MaoMi@main/img/bg.webp)
+{% endfolding %}
