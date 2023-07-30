@@ -1075,7 +1075,7 @@ console:
 
 # 51a统计配置
 LA:
-  enable: false
+  enable: true
   ck:
   LingQueMonitorID:
 
