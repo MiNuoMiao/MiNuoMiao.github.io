@@ -4637,23 +4637,8 @@ body[data-type="about"] #web_bg {
   pointer-events: none;
   z-index: 3;
 }
-#about-page .author-content-item-group.column.mapAndInfo {
-  width: 100%;
-}
-#about-page .author-content-item-group.column {
-  -webkit-box-orient: horizontal;
-  -moz-box-orient: horizontal;
-  -o-box-orient: horizontal;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-}
-#about-page .author-content-item.map {
-  width: 50%;
-}
-#about-page .author-content-item.selfInfo {
-  height: 100%;
-  width: 49%;
+ {
+  body: 1;
 }
 @-moz-keyframes loading-bar {
   0% {
@@ -8691,11 +8676,11 @@ h1.page-title + .tag-cloud-list {
   position: relative;
 }
 #aside-content >.card-widget.card-info::before {
-  background: -webkit-linear-gradient(115deg, var(--anzhiyu-main), var(--anzhiyu-main-op-deep), var(--anzhiyu-main), var(--anzhiyu-main-op-deep));
-  background: -moz-linear-gradient(115deg, var(--anzhiyu-main), var(--anzhiyu-main-op-deep), var(--anzhiyu-main), var(--anzhiyu-main-op-deep));
-  background: -o-linear-gradient(115deg, var(--anzhiyu-main), var(--anzhiyu-main-op-deep), var(--anzhiyu-main), var(--anzhiyu-main-op-deep));
-  background: -ms-linear-gradient(115deg, var(--anzhiyu-main), var(--anzhiyu-main-op-deep), var(--anzhiyu-main), var(--anzhiyu-main-op-deep));
-  background: linear-gradient(-25deg, var(--anzhiyu-main), var(--anzhiyu-main-op-deep), var(--anzhiyu-main), var(--anzhiyu-main-op-deep));
+  background: -webkit-linear-gradient(115deg, rgba(255,152,162,0), rgba(255,152,162,0.541), rgba(255,152,162,0), rgba(255,152,162,0.541));
+  background: -moz-linear-gradient(115deg, rgba(255,152,162,0), rgba(255,152,162,0.541), rgba(255,152,162,0), rgba(255,152,162,0.541));
+  background: -o-linear-gradient(115deg, rgba(255,152,162,0), rgba(255,152,162,0.541), rgba(255,152,162,0), rgba(255,152,162,0.541));
+  background: -ms-linear-gradient(115deg, rgba(255,152,162,0), rgba(255,152,162,0.541), rgba(255,152,162,0), rgba(255,152,162,0.541));
+  background: linear-gradient(-25deg, rgba(255,152,162,0), rgba(255,152,162,0.541), rgba(255,152,162,0), rgba(255,152,162,0.541));
   background-size: 400%;
   position: absolute;
   width: 100%;

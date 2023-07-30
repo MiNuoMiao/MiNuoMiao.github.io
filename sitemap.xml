@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://minuomiao.github.io/2023/07/10/hello%20Miao/</loc>
+    
+    <lastmod>2023-07-30</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>http://minuomiao.github.io/air-conditioner/index.html</loc>
     
     <lastmod>2023-07-25</lastmod>
@@ -46,24 +55,29 @@
     <priority>0.6</priority>
   </url>
   
-  <url>
-    <loc>http://minuomiao.github.io/2023/07/10/hello%20Miao/</loc>
-    
-    <lastmod>2023-07-13</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
 
   <url>
     <loc>http://minuomiao.github.io/</loc>
-    <lastmod>2023-07-29</lastmod>
+    <lastmod>2023-07-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
   
+  <url>
+    <loc>http://minuomiao.github.io/tags/%E9%97%B2%E8%81%8A/</loc>
+    <lastmod>2023-07-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
 
+  
+  <url>
+    <loc>http://minuomiao.github.io/categories/%E9%97%B2%E8%81%8A/</loc>
+    <lastmod>2023-07-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
   
 </urlset>
