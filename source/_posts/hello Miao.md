@@ -54,15 +54,15 @@ tags:
 
 ### 首先我们在本地建好文件并与GitHub远程仓库绑定后,再建立一个远程仓库分支,然后在GitHub仓库的页面进入设置(Settings);
 
-![进入设置](https://cdn.jsdelivr.net/gh/MiNuoMiao/MaoMi@main/img/建站1.webp)
+![进入设置](https://ik.imagekit.io/nuomiao/img/%E5%BB%BA%E7%AB%991.webp)
 
 
 ### 然后在Pages选项页面,将分支改成新建的那个分支;
-![更改页面分支](https://cdn.jsdelivr.net/gh/MiNuoMiao/MaoMi@main/img/建站2.webp)
+![更改页面分支](https://ik.imagekit.io/nuomiao/img/%E5%BB%BA%E7%AB%992.webp)
 
 
 ### 最后回到hexo的配置页```_config.yml```,在```deploy:```下的```branch```这里填写新建的分支,之后便可以随心所欲的```hexo d```啦!
-![更改配置](https://cdn.jsdelivr.net/gh/MiNuoMiao/MaoMi@main/img/建站3.webp)
+![更改配置](https://ik.imagekit.io/nuomiao/img/%E5%BB%BA%E7%AB%993.webp)
 
 
 > ## 最后喵喵

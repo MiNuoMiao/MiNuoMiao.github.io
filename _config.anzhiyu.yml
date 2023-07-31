@@ -1033,16 +1033,16 @@ home_top:
       shadow: var(--anzhiyu-shadow-blue)
       class: blue
       icon: anzhiyu-icon-dove
-    - name: 未想好
-      path: /categories/未定义/
-      shadow: var(--anzhiyu-shadow-red)
-      class: red
-      icon: anzhiyu-icon-fire
     - name: 日常
       path: /categories/生活日常/
       shadow: var(--anzhiyu-shadow-green)
       class: green
       icon: anzhiyu-icon-book
+    - name: 未想好
+      path: /categories/未定义/
+      shadow: var(--anzhiyu-shadow-red)
+      class: red
+      icon: anzhiyu-icon-fire
   default_descr: 再怎么看我也不知道怎么描述它的啦！
   swiper:
     enable: false
