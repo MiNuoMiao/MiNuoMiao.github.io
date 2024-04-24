@@ -13,7 +13,7 @@
               use(xlink:href=`#`+ item.icon)
           else if (item.icon.startsWith("anzhiyu"))
             i.anzhiyufont(class=`${item.icon}`)
-      img.footer_mini_logo(title="返回顶部", onclick="anzhiyu.scrollToDest(0, 500)", src=centerImg, size="50px")
+      img.footer_mini_logo(title="返回顶部", alt="返回顶部" onclick="anzhiyu.scrollToDest(0, 500)", src=centerImg, size="50px")
       each item, index in rightInfo
         a.deal_link(href=url_for(item.link) title=item.title)
           if (item.icon.startsWith("fa"))
@@ -31,7 +31,7 @@
           .footer-title=item.title
           .footer-links
             each iten, indey in item.links
-              a.footer-item(title=iten.title target="_blank" href=iten.link)=iten.title
+              a.footer-item(title=iten.title href=url_for(iten.link))=iten.title
       if theme.footer.list.randomFriends > 0
         .footer-group
           .footer-title-group
@@ -41,8 +41,7 @@
           .footer-links#friend-links-in-footer
 
   if theme.footer.owner.enable && !theme.footer.footerBar.enable
-    - var now = new Date()
-    - var nowYear = now.getFullYear()
+    - var nowYear = new Date().getFullYear()
     if theme.footer.owner.since && theme.footer.owner.since != nowYear
       .copyright!= `<p style="color: #A7B5E9;">&copy;${theme.footer.owner.since} - ${nowYear} <i class="anzhiyufont anzhiyu-icon-heartbeat" style="color: red"></i> By ${config.author}</p>`
     else
@@ -68,29 +67,17 @@ if theme.footer.footerBar && theme.footer.footerBar.enable
       .footer-bar-left
         #footer-bar-tips
           if theme.footer.owner.enable
-            - var now = new Date()
-            - var nowYear = now.getFullYear()
+            - var nowYear = new Date().getFullYear()
+            - let authorLink = theme.footer.footerBar.authorLink ? theme.footer.footerBar.authorLink : config.url
             if theme.footer.owner.since && theme.footer.owner.since != nowYear
               .copyright!= `&copy;${theme.footer.owner.since} - ${nowYear} By `
-                a.footer-bar-link(href=url_for(config.url) title=config.author target="_blank")=config.author
+                a.footer-bar-link(href=url_for(authorLink) title=config.author target="_blank")=config.author
             else
               .copyright!= `&copy;${nowYear} By ${config.author} `
         #footer-type-tips
-        if theme.footer.footerBar && theme.footer.footerBar.typing && theme.footer.footerBar.typing.enable
-          - let typingConfig = theme.footer.footerBar.typing
-          script(src=url_for(theme.asset.typed))
-          script.
-            document.addEventListener("DOMContentLoaded", function() {
-              var configStrings = !{JSON.stringify(typingConfig.strings)};
-              var typed = new Typed("#footer-type-tips", {
-                strings: configStrings,
-                startDelay: parseInt('#{typingConfig.startDelay}'),
-                backDelay: parseInt('#{typingConfig.backDelay}'),
-                typeSpeed: parseInt('#{typingConfig.typeSpeed}'),
-                loop: '#{typingConfig.loop}' === 'true',
-                backSpeed: parseInt('#{typingConfig.backSpeed}')
-              });
-            });
+        if theme.footer.footerBar && theme.footer.footerBar.subTitle && theme.footer.footerBar.subTitle.enable
+          .js-pjax
+            include ./third-party/footerBarSubtitle.pug
       .footer-bar-right
         each item in theme.footer.footerBar.linkList
           a.footer-bar-link(href=url_for(item.link) title=item.text)=item.text

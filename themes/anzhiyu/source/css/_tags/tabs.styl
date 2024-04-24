@@ -3,68 +3,77 @@
   .tabs
     position: relative
     margin: 0 0 20px
-    border-right: 1px solid var(--tab-border-color)
-    border-bottom: 1px solid var(--tab-border-color)
-    border-left: 1px solid var(--tab-border-color)
+    border: 3px solid var(--anzhiyu-secondbg)
+    margin: 1rem 0 !important;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--anzhiyu-shadow-border);
+    background: var(--anzhiyu-card-bg);
+    padding: 8px
 
     > .nav-tabs
       display: flex
       flex-wrap: wrap
+      justify-content: center;
       margin: 0
-      padding: 0
-      background: var(--tab-botton-bg)
+      padding: 16px;
+      background: var(--anzhiyu-card-bg);
 
       > .tab
-        margin: 0
-        padding: 0
-        list-style: none
+        padding: 8px 18px
+        background: var(--anzhiyu-secondbg);
+        color: var(--anzhiyu-fontcolor);
+        line-height: 1
+        transition: all .4s
+        margin: 4px;
+        border: var(--style-border-always);
+        border-radius: 8px;
 
-        +maxWidth768()
-          flex-grow: 1
-
-        button
-          display: block
-          padding: 8px 18px
-          width: 100%
-          border-top: 2px solid var(--tab-border-color)
-          background: var(--tab-botton-bg)
-          color: var(--tab-botton-color)
-          line-height: 2
-          transition: all .4s
-
-          i
-            width: 1.5em
+        i
+          width: 1.5em
 
         &.active
-          button
-            border-top: 2px solid $tab-active-border-color
-            background: var(--tab-button-active-bg)
-            cursor: default
+          border: var(--style-border-hover-always);
+          background: var(--anzhiyu-background);
+          border-radius: 8px;
+          cursor: default;
 
         &:not(.active)
-          button
-            &:hover
-              border-top: 2px solid var(--tab-button-hover-bg)
-              background: var(--tab-button-hover-bg)
+          &:hover
+            background: var(--anzhiyu-main);
+            color: var(--anzhiyu-white);
+            transition: .3s;
+            border: var(--style-border-hover-always);
+
+      &.no-default
+        & ~ .tab-to-top
+          display: none
 
     > .tab-contents
       .tab-item-content
         position: relative
         display: none
-        padding: 36px 24px
+        background: var(--anzhiyu-background);
+        border: var(--style-border-always);
+        padding: 1.2rem 1.2rem;
+        border-radius: 8px;
 
         +maxWidth768()
           padding: 24px 14px
 
         &.active
           display: block
-          animation: tabshow .5s
 
-    .tab-to-top
-      position: relative
-      display: block
-      margin: 0 0 0 auto
-      color: $tab-to-top-color
+    > .tab-to-top
+      padding: 0 16px 10px 0
+      width: 100%
+      text-align: right
+
+      button
+        color: $tab-to-top-color
+
+        &:hover
+          color: $tab-to-top-hover-color
 
 @keyframes tabshow
   0%

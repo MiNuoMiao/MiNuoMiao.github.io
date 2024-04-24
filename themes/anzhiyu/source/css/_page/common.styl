@@ -1,53 +1,38 @@
-#web_container
-  background: var(--global-bg);
-  transition: all 0.3s ease-out;
-  position: relative;
-  z-index: 2;
-  max-height: 100vh;
-  -webkit-overflow-scrolling: touch;
-[data-theme="dark"] #web_container
-  background none
-#web_box
-  transition: all 0.3s ease-out;
-  position: relative;
-  z-index: 1;
-  max-height: 100vh;
-  -webkit-overflow-scrolling: touch;
-
+.post .layout#content-inner
+  +maxWidth768()
+    background: var(--anzhiyu-main);
 #body-wrap
   display: flex
   flex-direction: column
   min-height: 100vh
+  justify-content: space-between;
   +maxWidth768()
     .layout
       padding: 0;
-    #category,
-    #tag
-      padding: 40px 15px 20px;
-      // background: var(--anzhiyu-background)
-    +maxWidth768()
-      #tag
-        background: transparent;
     #archive
       background: var(--anzhiyu-background)
+      border: none
+      padding-top: 0px
   
 .layout
   display: flex
   flex: 1 auto
   margin: 0 auto
-  padding: 1.875rem 1.5rem
+  padding: 1.25rem 1.5rem
   max-width: 1200px
   width: 100%
+  justify-content: center;
 
-  +maxWidth900()
+  +maxWidth1200()
     flex-direction: column
+    padding-top: 10px
 
   +maxWidth768()
     padding: 20px 15px;
     z-index: 3
 
   +minWidth2000()
-    max-width: 1500px
+    max-width: 1700px
 
   & > div:first-child:not(.recent-posts)
     box-shadow: var(--anzhiyu-shadow-border);
@@ -65,8 +50,8 @@
       background: var(--anzhiyu-background);
 
   & > div:first-child
-    width: 74%
-    transition: all .3s
+    width: calc(100% - 300px)
+    transition: all .3s ease 0s
 
     +maxWidth900()
       width: 100% !important

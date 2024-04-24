@@ -83,6 +83,7 @@ blockquote {
 
   iframe
     margin: 0 0 20px
+    border-radius: 12px
 
   kbd
     margin: 0 3px
@@ -111,6 +112,10 @@ blockquote {
       font-weight: 700;
       &::before
         font-size: 2rem;
+  > :first-child:is(h2)
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
   h2
     .headerlink
       float: right;
@@ -191,6 +196,12 @@ blockquote {
   +maxWidth768()
     background: var(--anzhiyu-background) !important;
     border: none;
+  #article-container
+    h2
+      if hexo-config("h2Divider")
+        border-top: 1px dashed var(--anzhiyu-theme-op);
+        padding-top: 1.5rem;
+        margin-top: 1.5rem;
   .post_share
     margin: 8px 0 0
     width: fit-content
@@ -264,6 +275,7 @@ blockquote {
       align-items: center;
       justify-content: center;
       flex-direction: column;
+      margin-top: 1.5rem;
       .post-copyright__author_img
         width: 66px;
         height: 66px;
@@ -312,10 +324,10 @@ blockquote {
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: 12px;
+      margin-top: 0.2rem;
     &__original,&__reprint
       background: var(--anzhiyu-main);
-      color: var(--anzhiyu-card-bg);
+      color: var(--anzhiyu-wihite-font);
       padding: 0.2rem 1rem;
       font-size: .8rem;
       border-radius: 8px;
@@ -344,7 +356,7 @@ blockquote {
       max-width: 70%;
       span
         cursor pointer
-
+      
       &:hover
         color: var(--anzhiyu-fontcolor)
     .post-copyright__notice
@@ -357,6 +369,8 @@ blockquote {
         -webkit-line-clamp: 1;
         -webkit-box-orient: vertical;
         text-align: center;
+        +maxWidth768()
+          -webkit-line-clamp: 2;
         a
           &:hover
             color: var(--anzhiyu-main)
@@ -419,6 +433,14 @@ blockquote {
     font-weight: 800;
     font-size: 20px;
     line-height: 20px;
+    height 20px
+  .anzhiyufont.anzhiyu-icon-circle-dot
+    margin-left: auto;
+    margin-right: 4px;
+    font-size: 14px;
+    opacity: 0;
+    &:active
+      transform: scale(0.97);
   .anzhiyufont.anzhiyu-icon-arrow-rotate-right
     font-size: 14px;
     margin-left: 4px
@@ -433,7 +455,6 @@ blockquote {
   background-color: var(--anzhiyu-lighttext);
   color: rgba(255, 255, 255, 0.9);
   border-radius: 4px;
-  margin-left: auto;
   line-height: 1;
   padding: 4px 5px;
   cursor pointer

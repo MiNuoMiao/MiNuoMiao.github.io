@@ -1,8 +1,12 @@
+- let maxDate = 0
+each item in site.posts.data
+  if item.date > maxDate
+    - maxDate = item.date
 mixin postUI(posts)
   each article , index in page.posts.data
-    div(class = (index === 0 ? 'recent-post-item lastestpost-item' : 'recent-post-item'))
+    - let link = article.link || article.path
+    div(class = (index === 0 ? 'recent-post-item lastestpost-item' : 'recent-post-item') onclick=`pjax.loadUrl('${url_for(link)}')`)
       -
-        let link = article.link || article.path
         let title = article.title || _p('no_title')
         const position = theme.cover.position
         let leftOrRight = position === 'both'
@@ -10,29 +14,29 @@ mixin postUI(posts)
           : position === 'left' ? 'left' : 'right'
         let post_cover = article.cover
         let no_cover = article.cover === false || !theme.cover.index_enable ? 'no-cover' : ''
-        const new_post = numberone !== 1 && is_current('/') && (!article.sticky || (article.new && article.sticky))
       -
-      if (theme.post_meta.page.categories && article.categories.data.length > 0)
-        .article-meta__categories__box(style=`${(new_post && !theme.cover.index_enable) ? "left: 95px":""}`)
-          each item, index in article.categories.data
-            a(href=url_for(item.path)).article-meta__categories #[=item.name]
-          a.unvisited-post(href=url_for(link) title=title style=`${(!theme.cover.index_enable) ? "position: static;": new_post ? (theme.article_double_row ? "left: 90px;": "left: calc(44% + 85px);"):""}`) 未读
-      else 
-        a.unvisited-post(href=url_for(link) title=title style=`${(new_post && theme.cover.index_enable) ? "left: 90px;":""}`) 未读
+      - const new_post = is_current('/') && (maxDate === article.date)
+
       if post_cover && theme.cover.index_enable
         .post_cover(class=leftOrRight)
-          a(href=url_for(link) title=title)
-            img.post_bg(src=url_for(post_cover) onerror=`this.onerror=null;this.src='`+ url_for(theme.error_img.post_page) + `'` alt=title)
+          a(href=url_for(link) title=title style='display: flex;height: 100%;')
+            img.post_bg(src=url_for(post_cover) onerror=`this.onerror=null;this.src='`+ url_for(theme.error_img.post_page) + `'` alt=title style='pointer-events: none')
+
       .recent-post-info(class=no_cover)
-        if new_post
-          span.newPost 最新文章
-          - var numberone = 1
-        a.article-title(href=url_for(link) title=title)= title
+        .recent-post-info-top
+          .recent-post-info-top-tips
+            if (is_home() && (article.top || article.sticky > 0))
+              span.article-meta.sticky-warp
+                i.anzhiyufont.anzhiyu-icon-thumbtack.sticky
+                span.sticky= _p('sticky')
+            if (theme.post_meta.page.categories && article.categories.data.length > 0)
+              each item, index in article.categories.data
+                .article-categories-original=item.name
+            if new_post
+              span.newPost 最新
+            a.unvisited-post(href=url_for(link) title=title) 未读
+          a.article-title(href=url_for(link) title=title)= title
         .article-meta-wrap
-          if (is_home() && (article.top || article.sticky > 0))
-            span.article-meta.sticky-warp
-              i.anzhiyufont.anzhiyu-icon-thumbtack.sticky
-              span.sticky= _p('sticky')
           if (theme.post_meta.page.date_type)
             span.post-meta-date
               if (theme.post_meta.page.date_type === 'both')
@@ -54,7 +58,7 @@ mixin postUI(posts)
           if (theme.post_meta.page.tags && article.tags.data.length > 0)
             span.article-meta.tags
               each item, index in article.tags.data
-                a(href=url_for(item.path) tabindex="-1").article-meta__tags
+                a(href=url_for(item.path) event.cancelbubble onclick="window.event.cancelBubble=true;").article-meta__tags
                   span 
                     i.anzhiyufont.anzhiyu-icon-hashtag
                     =item.name
