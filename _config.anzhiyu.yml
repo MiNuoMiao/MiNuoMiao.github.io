@@ -141,7 +141,7 @@ favicon: /miao.ico
 
 # Avatar (头像)
 avatar:
-  img: /img/miao.png
+  img: /img/miao.webp
   effect: false
 
 # Disable all banner image
@@ -247,10 +247,10 @@ post_copyright:
 reward:
   enable: true
   QR_code:
-    - img: /img/miao.png
+    - img: /img/miao.webp
       link:
       text: 微信
-    - img: /img/miao.png
+    - img: /img/miao.webp
       link:
       text: 支付宝
 
@@ -777,7 +777,7 @@ preloader:
   source: 4
   # pace theme (see https://codebyzach.github.io/pace/)
   pace_css_url:
-  avatar: /img/miao.png # 自定加载动画义头像
+  avatar: /img/miao.webp # 自定加载动画义头像
 
 # aside (侧边栏)
 # --------------------------------------
