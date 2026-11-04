@@ -245,7 +245,6 @@ body:has(#loading-box:not(.loaded)) {
 body.float-hidden #live2d-widget,
 body.float-hidden #nav-music {
   opacity: 0 !important;
-  visibility: hidden !important;
   pointer-events: none !important;
 }
 body:not(.float-hidden) #live2d-widget,

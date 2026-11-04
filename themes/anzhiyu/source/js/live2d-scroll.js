@@ -27,9 +27,16 @@
     ;[live2dEl, musicEl].forEach(function (el) {
       if (!el) return
       try {
-        el.style.setProperty('opacity', visible ? '1' : '0', 'important')
-        el.style.setProperty('visibility', visible ? 'visible' : 'hidden', 'important')
-        el.style.setProperty('pointer-events', visible ? 'auto' : 'none', 'important')
+        if (visible) {
+          // 恢复成完全可交互，且不写 visibility（免得 aplayer 初始化时量到隐藏状态）
+          el.style.setProperty('opacity', '1', 'important')
+          el.style.setProperty('pointer-events', 'auto', 'important')
+          el.style.removeProperty('visibility')
+        } else {
+          el.style.setProperty('opacity', '0', 'important')
+          el.style.setProperty('pointer-events', 'none', 'important')
+          el.style.removeProperty('visibility')
+        }
       } catch (e) {}
     })
   }
