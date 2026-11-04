@@ -8,16 +8,51 @@
       .cat__tail
       .cat__head
 script.
+  // 每次打开都从最顶上开始（别让浏览器恢复到上次的滚动位置）
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
+  window.scrollTo(0, 0)
+
   const preloader = {
     endLoading: () => {
       document.getElementById('loading-box').classList.add("loaded");
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
     },
     initLoading: () => {
       document.getElementById('loading-box').classList.remove("loaded")
     }
   }
-  window.addEventListener('load',()=> { preloader.endLoading() })
-  setTimeout(function(){preloader.endLoading();},15000)
+
+  // 加载页期间锁住滚动（直接改内联样式，不依赖 :has）
+  document.documentElement.style.overflow = 'hidden'
+  document.body.style.overflow = 'hidden'
+
+  // 消失时机：进度条走完就进页面（不等所有外链图片），4 秒兜底
+  var finished = false
+  function finishLoading () {
+    if (finished) return
+    finished = true
+    preloader.endLoading()
+    // 进度条也一起收掉，不然会挂在顶部停在半路
+    try {
+      if (window.Pace && typeof window.Pace.stop === 'function') window.Pace.stop()
+      var paceEl = document.querySelector('.pace')
+      if (paceEl) paceEl.style.display = 'none'
+    } catch (e) {}
+  }
+
+  setTimeout(function () {
+    if (window.Pace && typeof window.Pace.on === 'function') {
+      if (window.Pace.running === false) {
+        finishLoading()                      // 进度条已经跑完了
+      } else {
+        window.Pace.on('done', finishLoading)
+      }
+    } else {
+      window.addEventListener('load', finishLoading)   // 没 pace 就退回 load
+    }
+  }, 150)
+  setTimeout(finishLoading, 4000)
 
   if (!{theme.pjax && theme.pjax.enable}) {
     document.addEventListener('pjax:send', () => { preloader.initLoading() })

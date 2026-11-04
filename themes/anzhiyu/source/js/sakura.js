@@ -150,11 +150,14 @@ function startSakura () {
 
 window.onresize = function () {
   let canvasSnow = document.getElementById('canvas_sakura')
+  if (!canvasSnow) return
   canvasSnow.width = window.innerWidth
   canvasSnow.height = window.innerHeight
 }
 
 imag.onload = function () {
+  // 右上角「樱」按钮关掉过的话就不再启动（开关状态存在 localStorage）
+  if (localStorage.getItem('sakura-off') === '1') return
   startSakura()
 }
 
@@ -165,3 +168,43 @@ function stopp () {
     window.cancelAnimationFrame(stop)
   }
 }
+
+/* 樱花开关：右侧那列按钮里的「樱」，状态记在 localStorage */
+;(function () {
+  function paint(btn, isOn) {
+    if (isOn) {
+      btn.classList.remove('is-off')
+      btn.title = '关闭樱花'
+    } else {
+      btn.classList.add('is-off')
+      btn.title = '开启樱花'
+    }
+  }
+
+  function bindSakuraToggle() {
+    var btn = document.getElementById('sakura-toggle')
+    if (!btn || btn.dataset.sakuraBound) return
+    btn.dataset.sakuraBound = '1'
+
+    var isOn = localStorage.getItem('sakura-off') !== '1'
+    paint(btn, isOn)
+
+    btn.addEventListener('click', function () {
+      isOn = !isOn
+      if (isOn) {
+        startSakura()
+      } else {
+        stopp()
+      }
+      localStorage.setItem('sakura-off', isOn ? '0' : '1')
+      paint(btn, isOn)
+    })
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindSakuraToggle)
+  } else {
+    bindSakuraToggle()
+  }
+  document.addEventListener('pjax:complete', bindSakuraToggle)
+})()

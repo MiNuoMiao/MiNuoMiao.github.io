@@ -46,9 +46,11 @@ script(async=true).
       } else {
         // 如果是下班时间，插入"安知鱼-下班啦.svg"图片
         let img = document.querySelector("#workboard .workSituationImg");
-        img.src = "#{offduty_img}";
-        img.title = "#{offduty_description}";
-        img.alt = "#{offduty_description}";
+        if (img != null) {
+          img.src = "#{offduty_img}";
+          img.title = "#{offduty_description}";
+          img.alt = "#{offduty_description}";
+        }
 
         currentTimeHtml = `<p style="color: #A7B5E9;">小破站已破壳 <span id="span_dt_dt" style="color: #A7B5E9;"><font style="color:#D3A0E7"> ${dnum} </font> 天 <span id='runtime'><font style="color:#f391a9"> ${hnum} </font> 时 <font style="color:#fdb933"> ${mnum} </font> 分 <font style="color:#a3cf62"> ${snum} </font> 秒</span></span>&emsp;<i class='anzhiyufont anzhiyu-icon-heartbeat' style='color:red'></i></p>`;
       }

@@ -1,340 +1,303 @@
-var RENDERER = {
-  POINT_INTERVAL: 5,
-  FISH_COUNT: 3,
-  MAX_INTERVAL_COUNT: 50,
-  INIT_HEIGHT_RATE: 0.5,
-  THRESHOLD: 50,
+/* 页底养鱼（重写版 v4）
+ * footer 就是一片水：水面在底栏顶边往下留一段空域，鱼在水里巡游，跃出水面画一道弧线再落回。
+ * - 物理统一按 dt 缩放，60Hz / 120Hz 屏速度一致
+ * - 出水、入水都会在水面激起一圈涟漪
+ */
+;(function () {
+  var CONFIG = {
+    waterTop: 240, // 水面距 footer 顶部的像素（上面这段空域留给鱼跃出）
+    fishCount: 6,
+    waveHeight: 5,
+    waveLen1: 0.006,
+    waveLen2: 0.019,
+    gravity: 0.1 // 跃水重力（像素/帧²）—— 越小越飘
+  }
 
-  init: function () {
-    this.setParameters()
-    this.reconstructMethods()
-    this.setup()
-    this.bindEvent()
-    this.render()
-  },
-  setParameters: function () {
-    this.$window = $(window)
-    this.$container = $('#jsi-flying-fish-container')
-    this.$canvas = $('<canvas id="fish" />')
-    this.context = this.$canvas.appendTo(this.$container).get(0).getContext('2d')
-    this.points = []
-    this.fishes = []
-    this.watchIds = []
-    this.htmlValue = $('html').data('theme')
-  },
-  createSurfacePoints: function () {
-    var count = Math.round(this.width / this.POINT_INTERVAL)
-    this.pointInterval = this.width / (count - 1)
-    this.points.push(new SURFACE_POINT(this, 0))
+  var container = document.getElementById('jsi-flying-fish-container')
+  if (!container) return
 
-    for (var i = 1; i < count; i++) {
-      var point = new SURFACE_POINT(this, i * this.pointInterval),
-        previous = this.points[i - 1]
+  var canvas = document.createElement('canvas')
+  canvas.id = 'fish'
+  canvas.style.display = 'block'
+  canvas.style.width = '100%'
+  canvas.style.height = '100%'
+  container.appendChild(canvas)
 
-      point.setPreviousPoint(previous)
-      previous.setNextPoint(point)
-      this.points.push(point)
+  var ctx = canvas.getContext('2d')
+  var W = 1
+  var H = 1
+  var dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1))
+  var fishes = []
+  var ripples = []
+  var t = 0
+  var rafId = 0
+  var lastTs = 0
+  var booted = false
+
+  function isDark() {
+    return document.documentElement.getAttribute('data-theme') === 'dark'
+  }
+
+  function resize() {
+    var rect = container.getBoundingClientRect()
+    var w = Math.round(rect.width) || window.innerWidth
+    var h = Math.round(rect.height)
+    if (h <= 0) h = 260
+    if (w === W && h === H && booted) return
+    W = w
+    H = h
+    canvas.width = Math.round(W * dpr)
+    canvas.height = Math.round(H * dpr)
+    canvas.style.width = W + 'px'
+    canvas.style.height = H + 'px'
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    ripples = []
+    createFishes()
+    booted = true
+  }
+
+  function addRipple(x, amp, wide) {
+    ripples.push({ x: x, age: 0, amp: amp, spread: wide || 90, life: 110 })
+    if (ripples.length > 20) ripples.shift()
+  }
+
+  function waterY(x) {
+    var y =
+      CONFIG.waterTop +
+      Math.sin(x * CONFIG.waveLen1 + t) * CONFIG.waveHeight +
+      Math.sin(x * CONFIG.waveLen2 - t * 1.6) * CONFIG.waveHeight * 0.45
+
+    for (var i = 0; i < ripples.length; i++) {
+      var r = ripples[i]
+      var d = Math.abs(x - r.x)
+      if (d > r.spread * 3) continue
+      var falloff = Math.exp(-d / r.spread) * Math.exp(-r.age / 45)
+      y += Math.sin(d * 0.075 - r.age * 0.32) * r.amp * falloff
     }
-  },
-  reconstructMethods: function () {
-    this.watchWindowSize = this.watchWindowSize.bind(this)
-    this.jdugeToStopResize = this.jdugeToStopResize.bind(this)
-    this.startEpicenter = this.startEpicenter.bind(this)
-    this.moveEpicenter = this.moveEpicenter.bind(this)
-    this.reverseVertical = this.reverseVertical.bind(this)
-    this.render = this.render.bind(this)
-  },
-  setup: function () {
-    this.points.length = 0
-    this.fishes.length = 0
-    this.watchIds.length = 0
-    this.intervalCount = this.MAX_INTERVAL_COUNT
-    this.width = this.$container.width()
-    this.height = this.$container.height()
-    this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500
-    this.$canvas.attr({ width: this.width, height: this.height })
-    this.reverse = false
+    return y
+  }
 
-    this.fishes.push(new FISH(this))
-    this.createSurfacePoints()
-  },
-  watchWindowSize: function () {
-    this.clearTimer()
-    this.tmpWidth = this.$window.width()
-    this.tmpHeight = this.$window.height()
-    this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
-  },
-  clearTimer: function () {
-    while (this.watchIds.length > 0) {
-      clearTimeout(this.watchIds.pop())
+  function createFishes() {
+    fishes = []
+    for (var i = 0; i < CONFIG.fishCount; i++) {
+      fishes.push(newFish(true))
     }
-  },
-  jdugeToStopResize: function () {
-    var width = this.$window.width(),
-      height = this.$window.height(),
-      stopped = (width == this.tmpWidth && height == this.tmpHeight)
+  }
 
-    this.tmpWidth = width
-    this.tmpHeight = height
-
-    if (stopped) {
-      this.setup()
-    }
-  },
-  bindEvent: function () {
-    this.$window.on('resize', this.watchWindowSize)
-    this.$container.on('mouseenter', this.startEpicenter)
-    this.$container.on('mousemove', this.moveEpicenter)
-    this.$container.on('click', this.reverseVertical)
-  },
-  getAxis: function (event) {
-    var offset = this.$container.offset()
-
+  function newFish(initial) {
+    var minY = CONFIG.waterTop + 40
+    var maxY = Math.max(minY + 20, H - 26)
+    var cruise = minY + Math.random() * (maxY - minY)
     return {
-      x: event.clientX - offset.left + this.$window.scrollLeft(),
-      y: event.clientY - offset.top + this.$window.scrollTop()
+      dir: Math.random() < 0.5 ? 1 : -1,
+      len: 7 + Math.random() * 8,
+      speed: 0.35 + Math.random() * 0.8,
+      x: initial ? Math.random() * W : -60,
+      cruiseY: cruise,
+      maxY: maxY,
+      minY: minY,
+      y: cruise,
+      phase: Math.random() * Math.PI * 2,
+      tilt: 0,
+      state: 'cruise',
+      t0: 0,
+      vy0: 0,
+      y0: 0,
+      wasOut: false,
+      cooldown: Math.random() * 240,
+      splash: 0,
+      alpha: isDark() ? 0.92 : 0.88
     }
-  },
-  startEpicenter: function (event) {
-    this.axis = this.getAxis(event)
-  },
-  moveEpicenter: function (event) {
-    var axis = this.getAxis(event)
+  }
 
-    if (!this.axis) {
-      this.axis = axis
-    }
-    this.generateEpicenter(axis.x, axis.y, axis.y - this.axis.y)
-    this.axis = axis
-  },
-  generateEpicenter: function (x, y, velocity) {
-    if (y < this.height / 2 - this.THRESHOLD || y > this.height / 2 + this.THRESHOLD) {
-      return
-    }
-    var index = Math.round(x / this.pointInterval)
+  function startJump(f) {
+    // 目标最高点：水面之上 40~75px（用掉 waterTop 这一段空域）
+    var peak = CONFIG.waterTop - (40 + Math.random() * 35)
+    var h = Math.max(36, f.y - peak)
+    f.state = 'jump'
+    f.t0 = 0
+    f.vy0 = -Math.sqrt(2 * CONFIG.gravity * h)
+    f.y0 = f.y
+    f.wasOut = false
+  }
 
-    if (index < 0 || index >= this.points.length) {
-      return
-    }
-    this.points[index].interfere(y, velocity)
-  },
-  reverseVertical: function () {
-    this.reverse = !this.reverse
+  function updateFish(f, dt) {
+    f.alpha = isDark() ? 0.92 : 0.88
+    if (f.splash > 0) f.splash -= dt
 
-    for (var i = 0, count = this.fishes.length; i < count; i++) {
-      this.fishes[i].reverseVertical()
-    }
-  },
-  controlStatus: function () {
-    for (var i = 0, count = this.points.length; i < count; i++) {
-      this.points[i].updateSelf()
-    }
-    for (var i = 0, count = this.points.length; i < count; i++) {
-      this.points[i].updateNeighbors()
-    }
-    if (this.fishes.length < this.fishCount) {
-      if (--this.intervalCount == 0) {
-        this.intervalCount = this.MAX_INTERVAL_COUNT
-        this.fishes.push(new FISH(this))
+    if (f.state === 'jump') {
+      f.t0 += dt
+      var g = CONFIG.gravity
+      f.y = f.y0 + f.vy0 * f.t0 + 0.5 * g * f.t0 * f.t0
+      var vyNow = f.vy0 + g * f.t0
+      f.x += f.dir * f.speed * 1.1 * dt
+      f.tilt = Math.atan2(vyNow, f.speed * 1.1) * 0.9
+
+      // 刚冲出水面：起一圈涟漪
+      if (!f.wasOut && f.y < CONFIG.waterTop) {
+        f.wasOut = true
+        addRipple(f.x, 5.5, 80)
       }
-    }
-  },
-  render: function () {
-    requestAnimationFrame(this.render)
-    this.controlStatus()
-    this.context.clearRect(0, 0, this.width, this.height)
-    this.context.fillStyle = '#f1f3f8'
-    // if (this.htmlValue === 'dark') {
-    //   this.context.fillStyle = '#30343f'
-    // } else if (this.htmlValue === 'light') {
-    //   this.context.fillStyle = '#f1f3f8'
-    // }
 
-    for (var i = 0, count = this.fishes.length; i < count; i++) {
-      this.fishes[i].render(this.context)
-    }
-    this.context.save()
-    this.context.globalCompositeOperation = 'xor'
-    this.context.beginPath()
-    this.context.moveTo(0, this.reverse ? 0 : this.height)
-
-    for (var i = 0, count = this.points.length; i < count; i++) {
-      this.points[i].render(this.context)
-    }
-    this.context.lineTo(this.width, this.reverse ? 0 : this.height)
-    this.context.closePath()
-    this.context.fill()
-    this.context.restore()
-  }
-}
-var SURFACE_POINT = function (renderer, x) {
-  this.renderer = renderer
-  this.x = x
-  this.init()
-}
-SURFACE_POINT.prototype = {
-  SPRING_CONSTANT: 0.03,
-  SPRING_FRICTION: 0.9,
-  WAVE_SPREAD: 0.3,
-  ACCELARATION_RATE: 0.01,
-
-  init: function () {
-    this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE
-    this.height = this.initHeight
-    this.fy = 0
-    this.force = { previous: 0, next: 0 }
-  },
-  setPreviousPoint: function (previous) {
-    this.previous = previous
-  },
-  setNextPoint: function (next) {
-    this.next = next
-  },
-  interfere: function (y, velocity) {
-    this.fy = this.renderer.height * this.ACCELARATION_RATE * ((this.renderer.height - this.height - y) >= 0 ? -1 : 1) * Math.abs(velocity)
-  },
-  updateSelf: function () {
-    this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height)
-    this.fy *= this.SPRING_FRICTION
-    this.height += this.fy
-  },
-  updateNeighbors: function () {
-    if (this.previous) {
-      this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)
-    }
-    if (this.next) {
-      this.force.next = this.WAVE_SPREAD * (this.height - this.next.height)
-    }
-  },
-  render: function (context) {
-    if (this.previous) {
-      this.previous.height += this.force.previous
-      this.previous.fy += this.force.previous
-    }
-    if (this.next) {
-      this.next.height += this.force.next
-      this.next.fy += this.force.next
-    }
-    context.lineTo(this.x, this.renderer.height - this.height)
-  }
-}
-var FISH = function (renderer) {
-  this.renderer = renderer
-  this.init()
-}
-FISH.prototype = {
-  GRAVITY: 0.4,
-
-  init: function () {
-    this.direction = Math.random() < 0.5
-    this.x = this.direction ? (this.renderer.width + this.renderer.THRESHOLD) : -this.renderer.THRESHOLD
-    this.previousY = this.y
-    this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1)
-
-    if (this.renderer.reverse) {
-      this.y = this.getRandomValue(this.renderer.height * 1 / 10, this.renderer.height * 4 / 10)
-      this.vy = this.getRandomValue(2, 5)
-      this.ay = this.getRandomValue(0.05, 0.2)
-    } else {
-      this.y = this.getRandomValue(this.renderer.height * 6 / 10, this.renderer.height * 9 / 10)
-      this.vy = this.getRandomValue(-5, -2)
-      this.ay = this.getRandomValue(-0.2, -0.05)
-    }
-    this.isOut = false
-    this.theta = 0
-    this.phi = 0
-  },
-  getRandomValue: function (min, max) {
-    return min + (max - min) * Math.random()
-  },
-  reverseVertical: function () {
-    this.isOut = !this.isOut
-    this.ay *= -1
-  },
-  controlStatus: function (context) {
-    this.previousY = this.y
-    this.x += this.vx
-    this.y += this.vy
-    this.vy += this.ay
-
-    if (this.renderer.reverse) {
-      if (this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE) {
-        this.vy -= this.GRAVITY
-        this.isOut = true
-      } else {
-        if (this.isOut) {
-          this.ay = this.getRandomValue(0.05, 0.2)
-        }
-        this.isOut = false
+      // 落回水里
+      if (f.y > CONFIG.waterTop + 4 && vyNow > 0) {
+        f.state = 'cruise'
+        f.splash = 18
+        addRipple(f.x, 7, 110)
+        f.cruiseY = Math.min(f.maxY, CONFIG.waterTop + 30 + Math.random() * 80)
+        f.cooldown = 170 + Math.random() * 320
       }
     } else {
-      if (this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE) {
-        this.vy += this.GRAVITY
-        this.isOut = true
-      } else {
-        if (this.isOut) {
-          this.ay = this.getRandomValue(-0.2, -0.05)
-        }
-        this.isOut = false
+      f.x += f.dir * f.speed * dt
+      f.phase += 0.04 * dt
+      f.y += (f.cruiseY + Math.sin(f.phase) * 7 - f.y) * 0.08 * dt
+      f.tilt = Math.sin(f.phase) * 0.12
+
+      if (f.cooldown > 0) {
+        f.cooldown -= dt
+      } else if (Math.random() < 0.005 * dt) {
+        startJump(f)
       }
     }
-    if (!this.isOut) {
-      this.theta += Math.PI / 20
-      this.theta %= Math.PI * 2
-      this.phi += Math.PI / 30
-      this.phi %= Math.PI * 2
+
+    if (f.x < -80 || f.x > W + 80) {
+      var n = newFish(false)
+      f.dir = f.dir === 1 ? -1 : 1
+      f.x = f.dir > 0 ? -40 : W + 40
+      f.cruiseY = n.cruiseY
+      f.maxY = n.maxY
+      f.y = n.cruiseY
+      f.state = 'cruise'
+      f.splash = 0
+      f.wasOut = false
     }
-    this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY)
-
-    if (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) {
-      this.init()
-    }
-  },
-  render: function (context) {
-    context.save()
-    context.translate(this.x, this.y)
-    context.rotate(Math.PI + Math.atan2(this.vy, this.vx))
-    context.scale(1, this.direction ? 1 : -1)
-    context.beginPath()
-    context.moveTo(-30, 0)
-    context.bezierCurveTo(-20, 15, 15, 10, 40, 0)
-    context.bezierCurveTo(15, -10, -20, -15, -30, 0)
-    context.fill()
-
-    context.save()
-    context.translate(40, 0)
-    context.scale(0.9 + 0.2 * Math.sin(this.theta), 1)
-    context.beginPath()
-    context.moveTo(0, 0)
-    context.quadraticCurveTo(5, 10, 20, 8)
-    context.quadraticCurveTo(12, 5, 10, 0)
-    context.quadraticCurveTo(12, -5, 20, -8)
-    context.quadraticCurveTo(5, -10, 0, 0)
-    context.fill()
-    context.restore()
-
-    context.save()
-    context.translate(-3, 0)
-    context.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1))
-
-    context.beginPath()
-
-    if (this.renderer.reverse) {
-      context.moveTo(5, 0)
-      context.bezierCurveTo(10, 10, 10, 30, 0, 40)
-      context.bezierCurveTo(-12, 25, -8, 10, 0, 0)
-    } else {
-      context.moveTo(-5, 0)
-      context.bezierCurveTo(-10, -10, -10, -30, 0, -40)
-      context.bezierCurveTo(12, -25, 8, -10, 0, 0)
-    }
-    context.closePath()
-    context.fill()
-    context.restore()
-    context.restore()
-    this.controlStatus(context)
   }
-}
-$(function () {
-  RENDERER.init()
-})
+
+  function drawFish(f, color) {
+    var L = f.len
+    ctx.save()
+    ctx.globalAlpha = f.alpha
+    ctx.translate(f.x, f.y)
+    ctx.scale(f.dir, 1)
+    ctx.rotate(f.tilt)
+    ctx.fillStyle = color
+
+    ctx.beginPath()
+    ctx.ellipse(0, 0, L, L * 0.42, 0, 0, Math.PI * 2)
+    ctx.fill()
+
+    ctx.beginPath()
+    ctx.moveTo(-L * 0.86, 0)
+    ctx.quadraticCurveTo(-L * 1.35, -L * 0.15, -L * 1.62, -L * 0.62)
+    ctx.quadraticCurveTo(-L * 1.2, 0, -L * 1.62, L * 0.62)
+    ctx.quadraticCurveTo(-L * 1.35, L * 0.15, -L * 0.86, 0)
+    ctx.fill()
+
+    ctx.beginPath()
+    ctx.moveTo(-L * 0.1, -L * 0.38)
+    ctx.quadraticCurveTo(L * 0.1, -L * 0.85, L * 0.45, -L * 0.34)
+    ctx.closePath()
+    ctx.fill()
+
+    ctx.restore()
+  }
+
+  function drawSplash(f, color) {
+    if (f.splash <= 0) return
+    var p = f.splash / 18
+    var grow = 1 - p
+    ctx.save()
+    ctx.globalAlpha = 0.36 * p
+    ctx.strokeStyle = color
+    ctx.lineWidth = 1
+    ctx.beginPath()
+    ctx.ellipse(f.x, waterY(f.x), 7 + grow * 20, 2 + grow * 5, 0, 0, Math.PI * 2)
+    ctx.stroke()
+    ctx.restore()
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, W, H)
+
+    var dark = isDark()
+    var waterColor = dark ? '#30343f' : '#f1f3f8'
+    var fishColor = dark ? '#f1f3f8' : '#30343f'
+
+    // 水面
+    ctx.beginPath()
+    ctx.moveTo(0, H)
+    ctx.lineTo(0, waterY(0))
+    for (var x = 0; x <= W; x += 5) {
+      ctx.lineTo(x, waterY(x))
+    }
+    ctx.lineTo(W, H)
+    ctx.closePath()
+    ctx.fillStyle = waterColor
+    ctx.fill()
+
+    // 水面高光
+    ctx.beginPath()
+    for (var gx = 0; gx <= W; gx += 5) {
+      var gy = waterY(gx)
+      if (gx === 0) ctx.moveTo(gx, gy)
+      else ctx.lineTo(gx, gy)
+    }
+    ctx.strokeStyle = dark ? 'rgba(241,243,248,0.18)' : 'rgba(48,52,63,0.16)'
+    ctx.lineWidth = 1.2
+    ctx.stroke()
+
+    for (var i = 0; i < fishes.length; i++) {
+      updateFish(fishes[i], render.dt || 1)
+      drawFish(fishes[i], fishColor)
+      drawSplash(fishes[i], fishColor)
+    }
+  }
+
+  function loop(ts) {
+    rafId = requestAnimationFrame(loop)
+    if (!lastTs) lastTs = ts
+    var dt = Math.min(50, ts - lastTs) / 16.67
+    lastTs = ts
+    t += 0.016 * dt
+    render.dt = dt
+
+    // 涟漪老化
+    for (var i = ripples.length - 1; i >= 0; i--) {
+      ripples[i].age += dt
+      if (ripples[i].age > ripples[i].life) ripples.splice(i, 1)
+    }
+
+    render()
+  }
+
+  function start() {
+    if (rafId) cancelAnimationFrame(rafId)
+    lastTs = 0
+    rafId = requestAnimationFrame(loop)
+  }
+
+  function boot() {
+    var el = document.getElementById('jsi-flying-fish-container')
+    if (!el) return
+    if (el !== container || !document.body.contains(canvas)) {
+      container = el
+      if (!document.body.contains(canvas)) container.appendChild(canvas)
+    }
+    resize()
+    start()
+  }
+
+  if (window.ResizeObserver) {
+    new ResizeObserver(function () {
+      resize()
+    }).observe(container)
+  }
+  window.addEventListener('resize', resize, { passive: true })
+  document.addEventListener('pjax:complete', boot)
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot)
+  } else {
+    boot()
+  }
+})()

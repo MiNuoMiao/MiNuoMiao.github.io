@@ -43,6 +43,7 @@ mixin rightsideItem(array)
     if hideArray
       +rightsideItem(hideArray)
   #rightside-config-show
+    button#sakura-toggle(type="button" title="关闭樱花")= '樱'
     if enable
       if hide
         button#rightside-config(type="button" title=_p("rightside.setting"))
