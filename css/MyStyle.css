@@ -220,28 +220,11 @@ body:has(#loading-box:not(.loaded)) {
 }
 
 /* 首屏 / 页脚：浮层（live2d 小猫 + 音乐球）一起隐藏 */
-#live2d-widget.hidden-float,
-#nav-music.hidden-float {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  transition: opacity 0.35s ease;
-}
 
-/* 主题在进页脚时会把它挪到 bottom:-10px，这里锁住位置，只淡出不下掉 */
-#nav-music.hidden-float {
-  bottom: 20px !important;
-}
 
-/* 主题会给自己写行内 opacity:0 / bottom:-10px，这里在显示状态强制压回来 */
-#nav-music.shown-float {
-  opacity: 1 !important;
-  bottom: 20px !important;
-  pointer-events: auto !important;
-}
-#live2d-widget.shown-float {
-  opacity: 1 !important;
-  pointer-events: auto !important;
-}
+
+
+
 
 /* 底栏版权居中（主题链接已从配置里删掉） */
 #footer-bar .footer-bar-links {
@@ -256,4 +239,24 @@ body:has(#loading-box:not(.loaded)) {
 /* 右上角那个「主题」链接直接藏掉 */
 #footer-bar .footer-bar-right {
   display: none !important;
+}
+
+/* 首屏 / 页脚：浮层（live2d 小猫 + 音乐球）统一靠 body.float-hidden 隐藏 */
+body.float-hidden #live2d-widget,
+body.float-hidden #nav-music {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+body:not(.float-hidden) #live2d-widget,
+body:not(.float-hidden) #nav-music {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+/* 音乐球位置锁死，别被主题挪下去 */
+#nav-music {
+  bottom: 20px !important;
+  transition: opacity 0.35s ease;
+}
+#live2d-widget {
+  transition: opacity 0.35s ease;
 }
