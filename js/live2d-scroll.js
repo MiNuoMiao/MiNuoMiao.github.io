@@ -27,9 +27,15 @@
     ;[live2dEl, musicEl].forEach(function (el) {
       if (!el) return
       try {
-        el.style.setProperty('opacity', visible ? '1' : '0', 'important')
-        el.style.setProperty('visibility', visible ? 'visible' : 'hidden', 'important')
-        el.style.setProperty('pointer-events', visible ? 'auto' : 'none', 'important')
+        if (visible) {
+          // 显示时把行内样式清掉，交还给主题，别干扰它自己的点击/展开歌单
+          el.style.removeProperty('opacity')
+          el.style.removeProperty('visibility')
+          el.style.removeProperty('pointer-events')
+        } else {
+          el.style.setProperty('opacity', '0', 'important')
+          el.style.setProperty('visibility', 'hidden', 'important')
+        }
       } catch (e) {}
     })
   }
