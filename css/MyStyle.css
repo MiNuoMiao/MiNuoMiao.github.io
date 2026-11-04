@@ -1,0 +1,259 @@
+@font-face {
+  font-family: 'ZhuZiAYuanJWD';
+  src: url(https://npm.elemecdn.com/anzhiyu-blog@1.1.6/fonts/ZhuZiAWan.woff2);
+  font-display: swap;
+  font-weight: lighter;
+}
+
+/* div#menus {
+  font-family: "ZhuZiAYuanJWD";
+} */
+
+h1#site-title {
+  /* font-family: "ZhuZiAYuanJWD"; */
+  font-size: 3em !important;
+}
+
+/* 首页文章顶部标签栏小箭头修复 */
+#catalog-list {
+  overflow-x: auto
+}
+
+
+
+/* h1的下面两个是侧边栏按钮的字体和顶部导航栏的字体 */
+/* a.article-title,
+a.blog-slider__title,
+a.categoryBar-list-link,
+h1.post-title,
+.banner-button-text,
+#blog_name #site-name .title {
+  font-family: 'ZhuZiAYuanJWD';
+} */
+
+
+
+/* 外置特效 */
+
+/* 樱花特效 */
+#canvas_sakura {
+  z-index: 2;
+}
+
+/* 页底养鱼：铺满整个 footer，水面就是 footer 的顶边 */
+#jsi-flying-fish-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  height: auto;
+  z-index: 1;
+  pointer-events: none;
+  line-height: 0;
+}
+
+/* footer 里的文字压在水面之上 */
+#footer-wrap,
+#footer-bar {
+  position: relative;
+  z-index: 2;
+}
+
+/* 底栏高度：压矮一点，水面下的空间不要太空 */
+
+/* 页脚背景透明：让星空一直铺到水面 */
+#footer {
+  overflow: hidden; /* 防止 margin 穿透 */
+}
+#footer,
+#footer:before {
+  background: transparent !important;
+  background-image: none !important;
+}
+#footer-bar {
+  background: transparent !important;
+}
+
+#footer-wrap {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 250px;
+}
+
+#footer #footer-bar {
+  margin-top: 0 !important;
+  margin-bottom: 0.4rem !important;
+  padding-top: 0.2rem;
+}
+
+
+
+/* live 2d */
+#live2d-widget {
+  bottom: -8px !important;
+}
+
+/* ... */
+
+
+/* 顶部 */
+
+#nav #menus a,
+#nav #blog_name a {
+  color: var(--anzhiyu-white);
+}
+
+#center-console+label:hover i {
+  background-color: var(--anzhiyu-white);
+}
+
+
+
+/* ... */
+
+
+/* 侧边栏 */
+
+/* 侧边栏标签及标题字体更改及顶部打字特效字体 */
+.author-info__name,
+#aside-content>.card-widget.card-info #author-info__sayhi,
+#page-header #site-subtitle {
+  /* font-family: 'ZhuZiAYuanJWD' !important; */
+  color: var(--anzhiyu-white);
+}
+
+/* 作者页卡片背景 */
+#aside-content>.card-widget.card-info {
+  background: url(https://cdn.jsdelivr.net/gh/MiNuoMiao/MaoMi@main/img/bg.webp) center / cover no-repeat;
+}
+
+#aside-content .card-info #author-info__sayhi:hover {
+  /* 作者页卡片顶部文字hover */
+  color: var(--anzhiyu-fontcolor) !important;
+}
+
+
+/* ... */
+
+
+
+
+/* 页底 */
+
+/* 页底字体 */
+#workboard {
+  font-size: 16px;
+}
+
+/* ... */
+
+
+
+/* 手机 */
+
+/* 手机控制台开启后的背景 */
+#sidebar #sidebar-menus.open {
+  background: #ffc7cd;
+}
+
+[data-theme='dark'] #sidebar #sidebar-menus.open {
+  background: #ffe4e600;
+}
+
+/* ... */
+
+/* 右侧「樱」按钮：樱花关掉时变淡，一眼看出状态 */
+#sakura-toggle.is-off {
+  opacity: 0.45;
+}
+/* 启动动画期间先别显示 live2d 小猫 */
+#loading-box:not(.loaded) ~ #live2d-widget {
+  visibility: hidden !important;
+}
+
+/* 加载页期间：锁滚动、藏掉正文里会漏出来的东西 */
+body:has(#loading-box:not(.loaded)) {
+  overflow: hidden !important;
+}
+#loading-box:not(.loaded) ~ #rightside,
+#loading-box:not(.loaded) ~ #nav-music {
+  display: none !important;
+}
+/* 底部那条原来 z-index 1002，会盖到加载页上面 */
+#footer-bar {
+  z-index: 2 !important;
+}
+
+/* 加载猫：四块碎片旋转时会分离，改成整图旋转（放在这里避免被主题样式覆盖） */
+#loading-box .cat__scene .cat__main .cat__body,
+#loading-box .cat__scene .cat__main .cat__tail,
+#loading-box .cat__scene .cat__main .cat__head {
+  display: none !important;
+}
+#loading-box .cat__scene .cat__main::after {
+  content: "";
+  position: absolute;
+  top: 13%;
+  left: 13%;
+  width: 74%;
+  height: 74%;
+  background: url("/img/cat-loading.png") center / contain no-repeat;
+  -webkit-animation: cat__rotating 2.79s cubic-bezier(0.65, 0.54, 0.12, 0.93) infinite;
+  animation: cat__rotating 2.79s cubic-bezier(0.65, 0.54, 0.12, 0.93) infinite;
+  z-index: 1;
+}
+
+/* 加载页头像：缩小一点，正好坐在猫的怀里 */
+#loading-box .cat__scene .cat__main .loading-img {
+  width: 90px !important;
+  height: 90px !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%);
+}
+#loading-box .cat__scene .cat__main .loading-image-dot {
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(14px, 16px) !important;
+}
+
+/* 首屏 / 页脚：浮层（live2d 小猫 + 音乐球）一起隐藏 */
+#live2d-widget.hidden-float,
+#nav-music.hidden-float {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.35s ease;
+}
+
+/* 主题在进页脚时会把它挪到 bottom:-10px，这里锁住位置，只淡出不下掉 */
+#nav-music.hidden-float {
+  bottom: 20px !important;
+}
+
+/* 主题会给自己写行内 opacity:0 / bottom:-10px，这里在显示状态强制压回来 */
+#nav-music.shown-float {
+  opacity: 1 !important;
+  bottom: 20px !important;
+  pointer-events: auto !important;
+}
+#live2d-widget.shown-float {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* 底栏版权居中（主题链接已从配置里删掉） */
+#footer-bar .footer-bar-links {
+  justify-content: center !important;
+}
+#footer-bar .footer-bar-left {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+
+/* 右上角那个「主题」链接直接藏掉 */
+#footer-bar .footer-bar-right {
+  display: none !important;
+}
