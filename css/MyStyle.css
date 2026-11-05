@@ -245,29 +245,31 @@ html:not(.float-hidden) #nav-music {
   transition: opacity 0.35s ease;
 }
 
-/* 音乐球：允许内容溢出（音量滑块要从球里弹出来） */
+/* 音乐球：允许音量滑块探出 */
 #nav-music {
   overflow: visible !important;
 }
-/* 展开后的控制条：贴在球的右端，底色由 JS 从 aplayer 同步 */
+/* 鼠标悬停时，在球内部铺一层遮挡层，按钮排在遮挡层上（球本身不改变宽度） */
 #music-edge-panel {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
   display: flex;
   align-items: center;
-  gap: 2px;
-  width: 0;
-  height: 100%;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 40px;
+  background: rgba(30, 30, 40, 0.55);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
   opacity: 0;
-  overflow: hidden;
-  flex-shrink: 0;
-  padding-left: 2px;
-  padding-right: 6px;
-  border-radius: 0 40px 40px 0;
-  transition: width 0.3s ease, opacity 0.2s ease;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
 }
 #nav-music:hover #music-edge-panel,
 #nav-music.force-panel #music-edge-panel {
-  width: 168px;
   opacity: 1;
+  pointer-events: auto;
 }
 #music-edge-panel button {
   width: 28px;
@@ -276,22 +278,21 @@ html:not(.float-hidden) #nav-music {
   border: none;
   border-radius: 50%;
   background: transparent;
-  color: inherit;
+  color: #fff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  opacity: 0.85;
+  opacity: 0.9;
   transition: background 0.18s ease, opacity 0.18s ease, transform 0.12s ease;
 }
 #music-edge-panel button:hover {
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.24);
   opacity: 1;
 }
 #music-edge-panel button:active {
   transform: scale(0.9);
 }
-/* 上下一首按钮里的竖线 */
 #music-edge-panel button .mp-bar {
   display: none;
 }
@@ -328,7 +329,7 @@ html:not(.float-hidden) #nav-music {
   width: 6px;
   height: 84px;
   border-radius: 3px;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.42);
   outline: none;
   cursor: pointer;
   display: block;

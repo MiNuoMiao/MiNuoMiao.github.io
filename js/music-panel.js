@@ -65,18 +65,11 @@
     setTimeout(syncIcon, 200)
   })
 
-  function syncBg() {
-    var ap = document.querySelector('#nav-music .aplayer')
-    if (!ap) return
-    var bg = getComputedStyle(ap).backgroundColor
-    if (bg && bg !== 'rgba(0, 0, 0, 0)') panel.style.background = bg
-  }
 
   function mount() {
     var ball = document.getElementById('nav-music')
     if (!ball) { setTimeout(mount, 400); return }
     if (!ball.contains(panel)) ball.appendChild(panel)
-    syncBg()
   }
   mount()
   setInterval(mount, 2000)
