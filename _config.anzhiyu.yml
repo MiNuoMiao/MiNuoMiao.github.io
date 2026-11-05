@@ -1215,7 +1215,7 @@ inject:
     # 自定义css
     # - <link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'">
     - <link rel="stylesheet" href="/css/mouse.css">    # 鼠标样式
-    - <link rel="stylesheet" href="/css/MyStyle.css?v=20261106k">    # 自定义样式
+    - <link rel="stylesheet" href="/css/MyStyle.css?v=20261106m">    # 自定义样式
     # - <link rel="stylesheet" href="/css/music.css">    # 音乐css
   bottom:
     # 自定义js
