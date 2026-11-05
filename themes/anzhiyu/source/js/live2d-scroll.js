@@ -1,16 +1,13 @@
 /* 首屏 / 页脚的浮层显隐：live2d 小猫 + 左下角音乐球
- * 直接给元素写 inline style（带 important），因为主题也会给它们写行内样式，
- * 光靠 CSS 规则压不住。同时挂 body class 作兜底。
+ * 只切换 body 上的 class，具体隐藏交给 CSS 做。
+ * 不给元素写行内样式，避免干扰 aplayer / live2d 自己的初始化与交互。
  */
 ;(function () {
   var SHOW_AFTER = 180 // 滚过这么多像素出现
   var WATER_OFFSET = 240 // 页脚里水面线离页脚顶部的大致距离
   var HIDE_MARGIN = 70 // 水面滚到离视口底部这么近时隐藏
 
-  var live2dEl = null
-  var musicEl = null
-
-  function apply() {
+  function update() {
     var st = window.scrollY || document.documentElement.scrollTop || 0
     var winH = window.innerHeight
     var footer = document.getElementById('footer')
@@ -23,40 +20,13 @@
 
     var visible = st > SHOW_AFTER && !atFooter
     document.body.classList.toggle('float-hidden', !visible)
-
-    ;[live2dEl, musicEl].forEach(function (el) {
-      if (!el) return
-      try {
-        if (visible) {
-          // 恢复成完全可交互，且不写 visibility（免得 aplayer 初始化时量到隐藏状态）
-          el.style.setProperty('opacity', '1', 'important')
-          el.style.setProperty('pointer-events', 'auto', 'important')
-          el.style.removeProperty('visibility')
-        } else {
-          el.style.setProperty('opacity', '0', 'important')
-          el.style.setProperty('pointer-events', 'none', 'important')
-          el.style.removeProperty('visibility')
-        }
-      } catch (e) {}
-    })
-  }
-
-  function find() {
-    live2dEl = document.getElementById('live2d-widget')
-    musicEl = document.getElementById('nav-music')
-    if (!live2dEl || !musicEl) setTimeout(find, 300) // 这两个是动态创建的
-    apply()
   }
 
   function start() {
-    apply()
-    find()
-    window.addEventListener('scroll', apply, { passive: true })
-    window.addEventListener('resize', apply, { passive: true })
-    document.addEventListener('pjax:complete', function () {
-      apply()
-      find()
-    })
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update, { passive: true })
+    document.addEventListener('pjax:complete', update)
   }
 
   if (document.readyState === 'loading') {
