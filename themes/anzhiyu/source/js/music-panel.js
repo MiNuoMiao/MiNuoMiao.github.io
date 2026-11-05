@@ -91,6 +91,30 @@
     panel.classList.toggle('show', panelShown)
   })
 
+
+  // 主题球 hover 展开后是 aplayer 原生控制条，它的☰和音量键也接上我们的逻辑
+  function bindNative() {
+    var ball = document.getElementById('nav-music')
+    if (!ball) return
+    var listBtn = ball.querySelector('.aplayer-list-toggle')
+    if (listBtn && !listBtn.dataset.bound) {
+      listBtn.dataset.bound = '1'
+      listBtn.addEventListener('click', function (e) {
+        e.stopPropagation()
+        ball.classList.toggle('show-list')
+      })
+    }
+    var volBtn = ball.querySelector('.aplayer-volume')
+    if (volBtn && !volBtn.dataset.bound) {
+      volBtn.dataset.bound = '1'
+      volBtn.addEventListener('click', function (e) {
+        e.stopPropagation()
+        panel.classList.toggle('show-vol')
+      })
+    }
+  }
+  setInterval(bindNative, 1200)
+
   function mount() {
     var ball = document.getElementById('nav-music')
     if (!ball) { setTimeout(mount, 400); return }

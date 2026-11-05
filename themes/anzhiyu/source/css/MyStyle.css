@@ -478,3 +478,22 @@ html:not(.float-hidden) #nav-music {
   background: #fff !important;
   cursor: pointer !important;
 }
+
+/* 音量滑块改成横向（旋转版在部分浏览器拖不动） */
+#music-vol {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 120px !important;
+  height: 6px !important;
+  border-radius: 3px !important;
+  background: rgba(255, 255, 255, 0.45) !important;
+  outline: none !important;
+  cursor: pointer !important;
+  transform: none !important;
+  margin: 0 !important;
+  display: block !important;
+}
+#music-edge-panel .mp-vol-pop {
+  padding: 10px 14px !important;
+  border-radius: 14px !important;
+}
