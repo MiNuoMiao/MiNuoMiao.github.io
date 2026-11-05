@@ -177,9 +177,13 @@ h1.post-title,
 body:has(#loading-box:not(.loaded)) {
   overflow: hidden !important;
 }
-#loading-box:not(.loaded) ~ #rightside,
-#loading-box:not(.loaded) ~ #nav-music {
+#loading-box:not(.loaded) ~ #rightside {
   display: none !important;
+}
+/* 音乐球不能用 display:none——那会让 aplayer 初始化时量到 0 尺寸，后面就点不动了 */
+#loading-box:not(.loaded) ~ #nav-music {
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 /* 底部那条原来 z-index 1002，会盖到加载页上面 */
 #footer-bar {
@@ -219,43 +223,14 @@ body:has(#loading-box:not(.loaded)) {
   transform: translate(14px, 16px) !important;
 }
 
-/* 首屏 / 页脚：浮层（live2d 小猫 + 音乐球）一起隐藏 */
-
-
-
-
-
-
-/* 底栏版权居中（主题链接已从配置里删掉） */
-#footer-bar .footer-bar-links {
-  justify-content: center !important;
-}
-#footer-bar .footer-bar-left {
-  width: 100%;
-  justify-content: center;
-  text-align: center;
-}
-
-/* 右上角那个「主题」链接直接藏掉 */
-#footer-bar .footer-bar-right {
-  display: none !important;
-}
-
-/* 首屏 / 页脚：浮层（live2d 小猫 + 音乐球）统一靠 body.float-hidden 隐藏 */
-body.float-hidden #live2d-widget,
-body.float-hidden #nav-music {
+/* 只管 live2d 小猫；音乐球完全不碰，它有自己的加载逻辑 */
+body.float-hidden #live2d-widget {
   opacity: 0 !important;
   pointer-events: none !important;
 }
-body:not(.float-hidden) #live2d-widget,
-body:not(.float-hidden) #nav-music {
+body:not(.float-hidden) #live2d-widget {
   opacity: 1 !important;
   pointer-events: auto !important;
-}
-/* 音乐球位置锁死，别被主题挪下去 */
-#nav-music {
-  bottom: 20px !important;
-  transition: opacity 0.35s ease;
 }
 #live2d-widget {
   transition: opacity 0.35s ease;
