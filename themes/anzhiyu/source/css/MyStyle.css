@@ -244,3 +244,44 @@ html:not(.float-hidden) #nav-music {
 #live2d-widget {
   transition: opacity 0.35s ease;
 }
+
+/* 右边缘滑出的音乐控制面板 */
+#music-edge-panel {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translate(100%, -50%);
+  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10010;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 6px;
+  background: rgba(38, 38, 48, 0.86);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-radius: 14px 0 0 14px;
+  box-shadow: -4px 0 18px rgba(0, 0, 0, 0.18);
+  pointer-events: auto;
+}
+#music-edge-panel.show {
+  transform: translate(0, -50%);
+}
+#music-edge-panel button {
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #f4f4f6;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+#music-edge-panel button:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+#music-edge-panel button:active {
+  transform: scale(0.92);
+}
