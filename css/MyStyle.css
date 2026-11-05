@@ -388,3 +388,93 @@ html:not(.float-hidden) #nav-music {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22) !important;
   padding: 6px 0 !important;
 }
+
+/* ===== 音乐列表：全部放在这里（index.css 有缓存，靠这里兜底覆盖） ===== */
+#nav-music .aplayer-list {
+  display: block !important;
+  position: fixed !important;
+  left: 20px !important;
+  bottom: 72px !important;
+  top: auto !important;
+  right: auto !important;
+  width: 300px !important;
+  max-height: 56vh !important;
+  overflow-y: auto !important;
+  border-radius: 16px !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22) !important;
+  padding: 6px 0 !important;
+  z-index: 10002 !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+#nav-music.show-list .aplayer-list {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+#nav-music.show-list {
+  z-index: 10001 !important;
+}
+#nav-music.show-list .aplayer-list li {
+  color: #444 !important;
+  font-size: 13px !important;
+  line-height: 34px !important;
+  height: 34px !important;
+}
+
+/* ===== 音量竖条：用 rotate 实现，保证能拖 ===== */
+#music-edge-panel .mp-vol-pop {
+  position: absolute !important;
+  bottom: 100% !important;
+  left: 50% !important;
+  transform: translate(-50%, 6px) !important;
+  margin-bottom: 6px !important;
+  padding: 14px 10px !important;
+  border-radius: 18px !important;
+  background: rgba(40, 40, 50, 0.92) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22) !important;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+#music-edge-panel .mp-vol:hover .mp-vol-pop,
+#music-edge-panel.show-vol .mp-vol-pop {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translate(-50%, 0) !important;
+}
+#music-vol {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 90px !important;
+  height: 6px !important;
+  border-radius: 3px !important;
+  background: rgba(255, 255, 255, 0.45) !important;
+  outline: none !important;
+  cursor: pointer !important;
+  transform: rotate(-90deg) !important;
+  margin: 42px -42px !important;
+  display: block !important;
+}
+#music-vol::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 14px !important;
+  height: 14px !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35) !important;
+  cursor: pointer !important;
+}
+#music-vol::-moz-range-thumb {
+  width: 14px !important;
+  height: 14px !important;
+  border: none !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  cursor: pointer !important;
+}
