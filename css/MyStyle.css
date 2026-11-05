@@ -245,21 +245,23 @@ html:not(.float-hidden) #nav-music {
   transition: opacity 0.35s ease;
 }
 
-/* 鼠标移到音乐球上时，从球内部向右展开一排控制按钮 */
+/* 鼠标移到音乐球上时，从球内部向右展开控制条（按钮 + 横向音量滑块） */
 #music-edge-panel {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   width: 0;
   height: 100%;
   opacity: 0;
   overflow: hidden;
   flex-shrink: 0;
+  padding-left: 4px;
   transition: width 0.3s ease, opacity 0.2s ease;
 }
 #nav-music:hover #music-edge-panel,
+#nav-music.force-panel #music-edge-panel,
 html.show-music-panel #music-edge-panel {
-  width: 196px;
+  width: 236px;
   opacity: 1;
 }
 #music-edge-panel button {
@@ -280,4 +282,39 @@ html.show-music-panel #music-edge-panel {
 }
 #music-edge-panel button:active {
   transform: scale(0.9);
+}
+/* 音量滑块 */
+#music-edge-panel .mp-vol-wrap {
+  display: flex;
+  align-items: center;
+  margin-left: 2px;
+  padding-right: 6px;
+}
+#music-vol {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 62px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.35);
+  outline: none;
+  cursor: pointer;
+}
+#music-vol::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+#music-vol::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
 }

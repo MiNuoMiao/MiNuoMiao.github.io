@@ -1,5 +1,5 @@
-/* 鼠标移到音乐球上时，从球内部向右滑出一排控制按钮
- * 面板是 #nav-music 的子元素，球本身 overflow:hidden，所以展开时看起来就是球变宽了
+/* 鼠标移到音乐球上时，从球内部向右展开控制条
+ * 按钮 + 横向音量滑块都放在球里面（球是 overflow:hidden，任何伸出去的东西都会被裁掉）
  */
 ;(function () {
   if (window.innerWidth < 768) return
@@ -11,8 +11,9 @@
     '<button data-act="toggle" title="播放 / 暂停">▶</button>' +
     '<button data-act="next" title="下一首">⏭</button>' +
     '<button data-act="list" title="播放列表">☰</button>' +
-    '<button data-act="vol-down" title="音量 -">🔉</button>' +
-    '<button data-act="vol-up" title="音量 +">🔊</button>'
+    '<span class="mp-vol-wrap" title="音量">' +
+    '<input type="range" min="0" max="100" step="1" value="70" id="music-vol">' +
+    '</span>'
 
   function getAplayer() {
     var el = document.querySelector('#nav-music meting-js')
@@ -25,12 +26,31 @@
     if (!ap || !btn || !ap.audio) return
     btn.textContent = ap.audio.paused ? '▶' : '⏸'
   }
-  setInterval(syncIcon, 800)
+  function syncVolume() {
+    var ap = getAplayer()
+    var vol = panel.querySelector('#music-vol')
+    if (!ap || !vol || typeof ap.volume !== 'function') return
+    var v = ap.volume()
+    if (typeof v === 'number' && Math.abs(v * 100 - vol.value) > 2) {
+      vol.value = Math.round(v * 100)
+    }
+  }
+  setInterval(function () { syncIcon(); syncVolume() }, 800)
+
+  panel.addEventListener('click', function (e) {
+    e.stopPropagation() // 别触发球自身的展开播放器
+  })
+
+  panel.addEventListener('input', function (e) {
+    if (e.target && e.target.id === 'music-vol') {
+      var ap = getAplayer()
+      if (ap) ap.volume(e.target.value / 100)
+    }
+  })
 
   panel.addEventListener('click', function (e) {
     var btn = e.target.closest('button')
     if (!btn) return
-    e.stopPropagation() // 别触发球自己的点击（展开播放器）
     var ap = getAplayer()
     if (!ap || !ap.list) return
     var act = btn.getAttribute('data-act')
@@ -39,26 +59,23 @@
       else if (act === 'next') ap.list.switch(ap.list.index + 1)
       else if (act === 'toggle') ap.toggle()
       else if (act === 'list') ap.list.toggle()
-      else if (act === 'vol-up') ap.volume(Math.min(1, (ap.volume() || 0.7) + 0.1))
-      else if (act === 'vol-down') ap.volume(Math.max(0, (ap.volume() || 0.7) - 0.1))
     } catch (err) {}
     setTimeout(syncIcon, 200)
   })
 
-  // 挂到球里面；aplayer 重新渲染时会被顶掉，所以定期检查
+  // 挂到球里面；aplayer 重渲染时会被顶掉，定期检查补回去
   function mount() {
     var ball = document.getElementById('nav-music')
-    if (!ball) {
-      setTimeout(mount, 400)
-      return
-    }
+    if (!ball) { setTimeout(mount, 400); return }
     if (!ball.contains(panel)) ball.appendChild(panel)
   }
   mount()
   setInterval(mount, 2000)
 
-  // 调试用：?panel=1 强制展开
   if (location.search.indexOf('panel=1') > -1) {
-    document.documentElement.classList.add('show-music-panel')
+    var forced = setInterval(function () {
+      var ball = document.getElementById('nav-music')
+      if (ball) { ball.classList.add('force-panel'); clearInterval(forced) }
+    }, 300)
   }
 })()
