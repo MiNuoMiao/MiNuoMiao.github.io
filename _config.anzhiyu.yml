@@ -1294,7 +1294,7 @@ CDN:
     # aplayer_css:
     # aplayer_js:
     meting_js: https://npm.elemecdn.com/hexo-anzhiyu-music@1.0.1/assets/js/Meting2.min.js
-    # meting_api:
+    meting_api: https://api.qijieya.cn/meting/?server=:server&type=:type&id=:id
     # prismjs_js:
     # prismjs_lineNumber_js:
     # prismjs_autoloader:
