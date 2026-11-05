@@ -61,8 +61,7 @@
       else if (act === 'next') ap.list.switch(ap.list.index + 1)
       else if (act === 'toggle') ap.toggle()
       else if (act === 'list') {
-        var ballEl = document.getElementById('nav-music')
-        if (ballEl) ballEl.classList.toggle('show-list')
+        window.location.href = '/music/'
       }
     } catch (err) {}
     setTimeout(syncIcon, 200)
