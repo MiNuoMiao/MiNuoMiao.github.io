@@ -245,7 +245,11 @@ html:not(.float-hidden) #nav-music {
   transition: opacity 0.35s ease;
 }
 
-/* 鼠标移到音乐球上时，从球内部向右展开控制条（按钮 + 横向音量滑块） */
+/* 音乐球：允许内容溢出（音量滑块要从球里弹出来） */
+#nav-music {
+  overflow: visible !important;
+}
+/* 展开后的控制条（贴在球的右侧，和球同一个颜色） */
 #music-edge-panel {
   display: flex;
   align-items: center;
@@ -256,12 +260,12 @@ html:not(.float-hidden) #nav-music {
   overflow: hidden;
   flex-shrink: 0;
   padding-left: 4px;
+  border-radius: 0 40px 40px 0;
   transition: width 0.3s ease, opacity 0.2s ease;
 }
 #nav-music:hover #music-edge-panel,
-#nav-music.force-panel #music-edge-panel,
-html.show-music-panel #music-edge-panel {
-  width: 236px;
+#nav-music.force-panel #music-edge-panel {
+  width: 196px;
   opacity: 1;
 }
 #music-edge-panel button {
@@ -283,36 +287,56 @@ html.show-music-panel #music-edge-panel {
 #music-edge-panel button:active {
   transform: scale(0.9);
 }
-/* 音量滑块 */
-#music-edge-panel .mp-vol-wrap {
+/* 音量：悬停音量键时向上弹出竖向滑块 */
+#music-edge-panel .mp-vol {
+  position: relative;
   display: flex;
   align-items: center;
-  margin-left: 2px;
-  padding-right: 6px;
+}
+#music-edge-panel .mp-vol-pop {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translate(-50%, 6px);
+  margin-bottom: 4px;
+  padding: 10px 8px;
+  border-radius: 16px;
+  background: rgba(40, 40, 50, 0.9);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 20;
+}
+#music-edge-panel .mp-vol:hover .mp-vol-pop {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
 }
 #music-vol {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 62px;
-  height: 4px;
-  border-radius: 2px;
+  -webkit-appearance: slider-vertical;
+  appearance: slider-vertical;
+  writing-mode: bt-lr;
+  width: 6px;
+  height: 84px;
+  border-radius: 3px;
   background: rgba(255, 255, 255, 0.35);
   outline: none;
   cursor: pointer;
+  display: block;
 }
 #music-vol::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   cursor: pointer;
 }
 #music-vol::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border: none;
   border-radius: 50%;
   background: #fff;
