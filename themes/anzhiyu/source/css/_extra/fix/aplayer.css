@@ -181,35 +181,8 @@
   align-items: center;
 }
 
-/* 列表默认收起，点按钮时展开成浮层（原来写死 display:none，列表永远出不来） */
 #nav-music .aplayer-list {
-  display: block;
-  position: absolute;
-  bottom: calc(100% + 10px);
-  left: 0;
-  width: 300px;
-  max-height: 320px;
-  overflow-y: auto;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.97);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
-  padding: 6px 0;
-  z-index: 30;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-}
-#nav-music .aplayer-list li {
-  color: #444;
-  font-size: 13px;
-  line-height: 34px;
-  height: 34px;
-}
-#nav-music.show-list .aplayer-list {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
+  display: none;
 }
 
 #nav-music .aplayer .aplayer-info .aplayer-music {
