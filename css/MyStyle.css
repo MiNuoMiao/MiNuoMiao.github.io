@@ -352,3 +352,48 @@ html:not(.float-hidden) #nav-music {
   background: #fff;
   cursor: pointer;
 }
+
+/* 播放列表：主题把 .aplayer-list 写死 display:none，这里按需展开成浮层 */
+#nav-music.show-list .aplayer-list {
+  display: block !important;
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
+  width: 300px;
+  max-height: 320px;
+  overflow-y: auto;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  padding: 6px 0;
+  z-index: 30;
+}
+#nav-music.show-list .aplayer-list ol {
+  padding: 0;
+  margin: 0;
+}
+#nav-music.show-list .aplayer-list li {
+  color: #444;
+  font-size: 13px;
+  line-height: 34px;
+  height: 34px;
+  padding: 0 14px;
+}
+#nav-music.show-list .aplayer-list li:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+#nav-music.show-list .aplayer-list li.aplayer-list-light {
+  background: rgba(255, 138, 155, 0.18);
+}
+#nav-music.show-list .aplayer-list li .aplayer-list-index,
+#nav-music.show-list .aplayer-list li .aplayer-list-author {
+  color: #999;
+  font-size: 12px;
+}
+
+/* 音量弹层：改成点击切换，鼠标移开不再立刻消失 */
+#music-edge-panel.show-vol .mp-vol-pop {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}

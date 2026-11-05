@@ -53,18 +53,30 @@
     var btn = e.target.closest('button')
     if (!btn) return
     var act = btn.getAttribute('data-act')
-    if (act === 'vol') return
+    if (act === 'vol') { panel.classList.toggle('show-vol'); return }
     var ap = getAplayer()
     if (!ap || !ap.list) return
     try {
       if (act === 'prev') ap.list.switch(ap.list.index - 1)
       else if (act === 'next') ap.list.switch(ap.list.index + 1)
       else if (act === 'toggle') ap.toggle()
-      else if (act === 'list') ap.list.toggle()
+      else if (act === 'list') {
+        var ballEl = document.getElementById('nav-music')
+        if (ballEl) ballEl.classList.toggle('show-list')
+      }
     } catch (err) {}
     setTimeout(syncIcon, 200)
   })
 
+
+
+  // 点别处收起列表和音量条
+  document.addEventListener('click', function (e) {
+    if (panel.contains(e.target)) return
+    panel.classList.remove('show-vol')
+    var ballNow = document.getElementById('nav-music')
+    if (ballNow && !ballNow.contains(e.target)) ballNow.classList.remove('show-list')
+  })
 
   // 只有鼠标进到球的最右端才浮出遮罩；在球内移动保持，离开球就收回
   var panelShown = false
