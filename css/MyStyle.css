@@ -249,43 +249,51 @@ html:not(.float-hidden) #nav-music {
 #nav-music {
   overflow: visible !important;
 }
-/* 展开后的控制条（贴在球的右侧，和球同一个颜色） */
+/* 展开后的控制条：贴在球的右端，底色由 JS 从 aplayer 同步 */
 #music-edge-panel {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   width: 0;
   height: 100%;
   opacity: 0;
   overflow: hidden;
   flex-shrink: 0;
-  padding-left: 4px;
+  padding-left: 2px;
+  padding-right: 6px;
   border-radius: 0 40px 40px 0;
   transition: width 0.3s ease, opacity 0.2s ease;
 }
 #nav-music:hover #music-edge-panel,
 #nav-music.force-panel #music-edge-panel {
-  width: 196px;
+  width: 168px;
   opacity: 1;
 }
 #music-edge-panel button {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
   border: none;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.28);
-  color: #fff;
-  font-size: 13px;
-  line-height: 1;
+  background: transparent;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.15s ease;
+  opacity: 0.85;
+  transition: background 0.18s ease, opacity 0.18s ease, transform 0.12s ease;
 }
 #music-edge-panel button:hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.22);
+  opacity: 1;
 }
 #music-edge-panel button:active {
   transform: scale(0.9);
+}
+/* 上下一首按钮里的竖线 */
+#music-edge-panel button .mp-bar {
+  display: none;
 }
 /* 音量：悬停音量键时向上弹出竖向滑块 */
 #music-edge-panel .mp-vol {
@@ -298,10 +306,11 @@ html:not(.float-hidden) #nav-music {
   bottom: 100%;
   left: 50%;
   transform: translate(-50%, 6px);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   padding: 10px 8px;
   border-radius: 16px;
-  background: rgba(40, 40, 50, 0.9);
+  background: rgba(40, 40, 50, 0.92);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease, transform 0.2s ease;
@@ -319,7 +328,7 @@ html:not(.float-hidden) #nav-music {
   width: 6px;
   height: 84px;
   border-radius: 3px;
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.4);
   outline: none;
   cursor: pointer;
   display: block;
@@ -327,16 +336,16 @@ html:not(.float-hidden) #nav-music {
 #music-vol::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
   border-radius: 50%;
   background: #fff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   cursor: pointer;
 }
 #music-vol::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
   border: none;
   border-radius: 50%;
   background: #fff;

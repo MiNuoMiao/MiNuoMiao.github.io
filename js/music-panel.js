@@ -1,16 +1,21 @@
-/* 鼠标移到音乐球上时展开控制条；音量是竖向滑块，悬停音量键时从球里向上弹出 */
+/* 鼠标移到音乐球上时展开控制条；音量悬停弹出竖向滑块 */
 ;(function () {
   if (window.innerWidth < 768) return
+
+  var I = function (d, filled) {
+    return '<svg viewBox="0 0 24 24" width="15" height="15" fill="' + (filled ? 'currentColor' : 'none') +
+      '" stroke="' + (filled ? 'none' : 'currentColor') + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="' + d + '"/></svg>'
+  }
 
   var panel = document.createElement('div')
   panel.id = 'music-edge-panel'
   panel.innerHTML =
-    '<button data-act="prev" title="上一首">⏮</button>' +
-    '<button data-act="toggle" title="播放 / 暂停">▶</button>' +
-    '<button data-act="next" title="下一首">⏭</button>' +
-    '<button data-act="list" title="播放列表">☰</button>' +
+    '<button data-act="prev" title="上一首">' + I('M19 20L9 12l10-8z', true) + '<span class="mp-bar"></span></button>' +
+    '<button data-act="toggle" title="播放 / 暂停">' + I('M7 4l13 8-13 8z', true) + '</button>' +
+    '<button data-act="next" title="下一首">' + I('M5 4l10 8-10 8z', true) + '<span class="mp-bar"></span></button>' +
+    '<button data-act="list" title="播放列表">' + I('M4 6h16M4 12h16M4 18h16') + '</button>' +
     '<span class="mp-vol">' +
-    '<button data-act="vol" class="mp-vol-btn" title="音量">🔊</button>' +
+    '<button data-act="vol" class="mp-vol-btn" title="音量">' + I('M4 9v6h4l5 4V5L8 9H4zM16 8a5 5 0 0 1 0 8') + '</button>' +
     '<span class="mp-vol-pop"><input type="range" min="0" max="100" step="1" value="70" id="music-vol"></span>' +
     '</span>'
 
@@ -19,11 +24,12 @@
     return el && el.aplayer ? el.aplayer : null
   }
 
+  var PLAY = 'M7 4l13 8-13 8z', PAUSE = 'M8 4v16M16 4v16'
   function syncIcon() {
     var ap = getAplayer()
     var btn = panel.querySelector('[data-act="toggle"]')
     if (!ap || !btn || !ap.audio) return
-    btn.textContent = ap.audio.paused ? '▶' : '⏸'
+    btn.innerHTML = I(ap.audio.paused ? PLAY : PAUSE, ap.audio.paused)
   }
   function syncVolume() {
     var ap = getAplayer()
@@ -37,19 +43,17 @@
   setInterval(function () { syncIcon(); syncVolume() }, 800)
 
   panel.addEventListener('click', function (e) { e.stopPropagation() })
-
   panel.addEventListener('input', function (e) {
     if (e.target && e.target.id === 'music-vol') {
       var ap = getAplayer()
       if (ap) ap.volume(Number(e.target.value) / 100)
     }
   })
-
   panel.addEventListener('click', function (e) {
     var btn = e.target.closest('button')
     if (!btn) return
     var act = btn.getAttribute('data-act')
-    if (act === 'vol') return // 音量按钮只用来显示滑块
+    if (act === 'vol') return
     var ap = getAplayer()
     if (!ap || !ap.list) return
     try {
@@ -61,7 +65,6 @@
     setTimeout(syncIcon, 200)
   })
 
-  // 让面板底色跟球一致
   function syncBg() {
     var ap = document.querySelector('#nav-music .aplayer')
     if (!ap) return
