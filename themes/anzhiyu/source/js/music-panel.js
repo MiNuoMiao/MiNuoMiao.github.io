@@ -1,8 +1,8 @@
-/* 鼠标靠近屏幕右边缘时，从右侧滑出一块音乐控制面板
- * 控制的对象是页脚那颗音乐球里的 aplayer 实例
+/* 鼠标移到音乐球上时，从球内部向右滑出一排控制按钮
+ * 面板是 #nav-music 的子元素，球本身 overflow:hidden，所以展开时看起来就是球变宽了
  */
 ;(function () {
-  if (window.innerWidth < 768) return // 小屏（触屏）不启用
+  if (window.innerWidth < 768) return
 
   var panel = document.createElement('div')
   panel.id = 'music-edge-panel'
@@ -13,25 +13,24 @@
     '<button data-act="list" title="播放列表">☰</button>' +
     '<button data-act="vol-down" title="音量 -">🔉</button>' +
     '<button data-act="vol-up" title="音量 +">🔊</button>'
-  document.body.appendChild(panel)
 
   function getAplayer() {
     var el = document.querySelector('#nav-music meting-js')
     return el && el.aplayer ? el.aplayer : null
   }
 
-  // 面板上的播放按钮跟随 aplayer 状态
   function syncIcon() {
     var ap = getAplayer()
     var btn = panel.querySelector('[data-act="toggle"]')
-    if (!ap || !btn) return
-    btn.textContent = ap.audio && !ap.audio.paused ? '⏸' : '▶'
+    if (!ap || !btn || !ap.audio) return
+    btn.textContent = ap.audio.paused ? '▶' : '⏸'
   }
   setInterval(syncIcon, 800)
 
   panel.addEventListener('click', function (e) {
     var btn = e.target.closest('button')
     if (!btn) return
+    e.stopPropagation() // 别触发球自己的点击（展开播放器）
     var ap = getAplayer()
     if (!ap || !ap.list) return
     var act = btn.getAttribute('data-act')
@@ -46,22 +45,20 @@
     setTimeout(syncIcon, 200)
   })
 
-  // 鼠标贴右边缘就滑出，离开后稍等一下收回
-  var hideTimer = null
-  document.addEventListener('mousemove', function (e) {
-    var nearEdge = e.clientX > window.innerWidth - 26
-    var overPanel = panel.contains(e.target)
-    if (nearEdge || overPanel) {
-      panel.classList.add('show')
-      clearTimeout(hideTimer)
-    } else {
-      clearTimeout(hideTimer)
-      hideTimer = setTimeout(function () {
-        panel.classList.remove('show')
-      }, 700)
+  // 挂到球里面；aplayer 重新渲染时会被顶掉，所以定期检查
+  function mount() {
+    var ball = document.getElementById('nav-music')
+    if (!ball) {
+      setTimeout(mount, 400)
+      return
     }
-  })
+    if (!ball.contains(panel)) ball.appendChild(panel)
+  }
+  mount()
+  setInterval(mount, 2000)
 
-  // 调试用：?panel=1 时强制展开
-  if (location.search.indexOf('panel=1') > -1) panel.classList.add('show')
+  // 调试用：?panel=1 强制展开
+  if (location.search.indexOf('panel=1') > -1) {
+    document.documentElement.classList.add('show-music-panel')
+  }
 })()
