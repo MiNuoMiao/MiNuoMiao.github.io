@@ -19,7 +19,7 @@
     }
 
     var visible = st > SHOW_AFTER && !atFooter
-    document.body.classList.toggle('float-hidden', !visible)
+    document.documentElement.classList.toggle('float-hidden', !visible)
   }
 
   function start() {
