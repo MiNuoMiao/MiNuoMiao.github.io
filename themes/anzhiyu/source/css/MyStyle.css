@@ -223,14 +223,19 @@ body:has(#loading-box:not(.loaded)) {
   transform: translate(14px, 16px) !important;
 }
 
-/* 只管 live2d 小猫；音乐球完全不碰，它有自己的加载逻辑 */
-body.float-hidden #live2d-widget {
+/* 首屏 / 页脚：白猫和音乐球一起淡出。只用 opacity，不碰 pointer-events 和 bottom，
+   避免影响音乐球自己的点击和主题的定位逻辑 */
+html.float-hidden #live2d-widget,
+html.float-hidden #nav-music {
   opacity: 0 !important;
-  pointer-events: none !important;
 }
-body:not(.float-hidden) #live2d-widget {
+html:not(.float-hidden) #live2d-widget,
+html:not(.float-hidden) #nav-music {
   opacity: 1 !important;
-  pointer-events: auto !important;
+}
+#live2d-widget,
+#nav-music {
+  transition: opacity 0.35s ease;
 }
 #live2d-widget {
   transition: opacity 0.35s ease;

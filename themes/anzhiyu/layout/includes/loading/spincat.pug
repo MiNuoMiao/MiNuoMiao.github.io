@@ -8,6 +8,9 @@
       .cat__tail
       .cat__head
 script.
+  // 首屏就把浮层藏起来（不等外部脚本，避免时机问题）
+  document.documentElement.classList.add('float-hidden')
+
   // 每次打开都从最顶上开始（别让浏览器恢复到上次的滚动位置）
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
   window.scrollTo(0, 0)
