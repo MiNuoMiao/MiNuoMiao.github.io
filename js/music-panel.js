@@ -73,7 +73,7 @@
     if (!ball) return
     var r = ball.getBoundingClientRect()
     var inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom
-    var nearRight = inside && e.clientX > r.right - 72
+    var nearRight = inside && e.clientX > r.right - 2
     if (nearRight) panelShown = true
     else if (!inside) panelShown = false
     panel.classList.toggle('show', panelShown)
