@@ -229,6 +229,10 @@ html.float-hidden #live2d-widget,
 html.float-hidden #nav-music {
   opacity: 0 !important;
 }
+/* 主题在进页脚时会把球挪到 bottom:-10px（往下坠 30px），这里锁住位置，只淡出 */
+html.float-hidden #nav-music {
+  bottom: 20px !important;
+}
 html:not(.float-hidden) #live2d-widget,
 html:not(.float-hidden) #nav-music {
   opacity: 1 !important;
