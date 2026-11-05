@@ -66,6 +66,19 @@
   })
 
 
+  // 只有鼠标进到球的最右端才浮出遮罩；在球内移动保持，离开球就收回
+  var panelShown = false
+  document.addEventListener('mousemove', function (e) {
+    var ball = document.getElementById('nav-music')
+    if (!ball) return
+    var r = ball.getBoundingClientRect()
+    var inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom
+    var nearRight = inside && e.clientX > r.right - 72
+    if (nearRight) panelShown = true
+    else if (!inside) panelShown = false
+    panel.classList.toggle('show', panelShown)
+  })
+
   function mount() {
     var ball = document.getElementById('nav-music')
     if (!ball) { setTimeout(mount, 400); return }

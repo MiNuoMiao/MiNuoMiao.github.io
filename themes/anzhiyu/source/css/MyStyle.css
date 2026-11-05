@@ -266,7 +266,7 @@ html:not(.float-hidden) #nav-music {
   pointer-events: none;
   transition: opacity 0.22s ease;
 }
-#nav-music:hover #music-edge-panel,
+#music-edge-panel.show,
 #nav-music.force-panel #music-edge-panel {
   opacity: 1;
   pointer-events: auto;
