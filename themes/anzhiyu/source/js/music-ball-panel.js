@@ -29,7 +29,7 @@
 
   var doc = document
   var bar, listEl, volEl, volInput, listBody
-  var st = { open: false, list: false, vol: false, drag: false, grace: 0, poll: 0 }
+  var st = { open: false, list: false, vol: false, drag: false, grace: 0, poll: 0, seek: false, seekCool: 0 }
   var cache = { r: null, key: '', t: 0 }
 
   /* ---------------- 基础 ---------------- */
@@ -369,6 +369,11 @@
     if (!ball()) { if (st.open) closeBar(); return }
     var r = ballRect()
     if (!r || r.width < 24) { if (st.open) scheduleClose(); return }
+    // 正在拖球的进度条（按住不放）→ 一律不弹，也别把已经开着的面板关掉
+    if (st.seek || e.buttons || Date.now() < st.seekCool) {
+      if (st.open) keepAlive()
+      return
+    }
     // 球没展开（进度层 <= 300）时完全不响应：贴边也不唤出
     if (!bigEnough()) {
       if (st.open) closeBar()
@@ -464,6 +469,18 @@
       var a = getAp()
       if (a && typeof a.volume === 'function') a.volume(pc / 100)
     })
+
+    // 在球上按下 = 要拖进度条（aplayer 的进度条铺满整颗球）：这期间遮挡层不许弹出
+    doc.addEventListener('pointerdown', function (e) {
+      var b = ball()
+      if (b && b.contains(e.target)) { st.seek = true; clearTimeout(st.grace) }
+    }, true)
+    doc.addEventListener('pointerup', function () {
+      if (!st.seek) return
+      st.seek = false
+      st.seekCool = Date.now() + 280 // 松手那一刻鼠标还在右边缘，别立刻弹出来
+    }, true)
+    doc.addEventListener('pointercancel', function () { st.seek = false }, true)
 
     // 触发判定：鼠标贴到球右边缘 2px
     // 同时挂 pointermove / pointerover / pointerdown：有的环境（含自动化点击）只会派发后两种，
