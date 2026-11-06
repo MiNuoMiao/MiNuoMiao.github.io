@@ -239,7 +239,7 @@ post_copyright:
   enable: true
   decode: false
   author_href:
-  location: 成都
+  location: 武汉
   license: CC BY-NC-SA 4.0
   license_url: https://creativecommons.org/licenses/by-nc-sa/4.0/
   avatarSinks: false # hover时头像下沉
@@ -1225,7 +1225,7 @@ inject:
     # 自定义js
     # - <script src="/js/xxx"></script>
     - <script src="/js/sakura.js"></script> # 樱花特效
-    - <script async data-pjax src="/js/txmap.js?v=20261107b"></script> # 来访者定位（接口换 ipwho.is，带版本号避免缓存）
+    - <script async data-pjax src="/js/txmap.js?v=20261107c"></script> # 来访者定位（ipinfo 优先拿 IPv4、ipwho 兜底，带版本号避免缓存）
     # - <script src="/js/fish.js"></script> # 页脚养鱼--F5刷新
 
 # CDN
