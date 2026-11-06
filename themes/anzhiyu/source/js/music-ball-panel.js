@@ -110,9 +110,9 @@
     '#mb-bar .mb-btn.mb-on{background:rgba(255,255,255,.34);opacity:1;}',
     '#mb-bar .mb-btn[hidden]{display:none;}',
 
-    /* 歌单：底色不动（主色粉 46% 玻璃），只把字改成白色 */
+    /* 歌单：深色字 + 正在播放那一行粉色加粗 */
     '#mb-list{position:fixed;z-index:100000;width:284px;max-height:52vh;overflow-y:auto;padding:6px;',
-    'box-sizing:border-box;border-radius:16px;background:rgba(255,152,162,.46);color:#fff;',
+    'box-sizing:border-box;border-radius:16px;background:rgba(255,152,162,.46);color:#3a3a44;',
     '-webkit-backdrop-filter:blur(14px) saturate(180%);backdrop-filter:blur(14px) saturate(180%);',
     'box-shadow:0 10px 30px rgba(255,114,128,.28),0 0 0 1px rgba(255,255,255,.45) inset;',
     'font-size:13px;line-height:1.35;',
@@ -120,13 +120,13 @@
     'transition:opacity .16s ease,transform .16s ease;}',
     '#mb-list.mb-open{opacity:1;pointer-events:auto;transform:translateY(0);}',
     '#mb-list .mb-row{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:10px;cursor:pointer;}',
-    '#mb-list .mb-row:hover{background:rgba(255,255,255,.22);}',
-    '#mb-list .mb-row.mb-cur{font-weight:700;}',
-    '#mb-list .mb-no{flex:0 0 18px;text-align:right;font-size:12px;opacity:.7;}',
+    '#mb-list .mb-row:hover{background:rgba(255,255,255,.32);}',
+    '#mb-list .mb-row.mb-cur{color:#ff7280;font-weight:600;}',
+    '#mb-list .mb-no{flex:0 0 18px;text-align:right;font-size:12px;opacity:.5;}',
     '#mb-list .mb-name{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}',
-    '#mb-list .mb-singer{flex:0 0 auto;max-width:96px;font-size:12px;opacity:.72;overflow:hidden;',
+    '#mb-list .mb-singer{flex:0 0 auto;max-width:96px;font-size:12px;opacity:.55;overflow:hidden;',
     'text-overflow:ellipsis;white-space:nowrap;}',
-    '#mb-list .mb-empty{padding:14px 10px;text-align:center;opacity:.8;}',
+    '#mb-list .mb-empty{padding:14px 10px;text-align:center;opacity:.7;}',
 
     /* 音量弹层：竖着的推子（保持原来那套主色粉玻璃，不动） */
     '#mb-volpop{position:fixed;z-index:100000;width:46px;padding:12px 8px 8px;box-sizing:border-box;',
