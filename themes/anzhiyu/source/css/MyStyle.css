@@ -88,6 +88,28 @@ h1.post-title,
   padding-top: 0.2rem;
 }
 
+/* 文章里的标题：去掉默认的 20px 上外边距，行内垂直居中 */
+#article-container h1,
+#article-container h2,
+#article-container h3,
+#article-container h4,
+#article-container h5,
+#article-container h6 {
+  margin-top: 0 !important;
+  margin-bottom: 0.6rem !important;
+  display: flex;
+  align-items: center;
+  line-height: 1.5;
+}
+#article-container h1:before,
+#article-container h2:before,
+#article-container h3:before,
+#article-container h4:before,
+#article-container h5:before,
+#article-container h6:before {
+  line-height: 1;
+}
+
 /* 底栏右侧（作者那条「主题」链接等）已经清空，版号单独摆中间 */
 #footer-bar .footer-bar-links {
   justify-content: center !important;
