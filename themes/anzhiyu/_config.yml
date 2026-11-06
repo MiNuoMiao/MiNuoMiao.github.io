@@ -25,17 +25,19 @@ nav:
   enable: false
   travelling: false
   clock: false
-  menu:
-    - title: 网页
-      item:
-        - name: 博客
-          link: https://hexo.anheyu.com/
-          icon: /img/favicon.ico
-    - title: 项目
-      item:
-        - name: 安知鱼图床
-          link: https://image.anheyu.com/
-          icon: https://image.anheyu.com/favicon.ico
+  # 主题自带的「网页 / 项目」两组（作者的博客、安知鱼图床）已停用，需要时再解开
+  menu: []
+  # menu:
+  #   - title: 网页
+  #     item:
+  #       - name: 博客
+  #         link: https://hexo.anheyu.com/
+  #         icon: /img/favicon.ico
+  #   - title: 项目
+  #     item:
+  #       - name: 安知鱼图床
+  #         link: https://image.anheyu.com/
+  #         icon: https://image.anheyu.com/favicon.ico
 
 # mourn （哀悼日，指定日期网站简单变灰，不包括滚动条）
 # 注意： 仅网站首页变灰，其他页面正常显示
@@ -525,13 +527,11 @@ footer:
     cc:
       enable: false
       link: /copyright
-    linkList:
-      - link: https://github.com/anzhiyu-c/hexo-theme-anzhiyu
-        text: 主题
-      # - link: https://image.anheyu.com
-      #   text: 图床
+    linkList: []
+      # 主题作者那条「主题」链接先关掉（原来跳 github.com/anzhiyu-c/hexo-theme-anzhiyu）
+      # 想加自己的就照这个格式写：
       # - link: https://beian.miit.gov.cn/
-      #   text: 湘ICP备-xxxxxxx号
+      #   text: 粤ICP备-xxxxxxx号
     subTitle:
       enable: false
       # Typewriter Effect (打字效果)

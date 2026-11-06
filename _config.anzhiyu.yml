@@ -25,17 +25,20 @@ nav:
   enable: false
   travelling: false
   clock: false
-  menu:
-    - title: 网页
-      item:
-        - name: 博客
-          link: https://blog.anheyu.com/
-          icon: /img/favicon.ico
-    - title: 项目
-      item:
-        - name: 安知鱼图床
-          link: https://image.anheyu.com/
-          icon: https://image.anheyu.com/favicon.ico
+  # 手机版边栏的「网页 / 项目」两组是主题作者的链接（博客、安知鱼图床），
+  # 暂时不需要，清空掉；以后想加自己的就照原来的格式往 item 里写
+  menu: []
+  # menu:
+  #   - title: 网页
+  #     item:
+  #       - name: 博客
+  #         link: https://blog.anheyu.com/
+  #         icon: /img/favicon.ico
+  #   - title: 项目
+  #     item:
+  #       - name: 安知鱼图床
+  #         link: https://image.anheyu.com/
+  #         icon: https://image.anheyu.com/favicon.ico
 
 # mourn （哀悼日，指定日期网站简单变灰，不包括滚动条）
 # 注意： 仅网站首页变灰，其他页面正常显示
@@ -624,7 +627,7 @@ sidebar:
   menus_items: true
   tags_cloud: true
   display_mode: true
-  nav_menu_project: true
+  nav_menu_project: false # 手机版边栏的「网页 / 项目」两组（主题作者的博客、图床）先关掉
 
 # 文章h2添加分隔线
 h2Divider: false
@@ -1215,7 +1218,7 @@ inject:
     # 自定义css
     # - <link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'">
     - <link rel="stylesheet" href="/css/mouse.css">    # 鼠标样式
-    - <link rel="stylesheet" href="/css/MyStyle.css?v=20261106w">    # 自定义样式
+    - <link rel="stylesheet" href="/css/MyStyle.css?v=20261107a">    # 自定义样式
     # - <link rel="stylesheet" href="/css/music.css">    # 音乐css
   bottom:
     # 自定义js
