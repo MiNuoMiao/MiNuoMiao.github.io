@@ -1308,7 +1308,8 @@ CDN:
     # pace_default_css:
     # countup_js:
     # gsap_js:
-    # busuanzi:
+    # 原来的镜像 busuanzi.icodeq.com 的计数子域（counter.busuanzi.icodeq.com）已经挂了，换官方源
+    busuanzi: https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js
     # rightmenu:
     # waterfall:
     # ali_iconfont_css:

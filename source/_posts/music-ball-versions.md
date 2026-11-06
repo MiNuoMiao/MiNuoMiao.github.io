@@ -9,6 +9,11 @@ tags:
   - 建站
   - 折腾
   - 前端
+copyright_author: XiaoMiao
+copyright_author_desc: 住在小屋里的一只猫
+copyright_author_img_back: /img/xiaomiao.png
+copyright_author_img_front: /img/xiaomiao.png
+copyright_original: true
 description: 一颗 40px 高的音乐球，从「写了但没加载」一路改到「拖进度条别弹面板」——记一次真实的前端拉锯，顺便记下 GitHub Pages 为什么不构建。
 ---
 
