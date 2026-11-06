@@ -136,9 +136,9 @@ h1.post-title,
   color: var(--anzhiyu-white);
 }
 
-/* 作者页卡片背景 */
+/* 作者页卡片背景（图放在站内 /img/ 下，不再依赖私有图库的外链） */
 #aside-content>.card-widget.card-info {
-  background: url(https://cdn.jsdelivr.net/gh/MiNuoMiao/MaoMi@main/img/bg.webp) center / cover no-repeat;
+  background: url(/img/bg.webp) center / cover no-repeat;
 }
 
 #aside-content .card-info #author-info__sayhi:hover {
