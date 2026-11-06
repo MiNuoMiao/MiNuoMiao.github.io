@@ -88,6 +88,37 @@ h1.post-title,
   padding-top: 0.2rem;
 }
 
+/* 来访者卡片：IP 单独一行、居中、粉色，默认打码，鼠标移上去才显示 */
+#welcome-info .ip-line {
+  text-align: center;
+  margin: 10px 0 6px;
+}
+#welcome-info .ip-label {
+  display: block;
+  margin-bottom: 2px;
+}
+#welcome-info .ip-value {
+  display: inline-block;
+  color: var(--anzhiyu-main);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  filter: blur(5px);
+  -webkit-filter: blur(5px);
+  cursor: pointer;
+  user-select: none;
+  transition: filter 0.28s ease, opacity 0.28s ease;
+  opacity: 0.85;
+}
+#welcome-info .ip-value:hover,
+#welcome-info .ip-value:focus,
+#welcome-info .ip-value:active {
+  filter: blur(0);
+  -webkit-filter: blur(0);
+  opacity: 1;
+  user-select: text;
+}
+
 /* 文章里的标题：去掉默认的 20px 上外边距，行内垂直居中 */
 #article-container h1,
 #article-container h2,
