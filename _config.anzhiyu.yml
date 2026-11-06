@@ -10,6 +10,7 @@ menu:
   #   留言板: /comments/ || anzhiyu-icon-envelope
 
   我的:
+    小屋: /room/index.html || anzhiyu-icon-house-chimney
     音乐馆: /music/?id=8560567666&server=netease || anzhiyu-icon-music
     追番页: /bangumis/index.html || anzhiyu-icon-bilibili
   #   相册集: /album/ || anzhiyu-icon-images
