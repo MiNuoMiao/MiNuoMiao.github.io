@@ -4,7 +4,7 @@ date: 2026-11-07 03:10:00
 updated:
 cover: /img/miao.webp
 categories:
-  - 日常
+  - 网站
 tags:
   - 建站
   - 折腾

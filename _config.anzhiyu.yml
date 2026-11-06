@@ -1036,18 +1036,18 @@ home_top:
   subTitle: 万物可爱。
   siteText: minuomiao.github.io
   category:
-    - name: 前端
-      path: /categories/前端开发/
+    - name: 网站
+      path: /categories/网站/
       shadow: var(--anzhiyu-shadow-blue)
       class: blue
       icon: anzhiyu-icon-dove
     - name: 日常
-      path: /categories/生活日常/
+      path: /categories/日常/
       shadow: var(--anzhiyu-shadow-green)
       class: green
       icon: anzhiyu-icon-book
-    - name: 未想好
-      path: /categories/未定义/
+    - name: 小屋
+      path: /room/
       shadow: var(--anzhiyu-shadow-red)
       class: red
       icon: anzhiyu-icon-fire
@@ -1225,7 +1225,7 @@ inject:
     # 自定义js
     # - <script src="/js/xxx"></script>
     - <script src="/js/sakura.js"></script> # 樱花特效
-    - <script async data-pjax src="/js/txmap.js?v=20261107d"></script> # 来访者定位（ipinfo 优先拿 IPv4、ipwho 兜底，带版本号避免缓存）
+    - <script async data-pjax src="/js/txmap.js?v=20261107e"></script> # 来访者定位（ipinfo 优先拿 IPv4、ipwho 兜底，带版本号避免缓存）
     # - <script src="/js/fish.js"></script> # 页脚养鱼--F5刷新
 
 # CDN

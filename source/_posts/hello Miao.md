@@ -4,7 +4,7 @@ date: 2023-07-10 21:00:00
 updated: 
 cover: /img/bg.webp
 categories: 
-  - 闲聊
+  - 网站
 tags: 
   - 闲聊
 # title: postName #文章页面上的显示名称，一般是中文
