@@ -247,7 +247,7 @@ var CN_CITY = { wuhan: '武汉市', huanggang: '黄冈市', nanjing: '南京市'
 
 function ipNorm (s) { return String(s == null ? '' : s).toLowerCase().replace(/[^a-z]/g, '') }
 function ipProvKey (s) {
-  return ipNorm(String(s == null ? '' : s).replace(/\b(sheng|shi|zizhiqu|province|municipality|autonomous|region|uygur|zhuangzu|huizu|zhuang|hui)\b/g, ''))
+  return ipNorm(String(s == null ? '' : s).replace(/\b(sheng|shi|zizhiqu|province|municipality|autonomous|region|uygur|zhuangzu|huizu|zhuang|hui)\b/gi, ''))
 }
 function ipTr (map, value, keyer) {
   if (!value) return ''
