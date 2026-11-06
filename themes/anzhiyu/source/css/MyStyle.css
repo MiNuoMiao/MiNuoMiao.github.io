@@ -88,6 +88,27 @@ h1.post-title,
   padding-top: 0.2rem;
 }
 
+/* 首页那张大卡：做成「小屋」入口 —— 去掉右下角「更多推荐」按钮，文字改成上面大字下面小字 */
+.topGroup .todayCard .banner-button-group {
+  display: none !important;
+}
+.topGroup .todayCard .todayCard-info {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-start;
+}
+.topGroup .todayCard .todayCard-info .todayCard-title {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.topGroup .todayCard .todayCard-info .todayCard-tips {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 6px;
+  letter-spacing: 0.04em;
+}
+
 /* 来访者卡片：IP 单独一行、居中、粉色，默认打码，鼠标移上去才显示 */
 #welcome-info .ip-line {
   text-align: center;

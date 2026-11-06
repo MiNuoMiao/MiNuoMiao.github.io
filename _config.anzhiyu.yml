@@ -1046,8 +1046,8 @@ home_top:
       shadow: var(--anzhiyu-shadow-green)
       class: green
       icon: anzhiyu-icon-book
-    - name: 小屋
-      path: /room/
+    - name: 未想好
+      path: /categories/未定义/
       shadow: var(--anzhiyu-shadow-red)
       class: red
       icon: anzhiyu-icon-fire
@@ -1057,10 +1057,10 @@ home_top:
     swiper_css: https://npm.elemecdn.com/anzhiyu-theme-static@1.0.0/swiper/swiper.min.css #swiper css依赖
     swiper_js: https://npm.elemecdn.com/anzhiyu-theme-static@1.0.0/swiper/swiper.min.js #swiper js依赖
   banner:
-    tips: 更多推荐
-    title: 更多!!
+    tips: 诺喵和小喵的家
+    title: 小屋
     image: https://bu.dusays.com/2023/05/13/645fa3cf90d70.webp
-    link: # 网址 https://docs.anheyu.com/
+    link: /room/ # 小屋入口
 
 # 朋友圈配置
 friends_vue:
@@ -1219,7 +1219,7 @@ inject:
     # 自定义css
     # - <link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'">
     - <link rel="stylesheet" href="/css/mouse.css">    # 鼠标样式
-    - <link rel="stylesheet" href="/css/MyStyle.css?v=20261107c">    # 自定义样式
+    - <link rel="stylesheet" href="/css/MyStyle.css?v=20261107d">    # 自定义样式
     # - <link rel="stylesheet" href="/css/music.css">    # 音乐css
   bottom:
     # 自定义js
