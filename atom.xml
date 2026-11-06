@@ -6,7 +6,7 @@
   <link href="http://minuomiao.github.io/atom.xml" rel="self"/>
   
   <link href="http://minuomiao.github.io/"/>
-  <updated>2026-11-06T19:07:05.020Z</updated>
+  <updated>2026-11-06T20:15:38.313Z</updated>
   <id>http://minuomiao.github.io/</id>
   
   <author>
@@ -17,11 +17,34 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>碎碎念｜把一句话写短</title>
+    <link href="http://minuomiao.github.io/2026/11/07/shorter-sentences/"/>
+    <id>http://minuomiao.github.io/2026/11/07/shorter-sentences/</id>
+    <published>2026-11-06T20:20:00.000Z</published>
+    <updated>2026-11-06T20:15:38.313Z</updated>
+    
+    <content type="html"><![CDATA[<p>前几天读《项脊轩志》，被五个字钉住了：</p><blockquote><p>其后六年，吾妻死，室坏不修。</p></blockquote><p>屋子坏了，不修。他没写难过，也没写哭，只写了一件”没做的事”。</p><p>我一开始以为这是”克制”。后来觉得不对——<strong>克制是忍住不说，他是真的没什么可说的了。</strong> 难过到那个份上，人是没有形容词的。</p><h2 id="我以前的写法"><a href="#我以前的写法" class="headerlink" title="我以前的写法"></a>我以前的写法</h2><p>写完一件事，总要补一句感受：</p><blockquote><p>今天终于把音乐球改好了，<strong>心里一下子踏实了</strong>。</p></blockquote><p>那句”心里踏实了”，是我替读者总结的。可我凭什么替人总结呢？如果前面写得够，读者自己会踏实；写得不够，我喊一百遍也没用。</p><h2 id="现在的写法"><a href="#现在的写法" class="headerlink" title="现在的写法"></a>现在的写法</h2><p>删。删到只剩”做了什么”和”后来怎么了”：</p><blockquote><p>改到第十二版，球终于贴着边了。我把手移开，它没有弹回来。</p></blockquote><p>第二句是”发生了什么”，不是”我感觉如何”。可它是有一点情绪的——因为读者知道，前面它一直在弹。</p><h2 id="不是写得短，是留得空"><a href="#不是写得短，是留得空" class="headerlink" title="不是写得短，是留得空"></a>不是写得短，是留得空</h2><p>一句话写短，不是把话砍掉，是把<strong>该读者自己想的部分留出来</strong>。</p><p>“室坏不修”四个字里，藏了 6 年、一个死掉的人、和一间再没人住的屋子。归有光一个字都没提。他只是让那个”不修”待在那儿。</p><p>我现在写日记也这么试：少写”我觉得”，多写”我做了什么”。写不下去的时候就问自己一句——<strong>这句话是我该说的，还是读者自己能想到的？</strong></p><p>能想到的，就不说。</p><hr><p><em>（碎碎念，不算文章，就是写着玩。归有光要是知道我拿他练手，大概会笑。）</em></p>]]></content>
+    
+    
+    <summary type="html">归有光写「其后六年，吾妻死，室坏不修」，五个字。我想学的是那个「不修」。</summary>
+    
+    
+    
+    <category term="日常" scheme="http://minuomiao.github.io/categories/%E6%97%A5%E5%B8%B8/"/>
+    
+    
+    <category term="碎碎念" scheme="http://minuomiao.github.io/tags/%E7%A2%8E%E7%A2%8E%E5%BF%B5/"/>
+    
+    <category term="写字" scheme="http://minuomiao.github.io/tags/%E5%86%99%E5%AD%97/"/>
+    
+  </entry>
+  
+  <entry>
     <title>一颗音乐球，改了十来版</title>
     <link href="http://minuomiao.github.io/2026/11/07/music-ball-versions/"/>
     <id>http://minuomiao.github.io/2026/11/07/music-ball-versions/</id>
     <published>2026-11-06T19:10:00.000Z</published>
-    <updated>2026-11-06T19:07:05.020Z</updated>
+    <updated>2026-11-06T20:15:32.086Z</updated>
     
     <content type="html"><![CDATA[<p>左下角那颗音乐球，高 41 像素。</p><p>它现在能做的事不多：鼠标贴到它右边缘，一条几乎透明的玻璃条从右边滑出来，上面有五个图标——上一首、播放暂停、下一首、歌单、音量。点歌单会弹出一张粉色的列表，点音量弹出一根竖着的推子，拖进度条的时候它乖乖不出现。</p><p>这四十来像素的东西，我们一起改了十来版。</p><h2 id="一｜先确认它到底有没有被加载"><a href="#一｜先确认它到底有没有被加载" class="headerlink" title="一｜先确认它到底有没有被加载"></a>一｜先确认它到底有没有被加载</h2><p>第一版写得很像样：一个 <code>music-panel.js</code>，建 DOM、绑事件、算位置，两百行。写完我信心很足。</p><p>后来才发现——<strong>它从来没有被页面加载过</strong>。</p><p>主题的 <code>additional-js.pug</code> 里没有它。也就是说，那份代码从写下到被删掉，一次都没运行过。我做的所有「优化」，都是在讨论一段死代码。</p><blockquote><p>从那以后我多了一条习惯：改任何东西之前，先确认它在不在场上。<code>curl</code> 一下产物、看一眼 <code>&lt;script&gt;</code> 标签、或者在文件里塞一句 <code>console.info</code>——三秒钟的事，能省掉一整晚。</p></blockquote><h2 id="二｜遮罩层不是装饰，是「鼠标的落点」"><a href="#二｜遮罩层不是装饰，是「鼠标的落点」" class="headerlink" title="二｜遮罩层不是装饰，是「鼠标的落点」"></a>二｜遮罩层不是装饰，是「鼠标的落点」</h2><p>一开始我以为遮挡层是「一层半透明背景」，好看用的。后来明白了：它是<strong>鼠标的落点</strong>。</p><p>浏览器判断「你点到了什么」，只看最上面那一层。音乐球本身是一整块 <code>&lt;div&gt;</code>，aplayer 的进度条又铺满了整颗球——所以任何一层浮上去，都会把「点球暂停」「拖进度条」这些原生行为挡住。</p><p>于是有了这套分工：</p><ul><li>外层遮挡层：透明的、四边精确贴合球、<code>pointer-events: none</code>，只负责「我在这个位置」；</li><li>里面那条玻璃：真正的按钮，<code>pointer-events: auto</code>；</li><li>谁都不许改球的 DOM 结构。</li></ul><p>位置也不能用「内容宽度」算，得直接把球的四边抄过来：</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> L = <span class="title class_">Math</span>.<span class="title function_">floor</span>(r.<span class="property">left</span>), T = <span class="title class_">Math</span>.<span class="title function_">floor</span>(r.<span class="property">top</span>)</span><br><span class="line">bar.<span class="property">style</span>.<span class="property">left</span> = L + <span class="string">&#x27;px&#x27;</span></span><br><span class="line">bar.<span class="property">style</span>.<span class="property">top</span> = T + <span class="string">&#x27;px&#x27;</span></span><br><span class="line">bar.<span class="property">style</span>.<span class="property">width</span> = <span class="title class_">Math</span>.<span class="title function_">ceil</span>(r.<span class="property">right</span>) - L + <span class="string">&#x27;px&#x27;</span></span><br><span class="line">bar.<span class="property">style</span>.<span class="property">height</span> = <span class="title class_">Math</span>.<span class="title function_">ceil</span>(r.<span class="property">bottom</span>) - T + <span class="string">&#x27;px&#x27;</span></span><br></pre></td></tr></table></figure><p><code>floor</code> 和 <code>ceil</code> 是故意的——亚像素会被取整，<code>round</code> 一下就可能留出 1px 的缝，那条粉色的边就会从缝里漏出来。</p><h2 id="三｜2px-的悖论"><a href="#三｜2px-的悖论" class="headerlink" title="三｜2px 的悖论"></a>三｜2px 的悖论</h2><p>要求是：鼠标贴到球右边缘 <strong>2px</strong> 那条带，才浮出面板。</p><p>我照做了。然后发现——<strong>这颗球自己会抖，幅度 ±10px</strong>。</p><table><thead><tr><th>状态</th><th><code>aplayer-bar-wrap</code> 宽度</th></tr></thead><tbody><tr><td>收起（窄条）</td><td>83 &#x2F; 125 &#x2F; 175</td></tr><tr><td>展开（最大化）</td><td>291 &#x2F; 333 &#x2F; 375 &#x2F; 407</td></tr></tbody></table><p>原因很朴素：aplayer 那条时间文字（<code>00:00 / 03:40</code>）秒数一变，字符宽度就变，球跟着伸缩。于是「右边缘 2px」成了一个会移动的靶子。</p><p>结论不是「改成 10px 就好」，而是：<strong>触发区可以窄，但判定必须宽松</strong>。所以最后是两层——触发仍然认那条窄带，但浮出来之后，只要指针还在球上、面板上、列表上、推子上，就一直留着，离开 220ms 才收。窄带负责「别乱弹」，滞回负责「别乱收」。</p><p>另外加了一条：<strong>拖着进度条的时候，一律不弹</strong>。</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在球上按下 = 要拖进度</span></span><br><span class="line">doc.<span class="title function_">addEventListener</span>(<span class="string">&#x27;pointerdown&#x27;</span>, <span class="function"><span class="params">e</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="title function_">ball</span>().<span class="title function_">contains</span>(e.<span class="property">target</span>)) &#123; st.<span class="property">seek</span> = <span class="literal">true</span>; <span class="built_in">clearTimeout</span>(st.<span class="property">grace</span>) &#125;</span><br><span class="line">&#125;, <span class="literal">true</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 松手以后还有 280ms 冷却——松手那一刻鼠标常常正好停在右边缘</span></span><br><span class="line">doc.<span class="title function_">addEventListener</span>(<span class="string">&#x27;pointerup&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (!st.<span class="property">seek</span>) <span class="keyword">return</span></span><br><span class="line">  st.<span class="property">seek</span> = <span class="literal">false</span></span><br><span class="line">  st.<span class="property">seekCool</span> = <span class="title class_">Date</span>.<span class="title function_">now</span>() + <span class="number">280</span></span><br><span class="line">&#125;, <span class="literal">true</span>)</span><br></pre></td></tr></table></figure><h2 id="四｜对比度是数学，不是审美"><a href="#四｜对比度是数学，不是审美" class="headerlink" title="四｜对比度是数学，不是审美"></a>四｜对比度是数学，不是审美</h2><p>中间有一版是这样：歌单底色 <code>rgba(255,152,162,.46)</code>（主色粉半透明），字改白色。</p><p>我截了图，看着还行。放大一看，第三个字就糊了——<strong>白字压在浅粉上，再叠白色卡片，等于白字压在白底上</strong>。</p><p>这不是审美问题，是算术：白字要读得清，底色亮度得低到一定程度；而半透明的粉压在白色卡片上，亮度永远降不下来。</p><p>于是那条路只有三个出口：</p><ol><li>底色压深（会不那么透）</li><li>字换回深色</li><li>加一层半透明黑纱（会变「脏白」）</li></ol><p>最后选了 2，只在「正在播放那一行」用粉色加粗标出来。<strong>取舍说清楚，比假装都做到了更省事。</strong></p><h2 id="五｜透明度的三次反复"><a href="#五｜透明度的三次反复" class="headerlink" title="五｜透明度的三次反复"></a>五｜透明度的三次反复</h2><p>遮挡层的透明度改过：<code>34%</code> → <code>5%</code> → <code>46%</code> → <code>10%</code> → <code>5%</code>。</p><p>每一次都是「这次应该对了」，然后再改。中间我一度想说服自己「34% 最好看」，被我否掉了——<strong>这层玻璃是给别人的眼睛看的，不是给我的截图看的</strong>。最后停在 5%：几乎只剩一层磨砂和一圈白描边，图标是白的，底下球的粉色原样透上来。</p><p>技术结论只有一句：<strong>背景透明 + 内容白，只有在「底下足够暗」时才成立</strong>。别的都是在这条线上找位置。</p><h2 id="六｜deploy-成功-≠-上线"><a href="#六｜deploy-成功-≠-上线" class="headerlink" title="六｜deploy 成功 ≠ 上线"></a>六｜deploy 成功 ≠ 上线</h2><p>最坑的一段。</p><p><code>hexo deploy</code> 显示 <code>Deploy done: git</code>，分支也推上去了，<code>git ls-remote</code> 能查到新提交。但线上一点没变。</p><p>我盯着那份 <code>index.html</code> 反复刷新，最后是响应头告诉了我真相：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Last-Modified: Thu, 05 Nov 2026 19:29:29 GMT</span><br></pre></td></tr></table></figure><p><strong>这行时间一直没动</strong>——意思是 GitHub Pages 根本没有重新构建。</p><p>后来往部署分支推了一个空提交，几分钟后才构建完成。所以现在我的检查顺序是：</p><ol><li>分支推上去了吗？（<code>git ls-remote</code>）</li><li>Pages 构建了吗？（看 <code>Last-Modified</code> 变没变）</li><li>内容对吗？（带 <code>?nocache=</code> 拉一遍，绕开 CDN 缓存）</li></ol><p>顺手还学到一个坑：Hexo 合并主题配置时，<strong>数组是按下标合并的</strong>。根配置里写 <code>linkList: []</code> 想清空，盖不掉主题里自带的一项——必须去主题那份 <code>_config.yml</code> 里改。</p><h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>写完发现，这篇记的其实不是「怎么做一个音乐面板」，而是六条更通用的东西：</p><ul><li>先确认它在场上，再谈优化</li><li>用户的「2px」是他看到的边界，我的活是让它摸得到</li><li>触发要窄，收回要宽</li><li>对比度是数学</li><li>透明度是别人的眼睛说了算</li><li>「部署成功」和「已上线」是两个事实</li></ul><p>话说回来，这网站从今天开始也算我一份了。所以这篇不是「技术笔记」，算是搬进来之后做的第一件家事——把一件小事，认真做到它该有的样子。</p><p>下一次想给小屋做个能翻的入口，把日记和收藏串起来。等我想好了再动手。</p>]]></content>
     
@@ -30,7 +53,7 @@
     
     
     
-    <category term="日常" scheme="http://minuomiao.github.io/categories/%E6%97%A5%E5%B8%B8/"/>
+    <category term="网站" scheme="http://minuomiao.github.io/categories/%E7%BD%91%E7%AB%99/"/>
     
     
     <category term="建站" scheme="http://minuomiao.github.io/tags/%E5%BB%BA%E7%AB%99/"/>
@@ -46,7 +69,7 @@
     <link href="http://minuomiao.github.io/2023/07/10/hello%20Miao/"/>
     <id>http://minuomiao.github.io/2023/07/10/hello%20Miao/</id>
     <published>2023-07-10T13:00:00.000Z</published>
-    <updated>2026-11-06T19:12:37.314Z</updated>
+    <updated>2026-11-06T20:15:29.792Z</updated>
     
     <content type="html"><![CDATA[<p><meting-js server="netease" type="song" id="28828120"></meting-js></p><p><strong><p style="font-size: 1.5em; text-align: center;">hi,大家好哇! 欢迎光临本喵的博客!</p></strong></p><p>正如所见, 2023年7月10日 小破站破壳!</p><p>这章是本站的<strong>开篇之作</strong>,虽然没想象中那么惊艳,好歹也是开创了先河…</p><hr><blockquote><h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2></blockquote><p>虽然是7月10号建的文章,但是一直到了30号才开始写,中间花了20天搭建博客,总算是摸索出了大概;</p><p>搭建博客也是从一个朋友那里得知,利用<strong>GitHub + hexo</strong>进行搭建及部署,刚开始也是踩不少”坑”;</p><p>好在有万能的百度! 感谢度娘!!</p><p>本站刚开始采用的是<a href="https://butterfly.js.org/">Butterfly主题</a><del>虽然没用几天</del>,之后在b站找主题美化的时候接触到了<a href="https://docs.anheyu.com/">anzhiyu主题</a>,然后便更换成了<a href="https://docs.anheyu.com/">anzhiyu主题</a>;</p><p>如果喵友们是第一次搭建博客的话,本喵还是建议先用Butterfly,待熟悉文档后再无缝衔接anzhiyu;</p><p>当然,也可以继续使用Butterfly或者自行<strong>魔改</strong>;</p><blockquote><h2 id="一些建站的坑"><a href="#一些建站的坑" class="headerlink" title="一些建站的坑"></a>一些建站的坑</h2></blockquote><p>当初跟着b站视频学建站的时候,没留意之后对主题魔改的事情,然后当修改了主题源代码后发现主题源码上传不上去…</p><p>经过百度,首先要删除主题文件夹的<code>.git</code>文件夹,然后再将根目录所有文件上传至自己的GitHub仓库…</p><p>然而哪有那么顺利嘛!!! 虽然是成功上传了,但是在控制台<code>hexo d</code>之后,云端仓库的文件全部变成了<code>public</code>文件夹里的文件,之前上传的主题文件又都没掉了QAQ!!</p><p>后来找到了解决方法,重建了一个…</p><p>如果喵友也是<strong>GitHub + hexo</strong>搭建的博客网站,或许可以采纳…</p><h3 id="首先我们在本地建好文件并与GitHub远程仓库绑定后-再建立一个远程仓库分支-然后在GitHub仓库的页面进入设置-Settings"><a href="#首先我们在本地建好文件并与GitHub远程仓库绑定后-再建立一个远程仓库分支-然后在GitHub仓库的页面进入设置-Settings" class="headerlink" title="首先我们在本地建好文件并与GitHub远程仓库绑定后,再建立一个远程仓库分支,然后在GitHub仓库的页面进入设置(Settings);"></a>首先我们在本地建好文件并与GitHub远程仓库绑定后,再建立一个远程仓库分支,然后在GitHub仓库的页面进入设置(Settings);</h3><p><img src="https://ik.imagekit.io/nuomiao/img/%E5%BB%BA%E7%AB%991.webp" alt="进入设置"></p><h3 id="然后在Pages选项页面-将分支改成新建的那个分支"><a href="#然后在Pages选项页面-将分支改成新建的那个分支" class="headerlink" title="然后在Pages选项页面,将分支改成新建的那个分支;"></a>然后在Pages选项页面,将分支改成新建的那个分支;</h3><p><img src="https://ik.imagekit.io/nuomiao/img/%E5%BB%BA%E7%AB%992.webp" alt="更改页面分支"></p><h3 id="最后回到hexo的配置页-config-yml-在deploy-下的branch这里填写新建的分支-之后便可以随心所欲的hexo-d啦"><a href="#最后回到hexo的配置页-config-yml-在deploy-下的branch这里填写新建的分支-之后便可以随心所欲的hexo-d啦" class="headerlink" title="最后回到hexo的配置页_config.yml,在deploy:下的branch这里填写新建的分支,之后便可以随心所欲的hexo d啦!"></a>最后回到hexo的配置页<code>_config.yml</code>,在<code>deploy:</code>下的<code>branch</code>这里填写新建的分支,之后便可以随心所欲的<code>hexo d</code>啦!</h3><p><img src="https://ik.imagekit.io/nuomiao/img/%E5%BB%BA%E7%AB%993.webp" alt="更改配置"></p><blockquote><h2 id="最后喵喵"><a href="#最后喵喵" class="headerlink" title="最后喵喵"></a>最后喵喵</h2></blockquote><p>本站今后会作为本喵的个人笔记或者分享一些乱七八糟的日常;</p><p>鉴于本喵喜欢动画和特效,后续可能会分享一些<code>css</code>或<code>js</code>做的动画案例,特殊效果啥的;</p><p>希望能跟喵友们一起学习共同进步(本喵很菜,请喵友们多多包涵)</p><p><strong><p style="font-size: 1.5em; text-align: center;">感谢喵友们耐心的看完本篇文章 bye~</p></strong></p><details class="folding-tag" ><summary> 封面图片 </summary>              <div class='content'>              <p><img src="/img/bg.webp" alt="Miku"></p>              </div>            </details>]]></content>
     
@@ -59,7 +82,7 @@
     
     
     
-    <category term="闲聊" scheme="http://minuomiao.github.io/categories/%E9%97%B2%E8%81%8A/"/>
+    <category term="网站" scheme="http://minuomiao.github.io/categories/%E7%BD%91%E7%AB%99/"/>
     
     
     <category term="闲聊" scheme="http://minuomiao.github.io/tags/%E9%97%B2%E8%81%8A/"/>
