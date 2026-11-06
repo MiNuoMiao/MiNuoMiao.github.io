@@ -1,4 +1,4 @@
-﻿menu:
+menu:
   文章:
   #   隧道: /archives/ || anzhiyu-icon-box-archive
   #   分类: /categories/ || anzhiyu-icon-shapes
@@ -1059,8 +1059,8 @@ home_top:
   banner:
     tips: 诺喵和小喵的家
     title: 小屋
-    image: https://bu.dusays.com/2023/05/13/645fa3cf90d70.webp
-    link: /room/ # 小屋入口
+    image: /img/family.webp
+    link: /room/ # 小屋入口（背景是去水印后的全家福）
 
 # 朋友圈配置
 friends_vue:
