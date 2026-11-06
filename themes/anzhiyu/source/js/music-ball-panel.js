@@ -91,23 +91,23 @@
     'box-sizing:border-box;border-radius:40px;overflow:hidden;',
     'opacity:0;pointer-events:none;transition:opacity .1s ease;}',
     '#mb-bar.mb-open{opacity:1;}',
-    /* 跟音量弹层同一套「粉色玻璃」：46% 不透明 + 14px 模糊。压在粉球上不显形，
-       所以这条用主色深一档的 #ff7280；出现时从右往左传进（被球右边缘裁切，就是「滑出来」） */
+    /* 浅粉玻璃：主色 #ff98a2 只给 10% 不透明度，几乎只剩一层磨砂感；
+       按钮图标用深粉 #ff7280 撑住可读性。出现时从右往左传进（被球右边缘裁切） */
     '#mb-bar .mb-chrome{display:flex;align-items:center;justify-content:center;gap:1px;padding:0 4px;',
     'height:100%;margin-left:auto;border-radius:40px;',
-    'background:rgba(255,114,128,.46);',
-    '-webkit-backdrop-filter:blur(14px) saturate(180%);backdrop-filter:blur(14px) saturate(180%);',
-    'box-shadow:0 2px 12px rgba(255,114,128,.28),0 0 0 1px rgba(255,255,255,.45) inset;',
+    'background:rgba(255,152,162,.1);',
+    '-webkit-backdrop-filter:blur(12px) saturate(180%);backdrop-filter:blur(12px) saturate(180%);',
+    'box-shadow:0 2px 10px rgba(255,114,128,.16),0 0 0 1px rgba(255,255,255,.55) inset;',
     'transform:translateX(100%);opacity:0;pointer-events:none;',
     'transition:transform .28s cubic-bezier(.22,.61,.36,1),opacity .2s ease;}',
     '#mb-bar.mb-open .mb-chrome{transform:translateX(0);opacity:1;pointer-events:auto;}',
     '#mb-bar .mb-btn{width:var(--mb-btn,28px);height:var(--mb-btn,28px);flex:0 0 auto;',
     'display:inline-flex;align-items:center;',
-    'justify-content:center;padding:0;border:0;border-radius:50%;background:transparent;color:#fff;',
+    'justify-content:center;padding:0;border:0;border-radius:50%;background:transparent;color:#ff7280;',
     'cursor:pointer;opacity:.95;transition:background .15s ease,opacity .15s ease,transform .1s ease;}',
-    '#mb-bar .mb-btn:hover{background:rgba(255,255,255,.3);opacity:1;}',
+    '#mb-bar .mb-btn:hover{background:rgba(255,255,255,.42);opacity:1;}',
     '#mb-bar .mb-btn:active{transform:scale(.88);}',
-    '#mb-bar .mb-btn.mb-on{background:rgba(255,255,255,.42);opacity:1;}',
+    '#mb-bar .mb-btn.mb-on{background:rgba(255,255,255,.58);opacity:1;}',
     '#mb-bar .mb-btn[hidden]{display:none;}',
 
     /* 歌单：同一套粉色玻璃（半透明 + 模糊，底下的卡片颜色会透上来） */
