@@ -2,10 +2,12 @@
  *
  * 触发判定：
  *   1. 只在桌面宽屏生效（主题在 <=1200px 会隐藏音乐球）
- *   2. 鼠标贴到球「右边缘往里 2px」的那条窄带 → 遮挡层浮出
- *   3. 浮出后只要指针还在球上、遮挡层上、歌单或音量弹层上就保持
+ *   2. 球必须是「最大化」状态：aplayer-bar-wrap 宽度 > 300 才允许唤出；
+ *      <=300（球是收起来的窄条）时完全无反应，贴边也不触发
+ *   3. 在上面两条都满足的前提下，鼠标贴到球「右边缘往里 2px」的那条窄带 → 遮挡层浮出
+ *   4. 浮出后只要指针还在球上、遮挡层上、歌单或音量弹层上就保持
  *      （离开这几个区域 220ms 后才收起，避免边界抖动）
- *   4. 歌单 / 音量是「点了才开、开了不走」的粘性面板：
+ *   5. 歌单 / 音量是「点了才开、开了不走」的粘性面板：
  *      - 鼠标移开不会自己消失，只有点别处 / Esc / 再点一次按钮才收
  *      - 音量拖动时锁住面板（pointerdown → pointerup），拖出面板也不会断
  *
@@ -21,6 +23,7 @@
   var GRACE = 220 // 离开后收起延迟(ms)
   var POLL = 120 // 打开时对齐位置 / 同步图标的心跳(ms)
   var MIN_W = 1201 // 主题在 <=1200px 隐藏音乐球
+  var TRIGGER_MIN = 300 // .aplayer-bar-wrap 宽度要大于它（即球已经在展开态）才允许唤出遮挡层
 
   var doc = document
   var bar, listEl, volEl, volInput, listBody
@@ -57,6 +60,16 @@
   }
   function isWide() {
     return window.innerWidth >= MIN_W
+  }
+  // 球有没有「最大化」：看 aplayer 那条进度层有多宽（它跟着球一起伸缩）
+  function wrapWidth() {
+    var el = doc.querySelector('#nav-music .aplayer-bar-wrap')
+    if (el) return el.getBoundingClientRect().width
+    var r = ballRect()
+    return r ? r.width : 0 // 兜底：aplayer 还没起来时按球的宽度算
+  }
+  function bigEnough() {
+    return wrapWidth() > TRIGGER_MIN
   }
   function ballUsable() {
     var b = ball()
@@ -296,8 +309,9 @@
   /* ---------------- 开 / 关 ---------------- */
   function openBar() {
     if (st.open) { st.bail = 'already-open'; return }
-    if (!isWide()) { st.bail = 'narrow'; return }
+    if (!isWide()) { st.bail = 'narrow-screen'; return }
     if (!ballUsable()) { st.bail = 'ball-hidden'; return }
+    if (!bigEnough()) { st.bail = 'wrap<=' + TRIGGER_MIN; return }
     build()
     clearTimeout(st.grace)
     st.open = true
@@ -343,6 +357,11 @@
     if (!ball()) { if (st.open) closeBar(); return }
     var r = ballRect()
     if (!r || r.width < 24) { if (st.open) scheduleClose(); return }
+    // 球没展开（进度层 <= 300）时完全不响应：贴边也不唤出
+    if (!bigEnough()) {
+      if (st.open) closeBar()
+      return
+    }
 
     var overBall = inRect(r, e.clientX, e.clientY)
     var overBar = st.open && inRect(bar.getBoundingClientRect(), e.clientX, e.clientY)
@@ -489,6 +508,7 @@
         vw: window.innerWidth, vh: window.innerHeight, open: st.open, list: st.list, vol: st.vol,
         op: (function () { var b = ball(); return b ? Number(getComputedStyle(b).opacity) : -1 })(),
         bail: st.bail || '-',
+        wrap: Math.round(wrapWidth()),
         barBox: br2 ? [Math.round(br2.left), Math.round(br2.top), Math.round(br2.right), Math.round(br2.bottom)] : null
       }))
     }, 2500)
