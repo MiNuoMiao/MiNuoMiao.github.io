@@ -238,13 +238,55 @@ function showWelcome () {
 }
 window.onload = showWelcome
 document.addEventListener("pjax:complete", showWelcome)// 发起获取IP地址的GET请求
-fetch('https://api.qjqq.cn/api/Local')
-  .then(response => response.json())
-  .then(data => {
-    ipLocation = data
-    showWelcome() // IP地址获取成功后显示欢迎信息
+// 2026-11 换了数据源：原来的 https://api.qjqq.cn/api/Local 已经挂掉（Cloudflare 530 / 证书失败），
+// 现在用 ipwho.is（https、免 key、允许跨域），然后把英文国家和省份翻回中文，
+// 这样下面那套「北京市 → 北——京——欢迎你」的文案还能继续命中。
+var CN_COUNTRY = { china: '中国', cn: '中国', japan: '日本', jp: '日本', unitedstates: '美国', usa: '美国', us: '美国', unitedkingdom: '英国', uk: '英国', gb: '英国', britain: '英国', russia: '俄罗斯', ru: '俄罗斯', france: '法国', fr: '法国', germany: '德国', de: '德国', australia: '澳大利亚', au: '澳大利亚', canada: '加拿大', ca: '加拿大', singapore: '新加坡', sg: '新加坡', southkorea: '韩国', kr: '韩国', korea: '韩国', india: '印度', in: '印度', brazil: '巴西', br: '巴西', italy: '意大利', it: '意大利', spain: '西班牙', es: '西班牙', netherlands: '荷兰', nl: '荷兰', sweden: '瑞典', se: '瑞典', norway: '挪威', no: '挪威', finland: '芬兰', fi: '芬兰', poland: '波兰', pl: '波兰', turkey: '土耳其', tr: '土耳其', thailand: '泰国', th: '泰国', vietnam: '越南', vn: '越南', malaysia: '马来西亚', my: '马来西亚', indonesia: '印度尼西亚', id: '印度尼西亚', philippines: '菲律宾', ph: '菲律宾', newzealand: '新西兰', nz: '新西兰', mexico: '墨西哥', mx: '墨西哥', argentina: '阿根廷', ar: '阿根廷', egypt: '埃及', eg: '埃及', southafrica: '南非', za: '南非', taiwan: '中国台湾', tw: '中国台湾', hongkong: '中国香港', hk: '中国香港', macau: '中国澳门', mo: '中国澳门' }
+var CN_PROV = { beijing: '北京市', tianjin: '天津市', hebei: '河北省', shanxi: '山西省', shaanxi: '陕西省', neimenggu: '内蒙古自治区', neimongol: '内蒙古自治区', liaoning: '辽宁省', jilin: '吉林省', heilongjiang: '黑龙江省', shanghai: '上海市', jiangsu: '江苏省', zhejiang: '浙江省', anhui: '安徽省', fujian: '福建省', jiangxi: '江西省', shandong: '山东省', henan: '河南省', hubei: '湖北省', hunan: '湖南省', guangdong: '广东省', guangxi: '广西壮族自治区', hainan: '海南省', chongqing: '重庆市', sichuan: '四川省', guizhou: '贵州省', yunnan: '云南省', xizang: '西藏自治区', tibet: '西藏自治区', gansu: '甘肃省', qinghai: '青海省', ningxia: '宁夏回族自治区', xinjiang: '新疆维吾尔自治区', taiwan: '台湾省', hongkong: '香港特别行政区', macau: '澳门特别行政区' }
+var CN_CITY = { wuhan: '武汉市', huanggang: '黄冈市', nanjing: '南京市', suzhou: '苏州市', zhengzhou: '郑州市', nanyang: '南阳市', zhumadian: '驻马店市', kaifeng: '开封市', luoyang: '洛阳市', guangzhou: '广州市', shenzhen: '深圳市', yangjiang: '阳江市', beijing: '北京市', tianjin: '天津市', shanghai: '上海市', chongqing: '重庆市', chengdu: '成都市', hangzhou: '杭州市', changsha: '长沙市', xian: '西安市', nanchang: '南昌市', hefei: '合肥市', fuzhou: '福州市', xiamen: '厦门市', jinan: '济南市', qingdao: '青岛市', shenyang: '沈阳市', harbin: '哈尔滨市', kunming: '昆明市', guiyang: '贵阳市', nanning: '南宁市', haikou: '海口市', lanzhou: '兰州市', xining: '西宁市', yinchuan: '银川市', urumqi: '乌鲁木齐市', huhehaote: '呼和浩特市' }
+
+function ipNorm (s) { return String(s == null ? '' : s).toLowerCase().replace(/[^a-z]/g, '') }
+function ipProvKey (s) {
+  return ipNorm(String(s == null ? '' : s).replace(/\b(sheng|shi|zizhiqu|province|municipality|autonomous|region|uygur|zhuangzu|huizu|zhuang|hui)\b/g, ''))
+}
+function ipTr (map, value, keyer) {
+  if (!value) return ''
+  var k = (keyer || ipNorm)(value)
+  return map[k] || value
+}
+
+function applyLocation (o) {
+  ipLocation = {
+    ip: o.ip,
+    data: {
+      country: ipTr(CN_COUNTRY, o.country),
+      prov: ipTr(CN_PROV, o.region, ipProvKey),
+      city: ipTr(CN_CITY, o.city),
+      district: '',
+      lat: o.lat,
+      lng: o.lng
+    }
+  }
+  showWelcome()
+}
+
+// 第一个源不可用（限流/挂掉）就自动换第二个
+fetch('https://ipwho.is/')
+  .then(function (r) { return r.json() })
+  .then(function (d) {
+    if (!d || d.success === false) throw new Error((d && d.message) || 'ipwho.is failed')
+    applyLocation({ ip: d.ip, country: d.country, region: d.region, city: d.city, lat: d.latitude, lng: d.longitude })
   })
-  .catch(error => console.error('Error:', error))
+  .catch(function () {
+    return fetch('https://ipinfo.io/json')
+      .then(function (r) { return r.json() })
+      .then(function (d) {
+        if (!d || !d.ip) throw new Error('ipinfo failed')
+        var loc = String(d.loc || ',').split(',')
+        applyLocation({ ip: d.ip, country: d.country, region: d.region, city: d.city, lat: parseFloat(loc[0]), lng: parseFloat(loc[1]) })
+      })
+  })
+  .catch(function (error) { console.error('IP 定位都失败了:', error) })
 
 // 计算两个经纬度之间的距离
 function getDistance (e1, n1, e2, n2) {
