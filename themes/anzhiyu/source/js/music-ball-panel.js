@@ -87,20 +87,23 @@
     /* 遮挡层本身是透明的（只当感应面，四边精确贴合球），深色的那条是里面的 .mb-chrome */
     '#mb-bar{position:fixed;z-index:99999;display:flex;align-items:center;justify-content:flex-end;',
     'box-sizing:border-box;border-radius:40px;overflow:hidden;',
-    'opacity:0;pointer-events:none;transition:opacity .18s ease;}',
+    'opacity:0;pointer-events:none;transition:opacity .1s ease;}',
     '#mb-bar.mb-open{opacity:1;}',
+    /* 白色偏透明的遮挡层；出现时从右往左传进（被球右边缘裁切，就是「滑出来」） */
     '#mb-bar .mb-chrome{display:flex;align-items:center;justify-content:center;gap:1px;padding:0 4px;',
-    'height:100%;margin-left:auto;border-radius:40px;background:rgba(26,28,38,.72);',
-    '-webkit-backdrop-filter:blur(6px) saturate(140%);backdrop-filter:blur(6px) saturate(140%);',
-    'box-shadow:0 0 0 1px rgba(255,255,255,.14) inset;pointer-events:none;}',
-    '#mb-bar.mb-open .mb-chrome{pointer-events:auto;}',
+    'height:100%;margin-left:auto;border-radius:40px;background:rgba(255,255,255,.74);',
+    '-webkit-backdrop-filter:blur(10px) saturate(170%);backdrop-filter:blur(10px) saturate(170%);',
+    'box-shadow:0 2px 12px rgba(0,0,0,.16),0 0 0 1px rgba(0,0,0,.06) inset;',
+    'transform:translateX(100%);opacity:0;pointer-events:none;',
+    'transition:transform .28s cubic-bezier(.22,.61,.36,1),opacity .2s ease;}',
+    '#mb-bar.mb-open .mb-chrome{transform:translateX(0);opacity:1;pointer-events:auto;}',
     '#mb-bar .mb-btn{width:var(--mb-btn,28px);height:var(--mb-btn,28px);flex:0 0 auto;',
     'display:inline-flex;align-items:center;',
-    'justify-content:center;padding:0;border:0;border-radius:50%;background:transparent;color:#fff;',
-    'cursor:pointer;opacity:.9;transition:background .15s ease,opacity .15s ease,transform .1s ease;}',
-    '#mb-bar .mb-btn:hover{background:rgba(255,255,255,.22);opacity:1;}',
+    'justify-content:center;padding:0;border:0;border-radius:50%;background:transparent;color:#3a3a44;',
+    'cursor:pointer;opacity:.85;transition:background .15s ease,opacity .15s ease,transform .1s ease;}',
+    '#mb-bar .mb-btn:hover{background:rgba(0,0,0,.09);opacity:1;}',
     '#mb-bar .mb-btn:active{transform:scale(.88);}',
-    '#mb-bar .mb-btn.mb-on{background:rgba(255,255,255,.26);opacity:1;}',
+    '#mb-bar .mb-btn.mb-on{background:rgba(0,0,0,.13);opacity:1;}',
     '#mb-bar .mb-btn[hidden]{display:none;}',
 
     /* 歌单 */
@@ -119,9 +122,11 @@
     'text-overflow:ellipsis;white-space:nowrap;}',
     '#mb-list .mb-empty{padding:14px 10px;text-align:center;opacity:.6;}',
 
-    /* 音量弹层：竖着的推子 */
+    /* 音量弹层：竖着的推子（跟着遮挡层一起改成白色偏透明） */
     '#mb-volpop{position:fixed;z-index:100000;width:46px;padding:12px 8px 8px;box-sizing:border-box;',
-    'border-radius:16px;background:rgba(26,28,38,.94);box-shadow:0 10px 28px rgba(0,0,0,.3);color:#fff;',
+    'border-radius:16px;background:rgba(255,255,255,.86);color:#3a3a44;',
+    '-webkit-backdrop-filter:blur(10px) saturate(170%);backdrop-filter:blur(10px) saturate(170%);',
+    'box-shadow:0 8px 26px rgba(0,0,0,.2),0 0 0 1px rgba(0,0,0,.06) inset;',
     'display:flex;flex-direction:column;align-items:center;gap:6px;',
     'opacity:0;pointer-events:none;transform:translateY(6px);',
     'transition:opacity .16s ease,transform .16s ease;}',
@@ -132,10 +137,10 @@
     '#mb-volpop .mb-vol-wrap{position:relative;width:22px;height:108px;flex:0 0 auto;}',
     /* 轨道和填充自己画，不依赖旋转后渐变的方向，看得清也拖得准 */
     '#mb-volpop .mb-vol-wrap::before{content:"";position:absolute;left:50%;top:0;height:100%;width:6px;',
-    'transform:translateX(-50%);border-radius:3px;background:rgba(255,255,255,.28);z-index:0;}',
+    'transform:translateX(-50%);border-radius:3px;background:rgba(0,0,0,.14);z-index:0;}',
     '#mb-volpop .mb-vol-wrap::after{content:"";position:absolute;left:50%;bottom:0;width:6px;',
     'height:calc(var(--mb-vol,70) * 1%);transform:translateX(-50%);border-radius:3px;',
-    'background:#fff;z-index:0;}',
+    'background:#3b74e8;z-index:0;}',
     '#mb-volpop .mb-vol-num{font-size:12px;opacity:.72;font-variant-numeric:tabular-nums;}',
     /* 横着写的 input 转 -90° 变成竖向推子：value 0 在下、100 在上 */
     '#mb-volpop input[type=range]{position:absolute;top:50%;left:50%;width:108px;height:22px;',
