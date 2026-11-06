@@ -1,0 +1,458 @@
+/* 音乐球边缘遮挡层（全部由脚本注入，不改主题 CSS、不改 pug 结构）
+ *
+ * 触发判定：
+ *   1. 只在桌面宽屏生效（主题在 <=1200px 会隐藏音乐球）
+ *   2. 鼠标贴到球「右边缘往里 2px」的那条窄带 → 遮挡层浮出
+ *   3. 浮出后只要指针还在球上、遮挡层上、歌单或音量弹层上就保持
+ *      （离开这几个区域 220ms 后才收起，避免边界抖动）
+ *   4. 歌单 / 音量是「点了才开、开了不走」的粘性面板：
+ *      - 鼠标移开不会自己消失，只有点别处 / Esc / 再点一次按钮才收
+ *      - 音量拖动时锁住面板（pointerdown → pointerup），拖出面板也不会断
+ *
+ * 位置：遮挡层是 body 下的 fixed 元素，右边缘永远对齐球的右边缘、高度跟随球，
+ *       所以不会被球的 overflow:hidden 裁掉（上一版就栽在这儿）。
+ */
+;(function () {
+  'use strict'
+  if (window.__mbBarLoaded) return
+  window.__mbBarLoaded = true
+
+  var EDGE = 2 // 触发带宽：球右边缘往里 2px
+  var GRACE = 220 // 离开后收起延迟(ms)
+  var POLL = 120 // 打开时对齐位置 / 同步图标的心跳(ms)
+  var MIN_W = 1201 // 主题在 <=1200px 隐藏音乐球
+
+  var doc = document
+  var bar, listEl, volEl, volInput, listBody
+  var st = { open: false, list: false, vol: false, drag: false, grace: 0, poll: 0 }
+  var cache = { r: null, key: '', t: 0 }
+
+  /* ---------------- 基础 ---------------- */
+  function ball() {
+    return doc.getElementById('nav-music')
+  }
+  function getAp() {
+    var m = doc.querySelector('#nav-music meting-js')
+    return m && m.aplayer ? m.aplayer : null
+  }
+  function ballRect(fresh) {
+    var b = ball()
+    if (!b) return null
+    var tag = '1'
+    var now = Date.now()
+    if (!fresh && cache.key === tag && now - cache.t < 80) return cache.r
+    cache.r = b.getBoundingClientRect()
+    cache.t = now
+    return cache.r
+  }
+  function inRect(r, x, y) {
+    return !!r && r.width > 0 && x >= r.left && x <= r.right && y >= r.top && y <= r.bottom
+  }
+  function svg(d, filled) {
+    return (
+      '<svg viewBox="0 0 24 24" width="15" height="15" fill="' + (filled ? 'currentColor' : 'none') +
+      '" stroke="' + (filled ? 'none' : 'currentColor') +
+      '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="' + d + '"/></svg>'
+    )
+  }
+  function isWide() {
+    return window.innerWidth >= MIN_W
+  }
+  function ballUsable() {
+    var b = ball()
+    if (!b) return false
+    var r = b.getBoundingClientRect()
+    if (r.width < 24 || r.height < 14) return false
+    var cs = getComputedStyle(b)
+    if (cs.display === 'none' || cs.visibility === 'hidden') return false
+    if (Number(cs.opacity) < 0.5) return false // 首屏 / 页脚时主题会把它淡出
+    return true
+  }
+
+  /* ---------------- 样式 ---------------- */
+  var CSS = [
+    /* 遮挡层 */
+    '#mb-bar{position:fixed;z-index:99999;display:flex;align-items:center;justify-content:flex-end;',
+    'gap:1px;padding:0 4px;box-sizing:border-box;border-radius:40px;',
+    'background:rgba(26,28,38,.62);-webkit-backdrop-filter:blur(6px) saturate(140%);',
+    'backdrop-filter:blur(6px) saturate(140%);box-shadow:0 0 0 1px rgba(255,255,255,.12) inset;',
+    'opacity:0;pointer-events:none;transition:opacity .18s ease;}',
+    '#mb-bar.mb-open{opacity:1;pointer-events:auto;}',
+    '#mb-bar .mb-btn{width:var(--mb-btn,28px);height:var(--mb-btn,28px);flex:0 0 auto;',
+    'display:inline-flex;align-items:center;',
+    'justify-content:center;padding:0;border:0;border-radius:50%;background:transparent;color:#fff;',
+    'cursor:pointer;opacity:.9;transition:background .15s ease,opacity .15s ease,transform .1s ease;}',
+    '#mb-bar .mb-btn:hover{background:rgba(255,255,255,.22);opacity:1;}',
+    '#mb-bar .mb-btn:active{transform:scale(.88);}',
+    '#mb-bar .mb-btn.mb-on{background:rgba(255,255,255,.26);opacity:1;}',
+    '#mb-bar .mb-btn[hidden]{display:none;}',
+
+    /* 歌单 */
+    '#mb-list{position:fixed;z-index:100000;width:284px;max-height:52vh;overflow-y:auto;padding:6px;',
+    'box-sizing:border-box;border-radius:16px;background:#fff;color:#333;',
+    'box-shadow:0 12px 32px rgba(0,0,0,.24);font-size:13px;line-height:1.35;',
+    'opacity:0;pointer-events:none;transform:translateY(6px);',
+    'transition:opacity .16s ease,transform .16s ease;}',
+    '#mb-list.mb-open{opacity:1;pointer-events:auto;transform:translateY(0);}',
+    '#mb-list .mb-row{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:10px;cursor:pointer;}',
+    '#mb-list .mb-row:hover{background:rgba(0,0,0,.06);}',
+    '#mb-list .mb-row.mb-cur{color:#3b74e8;font-weight:600;}',
+    '#mb-list .mb-no{flex:0 0 18px;text-align:right;font-size:12px;opacity:.45;}',
+    '#mb-list .mb-name{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}',
+    '#mb-list .mb-singer{flex:0 0 auto;max-width:96px;font-size:12px;opacity:.5;overflow:hidden;',
+    'text-overflow:ellipsis;white-space:nowrap;}',
+    '#mb-list .mb-empty{padding:14px 10px;text-align:center;opacity:.6;}',
+
+    /* 音量弹层 */
+    '#mb-volpop{position:fixed;z-index:100000;padding:10px 12px;box-sizing:border-box;border-radius:14px;',
+    'background:rgba(26,28,38,.94);box-shadow:0 10px 28px rgba(0,0,0,.3);color:#fff;',
+    'display:flex;align-items:center;gap:8px;',
+    'opacity:0;pointer-events:none;transform:translateY(6px);',
+    'transition:opacity .16s ease,transform .16s ease;}',
+    '#mb-volpop.mb-open{opacity:1;pointer-events:auto;transform:translateY(0);}',
+    /* 上下各留一段透明桥：指针从按钮走到滑块、或滑出面板再回来，都不会断 */
+    '#mb-volpop::before,#mb-volpop::after{content:"";position:absolute;left:0;right:0;height:16px;}',
+    '#mb-volpop::before{top:-16px;}#mb-volpop::after{bottom:-16px;}',
+    '#mb-volpop .mb-vol-num{font-size:12px;opacity:.7;width:30px;text-align:center;',
+    'font-variant-numeric:tabular-nums;}',
+    '#mb-volpop input[type=range]{-webkit-appearance:none;appearance:none;width:118px;height:16px;',
+    'margin:0;padding:0;background:transparent;outline:none;cursor:pointer;}',
+    '#mb-volpop input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;',
+    'background:linear-gradient(to right,#fff 0 calc(var(--mb-vol,70) * 1%),rgba(255,255,255,.26) calc(var(--mb-vol,70) * 1%) 100%);}',
+    '#mb-volpop input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;',
+    'margin-top:-4px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.4);}',
+    '#mb-volpop input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:rgba(255,255,255,.26);}',
+    '#mb-volpop input[type=range]::-moz-range-thumb{width:14px;height:14px;border:0;border-radius:50%;background:#fff;}'
+  ].join('')
+
+  function injectCSS() {
+    if (doc.getElementById('mb-style')) return
+    var s = doc.createElement('style')
+    s.id = 'mb-style'
+    s.textContent = CSS
+    ;(doc.head || doc.documentElement).appendChild(s)
+  }
+
+  /* ---------------- DOM ---------------- */
+  var PLAY = 'M8 5v14l11-7z'
+  var PAUSE = 'M7 5h4v14H7zM13 5h4v14h-4z'
+  var PREV = 'M19 20L9 12l10-8v16zM6 5v14'
+  var NEXT = 'M5 4l10 8-10 8V4zM18 5v14'
+  var LIST = 'M4 6h16M4 12h16M4 18h16'
+  var VOL = 'M4 9v6h4l5 4V5L8 9H4zM16 8a5 5 0 0 1 0 8'
+
+  function build() {
+    if (bar) return
+    bar = doc.createElement('div')
+    bar.id = 'mb-bar'
+    bar.innerHTML =
+      '<button type="button" class="mb-btn" data-act="prev" title="上一首" aria-label="上一首">' + svg(PREV, true) + '</button>' +
+      '<button type="button" class="mb-btn" data-act="toggle" title="播放 / 暂停" aria-label="播放或暂停">' + svg(PLAY, true) + '</button>' +
+      '<button type="button" class="mb-btn" data-act="next" title="下一首" aria-label="下一首">' + svg(NEXT, true) + '</button>' +
+      '<button type="button" class="mb-btn" data-act="list" title="歌单" aria-label="歌单">' + svg(LIST, false) + '</button>' +
+      '<button type="button" class="mb-btn" data-act="vol" title="音量" aria-label="音量">' + svg(VOL, false) + '</button>'
+
+    listEl = doc.createElement('div')
+    listEl.id = 'mb-list'
+    listBody = doc.createElement('div')
+
+    volEl = doc.createElement('div')
+    volEl.id = 'mb-volpop'
+    volEl.innerHTML =
+      '<input type="range" min="0" max="100" step="1" value="70" aria-label="音量">' +
+      '<span class="mb-vol-num">70</span>'
+    volInput = volEl.querySelector('input')
+
+    doc.body.appendChild(bar)
+    listEl.appendChild(listBody)
+    doc.body.appendChild(listEl)
+    doc.body.appendChild(volEl)
+    bind()
+  }
+
+  /* ---------------- 定位 ---------------- */
+  function place() {
+    var r = ballRect(true)
+    if (!r) return
+    var vw = window.innerWidth
+    var vh = window.innerHeight
+
+    // 遮挡层：右边缘、高度都跟着球；宽度由内容决定，所以球窄时向左长，不会越过球右边缘
+    var pad = 4, gap = 1
+    var bw = Math.floor((r.width - pad * 2 - gap * 4) / 5)
+    bw = Math.max(22, Math.min(30, bw)) // 球窄就缩按钮，保证整条不超过球宽
+    bar.style.setProperty('--mb-btn', bw + 'px')
+    bar.style.top = Math.round(r.top) + 'px'
+    bar.style.height = Math.round(r.height) + 'px'
+    bar.style.right = Math.round(vw - r.right) + 'px'
+    bar.style.left = 'auto'
+
+    if (st.list) {
+      var lw = listEl.offsetWidth || 284
+      listEl.style.left = Math.round(Math.max(10, Math.min(r.left, vw - lw - 12))) + 'px'
+      listEl.style.top = 'auto'
+      // 底部压住球 2px，中间不留缝，指针从球走到面板不会掉出去
+      listEl.style.bottom = Math.round(vh - r.top - 2) + 'px'
+    }
+    if (st.vol) {
+      var pw = volEl.offsetWidth || 190
+      var volBtn = bar.querySelector('[data-act="vol"]')
+      var br = volBtn ? volBtn.getBoundingClientRect() : r
+      var cx = br.left + br.width / 2
+      var left = Math.max(10, Math.min(cx - pw / 2, vw - pw - 12))
+      volEl.style.left = Math.round(left) + 'px'
+      volEl.style.top = 'auto'
+      volEl.style.bottom = Math.round(vh - r.top - 2) + 'px'
+    }
+  }
+
+  /* ---------------- 状态同步 ---------------- */
+  function paintVol(pc) {
+    volEl.style.setProperty('--mb-vol', pc)
+    var n = volEl.querySelector('.mb-vol-num')
+    if (n) n.textContent = pc
+  }
+
+  function sync() {
+    if (!bar) return
+    var a = getAp()
+    if (!a) return
+    var tBtn = bar.querySelector('[data-act="toggle"]')
+    if (tBtn && a.audio) tBtn.innerHTML = svg(a.audio.paused ? PLAY : PAUSE, true)
+
+    var vBtn = bar.querySelector('[data-act="vol"]')
+    if (vBtn) vBtn.classList.toggle('mb-on', st.vol)
+
+    var lBtn = bar.querySelector('[data-act="list"]')
+    if (lBtn) lBtn.classList.toggle('mb-on', st.list)
+
+    if (typeof a.volume === 'function' && !st.drag) {
+      var v = a.volume()
+      if (typeof v === 'number') {
+        var pc = Math.round(v * 100)
+        if (Math.abs(pc - Number(volInput.value)) > 1) volInput.value = pc
+        paintVol(pc)
+      }
+    }
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]
+    })
+  }
+
+  function renderList() {
+    var a = getAp()
+    var audios = a && a.list && a.list.audios ? a.list.audios : null
+    if (!audios || !audios.length) {
+      listBody.innerHTML = '<div class="mb-empty">歌单还没加载出来</div>'
+      return
+    }
+    var cur = a.list.index
+    var html = ''
+    for (var i = 0; i < audios.length; i++) {
+      var s = audios[i] || {}
+      html +=
+        '<div class="mb-row' + (i === cur ? ' mb-cur' : '') + '" data-i="' + i + '">' +
+        '<span class="mb-no">' + (i + 1) + '</span>' +
+        '<span class="mb-name">' + esc(s.name || '未知曲目') + '</span>' +
+        '<span class="mb-singer">' + esc(s.artist || '') + '</span>' +
+        '</div>'
+    }
+    listBody.innerHTML = html
+  }
+
+  /* ---------------- 开 / 关 ---------------- */
+  function openBar() {
+    if (st.open || !isWide() || !ballUsable()) return
+    build()
+    clearTimeout(st.grace)
+    st.open = true
+    place()
+    bar.classList.add('mb-open')
+    sync()
+    if (!st.poll) st.poll = setInterval(function () { place(); sync() }, POLL)
+  }
+  function closeList() {
+    st.list = false
+    if (listEl) listEl.classList.remove('mb-open')
+  }
+  function closeVol() {
+    st.vol = false
+    if (volEl) volEl.classList.remove('mb-open')
+  }
+  function closeBar() {
+    if (!st.open) return
+    st.open = false
+    clearTimeout(st.grace)
+    if (st.poll) { clearInterval(st.poll); st.poll = 0 }
+    closeList()
+    closeVol()
+    if (bar) bar.classList.remove('mb-open')
+  }
+  function keepAlive() {
+    clearTimeout(st.grace)
+    if (!st.open) openBar()
+    else if (!st.poll) st.poll = setInterval(function () { place(); sync() }, POLL)
+  }
+  function scheduleClose() {
+    // 歌单或音量开着的时候就钉住，不因为鼠标移开而消失（这正是上一版最坑的地方）
+    if (!st.open || st.drag || st.list || st.vol) return
+    clearTimeout(st.grace)
+    st.grace = setTimeout(function () {
+      if (!st.drag) closeBar()
+    }, GRACE)
+  }
+
+  /* ---------------- 交互 ---------------- */
+  function onMove(e) {
+    if (!isWide()) return
+    if (!ball()) { if (st.open) closeBar(); return }
+    var r = ballRect()
+    if (!r || r.width < 24) { if (st.open) scheduleClose(); return }
+
+    var overBall = inRect(r, e.clientX, e.clientY)
+    var overBar = st.open && inRect(bar.getBoundingClientRect(), e.clientX, e.clientY)
+    var overList = st.list && inRect(listEl.getBoundingClientRect(), e.clientX, e.clientY)
+    var overVol = st.vol && inRect(volEl.getBoundingClientRect(), e.clientX, e.clientY)
+
+    // ① 触发：贴到球的右边缘（往里 2px 之内）
+    if (overBall && e.clientX >= r.right - EDGE) {
+      openBar()
+      keepAlive()
+      return
+    }
+    // ② 保持：还在球上 / 遮挡层上 / 歌单上 / 音量弹层上
+    if (overBar || overList || overVol || (st.open && overBall)) {
+      keepAlive()
+      return
+    }
+    // ③ 都离开了 → 延迟收起
+    scheduleClose()
+  }
+
+  function bind() {
+    bar.addEventListener('pointerdown', function (e) { e.stopPropagation() })
+    bar.addEventListener('click', function (e) {
+      e.preventDefault()
+      e.stopPropagation()
+      var btn = e.target.closest ? e.target.closest('.mb-btn') : null
+      if (!btn) return // 点遮挡层空白处不当成收起，避免贴边时误触
+      var act = btn.getAttribute('data-act')
+      var a = getAp()
+      if (!a) return
+
+      if (act === 'prev') { try { a.skipBack() } catch (err) {} }
+      else if (act === 'next') { try { a.skipForward() } catch (err) {} }
+      else if (act === 'toggle') { try { a.toggle() } catch (err) {} }
+      else if (act === 'list') {
+        st.list = !st.list
+        if (st.list) { renderList(); place(); listEl.classList.add('mb-open') }
+        else closeList()
+      } else if (act === 'vol') {
+        st.vol = !st.vol
+        if (st.vol) {
+          var pc = 70
+          if (typeof a.volume === 'function') {
+            var v = a.volume()
+            if (typeof v === 'number') pc = Math.round(v * 100)
+          }
+          volInput.value = pc
+          paintVol(pc)
+          place()
+          volEl.classList.add('mb-open')
+        } else closeVol()
+      }
+      place()
+      sync()
+    })
+
+    // 歌单：点了就切歌，面板不关（想连点几首也方便）
+    listEl.addEventListener('pointerdown', function (e) { e.stopPropagation() })
+    listEl.addEventListener('click', function (e) {
+      e.stopPropagation()
+      var row = e.target.closest ? e.target.closest('.mb-row') : null
+      if (!row) return
+      var i = Number(row.getAttribute('data-i'))
+      var a = getAp()
+      if (!a || !a.list) return
+      try { a.list.switch(i) } catch (err) {}
+      setTimeout(function () { renderList(); sync() }, 120)
+    })
+
+    // 音量：拖动期间锁住面板，绝不因为指针离开而消失
+    volEl.addEventListener('pointerdown', function (e) {
+      e.stopPropagation()
+      st.drag = true
+      clearTimeout(st.grace)
+      try { volInput.setPointerCapture(e.pointerId) } catch (err) {}
+    })
+    volEl.addEventListener('pointermove', function (e) { e.stopPropagation() })
+    doc.addEventListener('pointerup', function () {
+      if (!st.drag) return
+      st.drag = false
+      sync()
+    })
+    volInput.addEventListener('input', function () {
+      var pc = Number(volInput.value)
+      paintVol(pc)
+      var a = getAp()
+      if (a && typeof a.volume === 'function') a.volume(pc / 100)
+    })
+
+    // 触发判定：鼠标贴到球右边缘 2px
+    // 同时挂 pointermove / pointerover / pointerdown：有的环境（含自动化点击）只会派发后两种，
+    // 只监听 move 的话贴边会漏掉触发
+    doc.addEventListener('pointermove', onMove, { passive: true })
+    doc.addEventListener('pointerover', onMove, { passive: true })
+    doc.addEventListener('pointerdown', onMove, { passive: true })
+
+    // 点别处 / Esc 收起
+    doc.addEventListener('pointerdown', function (e) {
+      if (!st.open) return
+      if (bar.contains(e.target) || listEl.contains(e.target) || volEl.contains(e.target)) return
+      closeBar()
+    }, true)
+    doc.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeBar()
+    })
+    window.addEventListener('resize', function () { if (st.open) place() })
+  }
+
+  /* ---------------- 启动 ---------------- */
+  function boot() {
+    injectCSS()
+    build()
+    // 主题 / pjax 可能重排音乐球：打开时校对位置，球被淡出就收起
+    setInterval(function () {
+      if (st.open && !ballUsable()) closeBar()
+    }, 500)
+  }
+
+  if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', boot)
+  else boot()
+
+  if (location.search.indexOf('mbdebug') > -1) {
+    console.info('[mb-bar] loaded, edge=' + EDGE + 'px, minWidth=' + MIN_W)
+    // 调试用：带上 ?mbdebug=1 才会打，平时一行日志都不留
+    ;['pointerdown', 'click'].forEach(function (t) {
+      doc.addEventListener(t, function (e) {
+        var r = ballRect(true)
+        if (!r) return
+        console.info('[mb-bar] ' + t + ' ' + e.clientX + ',' + e.clientY +
+          ' band[' + (r.right - EDGE) + ',' + r.right + '] open=' + st.open +
+          ' tgt=' + ((e.target && (e.target.id || e.target.className)) || '?'))
+      }, true)
+    })
+    setInterval(function () {
+      var r = ballRect(true)
+      if (!r) return
+      console.info('[mb-bar] ball ' + JSON.stringify({
+        left: Math.round(r.left), top: Math.round(r.top), right: Math.round(r.right),
+        bottom: Math.round(r.bottom), w: Math.round(r.width), h: Math.round(r.height),
+        vw: window.innerWidth, vh: window.innerHeight, open: st.open, list: st.list, vol: st.vol
+      }))
+    }, 2500)
+  }
+})()
