@@ -26,7 +26,7 @@ function getDistance (e1, n1, e2, n2) {
 
 function showWelcome () {
 
-  let dist = getDistance(104.110853, 30.683003, ipLocation.data.lng, ipLocation.data.lat) //修改自己的经度
+  let dist = getDistance(114.305392, 30.593099, ipLocation.data.lng, ipLocation.data.lat) //博主在武汉
   let pos = ipLocation.data.country
   let ip = ipLocation.ip
   let posdesc
@@ -255,9 +255,16 @@ function ipTr (map, value, keyer) {
   return map[k] || value
 }
 
+// IPv6 太长，显示成「240e:36f:15d1:6ce0:…（IPv6）」，不然看着像乱码
+function ipShow (ip) {
+  if (!ip) return ''
+  if (String(ip).indexOf(':') === -1) return ip
+  return String(ip).split(':').slice(0, 4).join(':') + ':…（IPv6）'
+}
+
 function applyLocation (o) {
   ipLocation = {
-    ip: o.ip,
+    ip: ipShow(o.ip),
     data: {
       country: ipTr(CN_COUNTRY, o.country),
       prov: ipTr(CN_PROV, o.region, ipProvKey),
@@ -270,20 +277,20 @@ function applyLocation (o) {
   showWelcome()
 }
 
-// 第一个源不可用（限流/挂掉）就自动换第二个
-fetch('https://ipwho.is/')
+// 优先 ipinfo（能拿到 IPv4，地址更清楚），不行再换 ipwho.is
+fetch('https://ipinfo.io/json')
   .then(function (r) { return r.json() })
   .then(function (d) {
-    if (!d || d.success === false) throw new Error((d && d.message) || 'ipwho.is failed')
-    applyLocation({ ip: d.ip, country: d.country, region: d.region, city: d.city, lat: d.latitude, lng: d.longitude })
+    if (!d || !d.ip) throw new Error('ipinfo failed')
+    var loc = String(d.loc || ',').split(',')
+    applyLocation({ ip: d.ip, country: d.country, region: d.region, city: d.city, lat: parseFloat(loc[0]), lng: parseFloat(loc[1]) })
   })
   .catch(function () {
-    return fetch('https://ipinfo.io/json')
+    return fetch('https://ipwho.is/')
       .then(function (r) { return r.json() })
       .then(function (d) {
-        if (!d || !d.ip) throw new Error('ipinfo failed')
-        var loc = String(d.loc || ',').split(',')
-        applyLocation({ ip: d.ip, country: d.country, region: d.region, city: d.city, lat: parseFloat(loc[0]), lng: parseFloat(loc[1]) })
+        if (!d || d.success === false) throw new Error((d && d.message) || 'ipwho.is failed')
+        applyLocation({ ip: d.ip, country: d.country, region: d.region, city: d.city, lat: d.latitude, lng: d.longitude })
       })
   })
   .catch(function (error) { console.error('IP 定位都失败了:', error) })
@@ -307,7 +314,7 @@ function getDistance (e1, n1, e2, n2) {
 
 // 根据获取的IP地址显示欢迎信息
 function showWelcome () {
-  let dist = getDistance(104.110853, 30.683003, ipLocation.data.lng, ipLocation.data.lat) //修改自己的经度
+  let dist = getDistance(114.305392, 30.593099, ipLocation.data.lng, ipLocation.data.lat) //博主在武汉
   let pos = ipLocation.data.country
   let ip = ipLocation.ip
   let posdesc
