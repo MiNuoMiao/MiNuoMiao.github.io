@@ -1,4 +1,4 @@
-menu:
+﻿menu:
   文章:
   #   隧道: /archives/ || anzhiyu-icon-box-archive
   #   分类: /categories/ || anzhiyu-icon-shapes
@@ -1219,7 +1219,7 @@ inject:
     # 自定义css
     # - <link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'">
     - <link rel="stylesheet" href="/css/mouse.css">    # 鼠标样式
-    - <link rel="stylesheet" href="/css/MyStyle.css?v=20261107d">    # 自定义样式
+    - <link rel="stylesheet" href="/css/MyStyle.css?v=20261107e">    # 自定义样式
     # - <link rel="stylesheet" href="/css/music.css">    # 音乐css
   bottom:
     # 自定义js

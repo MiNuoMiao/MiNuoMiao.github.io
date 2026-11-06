@@ -109,6 +109,45 @@ h1.post-title,
   letter-spacing: 0.04em;
 }
 
+/* 首页大卡：补上鼠标悬停动效（其他地方都有，就它没有） */
+.topGroup .todayCard {
+  transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 0.35s ease;
+}
+.topGroup .todayCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(255, 152, 162, 0.3);
+}
+.topGroup .todayCard .todayCard-cover {
+  transition: transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: transform;
+}
+.topGroup .todayCard:hover .todayCard-cover {
+  transform: scale(1.07);
+}
+.topGroup .todayCard .todayCard-info {
+  transition: transform 0.35s ease;
+}
+.topGroup .todayCard:hover .todayCard-info {
+  transform: translateY(-3px);
+}
+/* 系统开了「减少动态效果」就不动 */
+@media (prefers-reduced-motion: reduce) {
+  .topGroup .todayCard,
+  .topGroup .todayCard .todayCard-cover,
+  .topGroup .todayCard .todayCard-info {
+    transition: none !important;
+  }
+  .topGroup .todayCard:hover {
+    transform: none;
+  }
+  .topGroup .todayCard:hover .todayCard-cover {
+    transform: none;
+  }
+  .topGroup .todayCard:hover .todayCard-info {
+    transform: none;
+  }
+}
+
 /* 来访者卡片：IP 单独一行、居中、粉色，默认打码，鼠标移上去才显示 */
 #welcome-info .ip-line {
   text-align: center;
