@@ -86,19 +86,18 @@
 
   /* ---------------- 样式 ---------------- */
   var CSS = [
-    /* 遮挡层本身是透明的（只当感应面，四边精确贴合球），深色的那条是里面的 .mb-chrome */
+    /* 遮挡层本身是透明的（只当感应面，四边精确贴合球），玻璃那条是里面的 .mb-chrome */
     '#mb-bar{position:fixed;z-index:99999;display:flex;align-items:center;justify-content:flex-end;',
     'box-sizing:border-box;border-radius:40px;overflow:hidden;',
     'opacity:0;pointer-events:none;transition:opacity .1s ease;}',
     '#mb-bar.mb-open{opacity:1;}',
-    /* 白色偏透明的遮挡层；出现时从右往左传进（被球右边缘裁切，就是「滑出来」） */
+    /* 跟音量弹层同一套「粉色玻璃」：46% 不透明 + 14px 模糊。压在粉球上不显形，
+       所以这条用主色深一档的 #ff7280；出现时从右往左传进（被球右边缘裁切，就是「滑出来」） */
     '#mb-bar .mb-chrome{display:flex;align-items:center;justify-content:center;gap:1px;padding:0 4px;',
     'height:100%;margin-left:auto;border-radius:40px;',
-    /* 主色粉 #ff98a2 的深一档（#ff7280，也是主题的 button_hover），只给 50% 不透明度：
-       压在粉色球上能看出「这里有一条面板」，又不糊成一块实心板 */
-    'background:rgba(255,114,128,.5);',
-    '-webkit-backdrop-filter:blur(12px) saturate(180%);backdrop-filter:blur(12px) saturate(180%);',
-    'box-shadow:0 2px 12px rgba(255,114,128,.22),0 0 0 1px rgba(255,255,255,.38) inset;',
+    'background:rgba(255,114,128,.46);',
+    '-webkit-backdrop-filter:blur(14px) saturate(180%);backdrop-filter:blur(14px) saturate(180%);',
+    'box-shadow:0 2px 12px rgba(255,114,128,.28),0 0 0 1px rgba(255,255,255,.45) inset;',
     'transform:translateX(100%);opacity:0;pointer-events:none;',
     'transition:transform .28s cubic-bezier(.22,.61,.36,1),opacity .2s ease;}',
     '#mb-bar.mb-open .mb-chrome{transform:translateX(0);opacity:1;pointer-events:auto;}',
@@ -111,17 +110,19 @@
     '#mb-bar .mb-btn.mb-on{background:rgba(255,255,255,.42);opacity:1;}',
     '#mb-bar .mb-btn[hidden]{display:none;}',
 
-    /* 歌单 */
+    /* 歌单：同一套粉色玻璃（半透明 + 模糊，底下的卡片颜色会透上来） */
     '#mb-list{position:fixed;z-index:100000;width:284px;max-height:52vh;overflow-y:auto;padding:6px;',
-    'box-sizing:border-box;border-radius:16px;background:#fff;color:#333;',
-    'box-shadow:0 12px 32px rgba(0,0,0,.24);font-size:13px;line-height:1.35;',
+    'box-sizing:border-box;border-radius:16px;background:rgba(255,152,162,.46);color:#3a3a44;',
+    '-webkit-backdrop-filter:blur(14px) saturate(180%);backdrop-filter:blur(14px) saturate(180%);',
+    'box-shadow:0 10px 30px rgba(255,114,128,.28),0 0 0 1px rgba(255,255,255,.45) inset;',
+    'font-size:13px;line-height:1.35;',
     'opacity:0;pointer-events:none;transform:translateY(6px);',
     'transition:opacity .16s ease,transform .16s ease;}',
     '#mb-list.mb-open{opacity:1;pointer-events:auto;transform:translateY(0);}',
     '#mb-list .mb-row{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:10px;cursor:pointer;}',
-    '#mb-list .mb-row:hover{background:rgba(0,0,0,.06);}',
+    '#mb-list .mb-row:hover{background:rgba(255,255,255,.32);}',
     '#mb-list .mb-row.mb-cur{color:#ff7280;font-weight:600;}',
-    '#mb-list .mb-no{flex:0 0 18px;text-align:right;font-size:12px;opacity:.45;}',
+    '#mb-list .mb-no{flex:0 0 18px;text-align:right;font-size:12px;opacity:.55;}',
     '#mb-list .mb-name{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}',
     '#mb-list .mb-singer{flex:0 0 auto;max-width:96px;font-size:12px;opacity:.5;overflow:hidden;',
     'text-overflow:ellipsis;white-space:nowrap;}',
