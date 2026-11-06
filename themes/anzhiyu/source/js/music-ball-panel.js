@@ -110,28 +110,27 @@
     '#mb-bar .mb-btn.mb-on{background:rgba(255,255,255,.34);opacity:1;}',
     '#mb-bar .mb-btn[hidden]{display:none;}',
 
-    /* 歌单：白字要读得清，底色就不能透——主色深一档 #ff7280 给到 92%（≈实心深粉），
-       再加字重 500 和深粉投影，白字在粉底上能立住 */
+    /* 歌单：底色不动（主色粉 46% 玻璃），只把字改成白色 */
     '#mb-list{position:fixed;z-index:100000;width:284px;max-height:52vh;overflow-y:auto;padding:6px;',
-    'box-sizing:border-box;border-radius:16px;background:rgba(255,114,128,.92);color:#fff;',
+    'box-sizing:border-box;border-radius:16px;background:rgba(255,152,162,.46);color:#fff;',
     '-webkit-backdrop-filter:blur(14px) saturate(180%);backdrop-filter:blur(14px) saturate(180%);',
-    'box-shadow:0 10px 30px rgba(255,114,128,.32),0 0 0 1px rgba(255,255,255,.5) inset;',
-    'font-size:13px;font-weight:500;line-height:1.35;text-shadow:0 1px 2px rgba(178,52,70,.55);',
+    'box-shadow:0 10px 30px rgba(255,114,128,.28),0 0 0 1px rgba(255,255,255,.45) inset;',
+    'font-size:13px;line-height:1.35;',
     'opacity:0;pointer-events:none;transform:translateY(6px);',
     'transition:opacity .16s ease,transform .16s ease;}',
     '#mb-list.mb-open{opacity:1;pointer-events:auto;transform:translateY(0);}',
     '#mb-list .mb-row{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:10px;cursor:pointer;}',
     '#mb-list .mb-row:hover{background:rgba(255,255,255,.22);}',
-    '#mb-list .mb-row.mb-cur{color:#fff;font-weight:700;background:rgba(255,255,255,.24);}',
+    '#mb-list .mb-row.mb-cur{font-weight:700;}',
     '#mb-list .mb-no{flex:0 0 18px;text-align:right;font-size:12px;opacity:.7;}',
     '#mb-list .mb-name{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}',
     '#mb-list .mb-singer{flex:0 0 auto;max-width:96px;font-size:12px;opacity:.72;overflow:hidden;',
     'text-overflow:ellipsis;white-space:nowrap;}',
     '#mb-list .mb-empty{padding:14px 10px;text-align:center;opacity:.8;}',
 
-    /* 音量弹层：竖着的推子（白字，所以底色同样压到深一档的 55%） */
+    /* 音量弹层：竖着的推子（保持原来那套主色粉玻璃，不动） */
     '#mb-volpop{position:fixed;z-index:100000;width:46px;padding:12px 8px 8px;box-sizing:border-box;',
-    'border-radius:16px;background:rgba(255,114,128,.55);color:#fff;',
+    'border-radius:16px;background:rgba(255,152,162,.46);color:#fff;',
     '-webkit-backdrop-filter:blur(14px) saturate(180%);backdrop-filter:blur(14px) saturate(180%);',
     'box-shadow:0 8px 26px rgba(255,114,128,.3),0 0 0 1px rgba(255,255,255,.42) inset;',
     'display:flex;flex-direction:column;align-items:center;gap:6px;',
