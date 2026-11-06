@@ -2,7 +2,7 @@
 title: MIAO MIAO
 date: 2023-07-10 21:00:00
 updated: 
-cover: https://cdn.jsdelivr.net/gh/MiNuoMiao/MaoMi@main/img/bg.webp
+cover: /img/bg.webp
 categories: 
   - 闲聊
 tags: 
@@ -77,5 +77,5 @@ tags:
 
 
 {% folding 封面图片%}
-![Miku](https://cdn.jsdelivr.net/gh/MiNuoMiao/MaoMi@main/img/bg.webp)
+![Miku](/img/bg.webp)
 {% endfolding %}
