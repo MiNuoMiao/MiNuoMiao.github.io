@@ -71,13 +71,16 @@
 
   /* ---------------- 样式 ---------------- */
   var CSS = [
-    /* 遮挡层 */
+    /* 遮挡层本身是透明的（只当感应面，四边精确贴合球），深色的那条是里面的 .mb-chrome */
     '#mb-bar{position:fixed;z-index:99999;display:flex;align-items:center;justify-content:flex-end;',
-    'gap:1px;padding:0 4px;box-sizing:border-box;border-radius:40px;',
-    'background:rgba(26,28,38,.62);-webkit-backdrop-filter:blur(6px) saturate(140%);',
-    'backdrop-filter:blur(6px) saturate(140%);box-shadow:0 0 0 1px rgba(255,255,255,.12) inset;',
+    'box-sizing:border-box;border-radius:40px;overflow:hidden;',
     'opacity:0;pointer-events:none;transition:opacity .18s ease;}',
-    '#mb-bar.mb-open{opacity:1;pointer-events:auto;}',
+    '#mb-bar.mb-open{opacity:1;}',
+    '#mb-bar .mb-chrome{display:flex;align-items:center;justify-content:center;gap:1px;padding:0 4px;',
+    'height:100%;margin-left:auto;border-radius:40px;background:rgba(26,28,38,.72);',
+    '-webkit-backdrop-filter:blur(6px) saturate(140%);backdrop-filter:blur(6px) saturate(140%);',
+    'box-shadow:0 0 0 1px rgba(255,255,255,.14) inset;pointer-events:none;}',
+    '#mb-bar.mb-open .mb-chrome{pointer-events:auto;}',
     '#mb-bar .mb-btn{width:var(--mb-btn,28px);height:var(--mb-btn,28px);flex:0 0 auto;',
     'display:inline-flex;align-items:center;',
     'justify-content:center;padding:0;border:0;border-radius:50%;background:transparent;color:#fff;',
@@ -103,26 +106,35 @@
     'text-overflow:ellipsis;white-space:nowrap;}',
     '#mb-list .mb-empty{padding:14px 10px;text-align:center;opacity:.6;}',
 
-    /* 音量弹层 */
-    '#mb-volpop{position:fixed;z-index:100000;padding:10px 12px;box-sizing:border-box;border-radius:14px;',
-    'background:rgba(26,28,38,.94);box-shadow:0 10px 28px rgba(0,0,0,.3);color:#fff;',
-    'display:flex;align-items:center;gap:8px;',
+    /* 音量弹层：竖着的推子 */
+    '#mb-volpop{position:fixed;z-index:100000;width:46px;padding:12px 8px 8px;box-sizing:border-box;',
+    'border-radius:16px;background:rgba(26,28,38,.94);box-shadow:0 10px 28px rgba(0,0,0,.3);color:#fff;',
+    'display:flex;flex-direction:column;align-items:center;gap:6px;',
     'opacity:0;pointer-events:none;transform:translateY(6px);',
     'transition:opacity .16s ease,transform .16s ease;}',
     '#mb-volpop.mb-open{opacity:1;pointer-events:auto;transform:translateY(0);}',
     /* 上下各留一段透明桥：指针从按钮走到滑块、或滑出面板再回来，都不会断 */
     '#mb-volpop::before,#mb-volpop::after{content:"";position:absolute;left:0;right:0;height:16px;}',
     '#mb-volpop::before{top:-16px;}#mb-volpop::after{bottom:-16px;}',
-    '#mb-volpop .mb-vol-num{font-size:12px;opacity:.7;width:30px;text-align:center;',
-    'font-variant-numeric:tabular-nums;}',
-    '#mb-volpop input[type=range]{-webkit-appearance:none;appearance:none;width:118px;height:16px;',
-    'margin:0;padding:0;background:transparent;outline:none;cursor:pointer;}',
-    '#mb-volpop input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;',
-    'background:linear-gradient(to right,#fff 0 calc(var(--mb-vol,70) * 1%),rgba(255,255,255,.26) calc(var(--mb-vol,70) * 1%) 100%);}',
-    '#mb-volpop input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;',
-    'margin-top:-4px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.4);}',
-    '#mb-volpop input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:rgba(255,255,255,.26);}',
-    '#mb-volpop input[type=range]::-moz-range-thumb{width:14px;height:14px;border:0;border-radius:50%;background:#fff;}'
+    '#mb-volpop .mb-vol-wrap{position:relative;width:22px;height:108px;flex:0 0 auto;}',
+    /* 轨道和填充自己画，不依赖旋转后渐变的方向，看得清也拖得准 */
+    '#mb-volpop .mb-vol-wrap::before{content:"";position:absolute;left:50%;top:0;height:100%;width:6px;',
+    'transform:translateX(-50%);border-radius:3px;background:rgba(255,255,255,.28);z-index:0;}',
+    '#mb-volpop .mb-vol-wrap::after{content:"";position:absolute;left:50%;bottom:0;width:6px;',
+    'height:calc(var(--mb-vol,70) * 1%);transform:translateX(-50%);border-radius:3px;',
+    'background:#fff;z-index:0;}',
+    '#mb-volpop .mb-vol-num{font-size:12px;opacity:.72;font-variant-numeric:tabular-nums;}',
+    /* 横着写的 input 转 -90° 变成竖向推子：value 0 在下、100 在上 */
+    '#mb-volpop input[type=range]{position:absolute;top:50%;left:50%;width:108px;height:22px;',
+    'margin:0;padding:0;background:transparent;outline:none;cursor:pointer;z-index:1;',
+    'transform:translate(-50%,-50%) rotate(-90deg);-webkit-appearance:none;appearance:none;}',
+    '#mb-volpop input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:transparent;}',
+    '#mb-volpop input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;',
+    'margin-top:-4.5px;border-radius:50%;background:#fff;border:1px solid rgba(0,0,0,.18);',
+    'box-shadow:0 1px 5px rgba(0,0,0,.45);}',
+    '#mb-volpop input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:transparent;}',
+    '#mb-volpop input[type=range]::-moz-range-thumb{width:15px;height:15px;border:1px solid rgba(0,0,0,.18);',
+    'border-radius:50%;background:#fff;box-shadow:0 1px 5px rgba(0,0,0,.45);}'
   ].join('')
 
   function injectCSS() {
@@ -146,11 +158,13 @@
     bar = doc.createElement('div')
     bar.id = 'mb-bar'
     bar.innerHTML =
+      '<span class="mb-chrome">' +
       '<button type="button" class="mb-btn" data-act="prev" title="上一首" aria-label="上一首">' + svg(PREV, true) + '</button>' +
       '<button type="button" class="mb-btn" data-act="toggle" title="播放 / 暂停" aria-label="播放或暂停">' + svg(PLAY, true) + '</button>' +
       '<button type="button" class="mb-btn" data-act="next" title="下一首" aria-label="下一首">' + svg(NEXT, true) + '</button>' +
       '<button type="button" class="mb-btn" data-act="list" title="歌单" aria-label="歌单">' + svg(LIST, false) + '</button>' +
-      '<button type="button" class="mb-btn" data-act="vol" title="音量" aria-label="音量">' + svg(VOL, false) + '</button>'
+      '<button type="button" class="mb-btn" data-act="vol" title="音量" aria-label="音量">' + svg(VOL, false) + '</button>' +
+      '</span>'
 
     listEl = doc.createElement('div')
     listEl.id = 'mb-list'
@@ -159,7 +173,7 @@
     volEl = doc.createElement('div')
     volEl.id = 'mb-volpop'
     volEl.innerHTML =
-      '<input type="range" min="0" max="100" step="1" value="70" aria-label="音量">' +
+      '<span class="mb-vol-wrap"><input type="range" min="0" max="100" step="1" value="70" aria-label="音量"></span>' +
       '<span class="mb-vol-num">70</span>'
     volInput = volEl.querySelector('input')
 
@@ -171,21 +185,37 @@
   }
 
   /* ---------------- 定位 ---------------- */
+  // 球有多宽就放几个按钮：5 个塞不下就藏掉「上一首」，再塞不下就只剩 播放/歌单/音量
+  function fitButtons(w, pad, gap) {
+    var order = [5, 4, 3]
+    for (var i = 0; i < order.length; i++) {
+      var c = order[i]
+      var span = w - pad * 2 - (c - 1) * gap
+      var bw = Math.floor(span / c)
+      if (bw >= 20) return { n: c, bw: Math.min(30, bw) }
+    }
+    return { n: 3, bw: 20 }
+  }
+
   function place() {
     var r = ballRect(true)
     if (!r) return
     var vw = window.innerWidth
     var vh = window.innerHeight
 
-    // 遮挡层：右边缘、高度都跟着球；宽度由内容决定，所以球窄时向左长，不会越过球右边缘
+    // 遮挡层：四边都跟球一模一样（取 ceil/floor 防止亚像素留缝），整颗球盖住
     var pad = 4, gap = 1
-    var bw = Math.floor((r.width - pad * 2 - gap * 4) / 5)
-    bw = Math.max(22, Math.min(30, bw)) // 球窄就缩按钮，保证整条不超过球宽
-    bar.style.setProperty('--mb-btn', bw + 'px')
-    bar.style.top = Math.round(r.top) + 'px'
-    bar.style.height = Math.round(r.height) + 'px'
-    bar.style.right = Math.round(vw - r.right) + 'px'
-    bar.style.left = 'auto'
+    var fit = fitButtons(r.width, pad, gap)
+    bar.style.setProperty('--mb-btn', fit.bw + 'px')
+    bar.querySelector('[data-act="prev"]').hidden = fit.n < 5
+    bar.querySelector('[data-act="next"]').hidden = fit.n < 4
+    var L = Math.floor(r.left), T = Math.floor(r.top)
+    bar.style.left = L + 'px'
+    bar.style.top = T + 'px'
+    bar.style.width = Math.ceil(r.right) - L + 'px'
+    bar.style.height = Math.ceil(r.bottom) - T + 'px'
+    bar.style.right = 'auto'
+    bar.style.bottom = 'auto'
 
     if (st.list) {
       var lw = listEl.offsetWidth || 284
@@ -195,7 +225,7 @@
       listEl.style.bottom = Math.round(vh - r.top - 2) + 'px'
     }
     if (st.vol) {
-      var pw = volEl.offsetWidth || 190
+      var pw = volEl.offsetWidth || 46
       var volBtn = bar.querySelector('[data-act="vol"]')
       var br = volBtn ? volBtn.getBoundingClientRect() : r
       var cx = br.left + br.width / 2
@@ -265,7 +295,9 @@
 
   /* ---------------- 开 / 关 ---------------- */
   function openBar() {
-    if (st.open || !isWide() || !ballUsable()) return
+    if (st.open) { st.bail = 'already-open'; return }
+    if (!isWide()) { st.bail = 'narrow'; return }
+    if (!ballUsable()) { st.bail = 'ball-hidden'; return }
     build()
     clearTimeout(st.grace)
     st.open = true
@@ -348,11 +380,12 @@
       else if (act === 'toggle') { try { a.toggle() } catch (err) {} }
       else if (act === 'list') {
         st.list = !st.list
-        if (st.list) { renderList(); place(); listEl.classList.add('mb-open') }
+        if (st.list) { closeVol(); renderList(); place(); listEl.classList.add('mb-open') }
         else closeList()
       } else if (act === 'vol') {
         st.vol = !st.vol
         if (st.vol) {
+          closeList()
           var pc = 70
           if (typeof a.volume === 'function') {
             var v = a.volume()
@@ -436,6 +469,7 @@
   if (location.search.indexOf('mbdebug') > -1) {
     console.info('[mb-bar] loaded, edge=' + EDGE + 'px, minWidth=' + MIN_W)
     // 调试用：带上 ?mbdebug=1 才会打，平时一行日志都不留
+    // 调试用：带上 ?mbdebug=1 才会打，平时一行日志都不留
     ;['pointerdown', 'click'].forEach(function (t) {
       doc.addEventListener(t, function (e) {
         var r = ballRect(true)
@@ -448,10 +482,14 @@
     setInterval(function () {
       var r = ballRect(true)
       if (!r) return
+      var br2 = bar ? bar.getBoundingClientRect() : null
       console.info('[mb-bar] ball ' + JSON.stringify({
         left: Math.round(r.left), top: Math.round(r.top), right: Math.round(r.right),
         bottom: Math.round(r.bottom), w: Math.round(r.width), h: Math.round(r.height),
-        vw: window.innerWidth, vh: window.innerHeight, open: st.open, list: st.list, vol: st.vol
+        vw: window.innerWidth, vh: window.innerHeight, open: st.open, list: st.list, vol: st.vol,
+        op: (function () { var b = ball(); return b ? Number(getComputedStyle(b).opacity) : -1 })(),
+        bail: st.bail || '-',
+        barBox: br2 ? [Math.round(br2.left), Math.round(br2.top), Math.round(br2.right), Math.round(br2.bottom)] : null
       }))
     }, 2500)
   }
