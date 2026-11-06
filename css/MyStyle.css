@@ -88,6 +88,18 @@ h1.post-title,
   padding-top: 0.2rem;
 }
 
+/* 底栏右侧（作者那条「主题」链接等）已经清空，版号单独摆中间 */
+#footer-bar .footer-bar-links {
+  justify-content: center !important;
+}
+#footer-bar .footer-bar-right {
+  display: none !important;
+}
+#footer-bar #footer-bar-tips .copyright,
+#footer-bar #footer-bar-tips .copyright a {
+  text-align: center;
+}
+
 
 
 /* live 2d */
