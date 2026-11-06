@@ -23,7 +23,9 @@
   var GRACE = 220 // 离开后收起延迟(ms)
   var POLL = 120 // 打开时对齐位置 / 同步图标的心跳(ms)
   var MIN_W = 1201 // 主题在 <=1200px 隐藏音乐球
-  var TRIGGER_MIN = 300 // .aplayer-bar-wrap 宽度要大于它（即球已经在展开态）才允许唤出遮挡层
+  var TRIGGER_MIN = 250 // .aplayer-bar-wrap 宽度要大于它（即球已经在展开态）才允许唤出遮挡层
+  // 说明：展开态的 wrap 实测在 291~470 之间浮动（跟歌名长短有关），收起态 83~197；
+  // 所以阈值取 250 能把两种状态干净分开。要改就改这一个数。
 
   var doc = document
   var bar, listEl, volEl, volInput, listBody
@@ -91,19 +93,22 @@
     '#mb-bar.mb-open{opacity:1;}',
     /* 白色偏透明的遮挡层；出现时从右往左传进（被球右边缘裁切，就是「滑出来」） */
     '#mb-bar .mb-chrome{display:flex;align-items:center;justify-content:center;gap:1px;padding:0 4px;',
-    'height:100%;margin-left:auto;border-radius:40px;background:rgba(255,255,255,.74);',
-    '-webkit-backdrop-filter:blur(10px) saturate(170%);backdrop-filter:blur(10px) saturate(170%);',
-    'box-shadow:0 2px 12px rgba(0,0,0,.16),0 0 0 1px rgba(0,0,0,.06) inset;',
+    'height:100%;margin-left:auto;border-radius:40px;',
+    /* 主色粉 #ff98a2 的深一档（#ff7280，也是主题的 button_hover），只给 50% 不透明度：
+       压在粉色球上能看出「这里有一条面板」，又不糊成一块实心板 */
+    'background:rgba(255,114,128,.5);',
+    '-webkit-backdrop-filter:blur(12px) saturate(180%);backdrop-filter:blur(12px) saturate(180%);',
+    'box-shadow:0 2px 12px rgba(255,114,128,.22),0 0 0 1px rgba(255,255,255,.38) inset;',
     'transform:translateX(100%);opacity:0;pointer-events:none;',
     'transition:transform .28s cubic-bezier(.22,.61,.36,1),opacity .2s ease;}',
     '#mb-bar.mb-open .mb-chrome{transform:translateX(0);opacity:1;pointer-events:auto;}',
     '#mb-bar .mb-btn{width:var(--mb-btn,28px);height:var(--mb-btn,28px);flex:0 0 auto;',
     'display:inline-flex;align-items:center;',
-    'justify-content:center;padding:0;border:0;border-radius:50%;background:transparent;color:#3a3a44;',
-    'cursor:pointer;opacity:.85;transition:background .15s ease,opacity .15s ease,transform .1s ease;}',
-    '#mb-bar .mb-btn:hover{background:rgba(0,0,0,.09);opacity:1;}',
+    'justify-content:center;padding:0;border:0;border-radius:50%;background:transparent;color:#fff;',
+    'cursor:pointer;opacity:.95;transition:background .15s ease,opacity .15s ease,transform .1s ease;}',
+    '#mb-bar .mb-btn:hover{background:rgba(255,255,255,.3);opacity:1;}',
     '#mb-bar .mb-btn:active{transform:scale(.88);}',
-    '#mb-bar .mb-btn.mb-on{background:rgba(0,0,0,.13);opacity:1;}',
+    '#mb-bar .mb-btn.mb-on{background:rgba(255,255,255,.42);opacity:1;}',
     '#mb-bar .mb-btn[hidden]{display:none;}',
 
     /* 歌单 */
@@ -115,18 +120,18 @@
     '#mb-list.mb-open{opacity:1;pointer-events:auto;transform:translateY(0);}',
     '#mb-list .mb-row{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:10px;cursor:pointer;}',
     '#mb-list .mb-row:hover{background:rgba(0,0,0,.06);}',
-    '#mb-list .mb-row.mb-cur{color:#3b74e8;font-weight:600;}',
+    '#mb-list .mb-row.mb-cur{color:#ff7280;font-weight:600;}',
     '#mb-list .mb-no{flex:0 0 18px;text-align:right;font-size:12px;opacity:.45;}',
     '#mb-list .mb-name{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}',
     '#mb-list .mb-singer{flex:0 0 auto;max-width:96px;font-size:12px;opacity:.5;overflow:hidden;',
     'text-overflow:ellipsis;white-space:nowrap;}',
     '#mb-list .mb-empty{padding:14px 10px;text-align:center;opacity:.6;}',
 
-    /* 音量弹层：竖着的推子（跟着遮挡层一起改成白色偏透明） */
+    /* 音量弹层：竖着的推子（跟遮挡层同一套主色粉） */
     '#mb-volpop{position:fixed;z-index:100000;width:46px;padding:12px 8px 8px;box-sizing:border-box;',
-    'border-radius:16px;background:rgba(255,255,255,.86);color:#3a3a44;',
-    '-webkit-backdrop-filter:blur(10px) saturate(170%);backdrop-filter:blur(10px) saturate(170%);',
-    'box-shadow:0 8px 26px rgba(0,0,0,.2),0 0 0 1px rgba(0,0,0,.06) inset;',
+    'border-radius:16px;background:rgba(255,152,162,.46);color:#fff;',
+    '-webkit-backdrop-filter:blur(14px) saturate(180%);backdrop-filter:blur(14px) saturate(180%);',
+    'box-shadow:0 8px 26px rgba(255,114,128,.3),0 0 0 1px rgba(255,255,255,.42) inset;',
     'display:flex;flex-direction:column;align-items:center;gap:6px;',
     'opacity:0;pointer-events:none;transform:translateY(6px);',
     'transition:opacity .16s ease,transform .16s ease;}',
@@ -137,22 +142,23 @@
     '#mb-volpop .mb-vol-wrap{position:relative;width:22px;height:108px;flex:0 0 auto;}',
     /* 轨道和填充自己画，不依赖旋转后渐变的方向，看得清也拖得准 */
     '#mb-volpop .mb-vol-wrap::before{content:"";position:absolute;left:50%;top:0;height:100%;width:6px;',
-    'transform:translateX(-50%);border-radius:3px;background:rgba(0,0,0,.14);z-index:0;}',
+    'transform:translateX(-50%);border-radius:3px;background:rgba(255,255,255,.4);z-index:0;}',
     '#mb-volpop .mb-vol-wrap::after{content:"";position:absolute;left:50%;bottom:0;width:6px;',
     'height:calc(var(--mb-vol,70) * 1%);transform:translateX(-50%);border-radius:3px;',
-    'background:#3b74e8;z-index:0;}',
-    '#mb-volpop .mb-vol-num{font-size:12px;opacity:.72;font-variant-numeric:tabular-nums;}',
+    'background:#fff;z-index:0;}',
+    '#mb-volpop .mb-vol-num{font-size:12px;color:#fff;opacity:.95;font-variant-numeric:tabular-nums;',
+    'text-shadow:0 1px 2px rgba(214,86,105,.45);}',
     /* 横着写的 input 转 -90° 变成竖向推子：value 0 在下、100 在上 */
     '#mb-volpop input[type=range]{position:absolute;top:50%;left:50%;width:108px;height:22px;',
     'margin:0;padding:0;background:transparent;outline:none;cursor:pointer;z-index:1;',
     'transform:translate(-50%,-50%) rotate(-90deg);-webkit-appearance:none;appearance:none;}',
     '#mb-volpop input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:transparent;}',
     '#mb-volpop input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;',
-    'margin-top:-4.5px;border-radius:50%;background:#fff;border:1px solid rgba(0,0,0,.18);',
-    'box-shadow:0 1px 5px rgba(0,0,0,.45);}',
+    'margin-top:-4.5px;border-radius:50%;background:#fff;border:1px solid rgba(255,255,255,.95);',
+    'box-shadow:0 1px 5px rgba(214,86,105,.5);}',
     '#mb-volpop input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:transparent;}',
-    '#mb-volpop input[type=range]::-moz-range-thumb{width:15px;height:15px;border:1px solid rgba(0,0,0,.18);',
-    'border-radius:50%;background:#fff;box-shadow:0 1px 5px rgba(0,0,0,.45);}'
+    '#mb-volpop input[type=range]::-moz-range-thumb{width:15px;height:15px;border:1px solid rgba(255,255,255,.95);',
+    'border-radius:50%;background:#fff;box-shadow:0 1px 5px rgba(214,86,105,.5);}'
   ].join('')
 
   function injectCSS() {
