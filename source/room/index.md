@@ -30,6 +30,14 @@ comments: false
   <a class="hot" href="/" style="left:25%;top:46%">
     <i></i><b>门</b><em>出去转转</em>
   </a>
+  <div id="room-player"><i></i></div>
+  <div id="room-hint"></div>
+  <div class="dpad">
+    <b data-dir="up" style="grid-area:1/2">↑</b>
+    <b data-dir="left" style="grid-area:2/1">←</b>
+    <b data-dir="down" style="grid-area:2/2">↓</b>
+    <b data-dir="right" style="grid-area:2/3">→</b>
+  </div>
 </div>
 
 <style>
@@ -41,11 +49,56 @@ comments: false
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(20, 25, 50, 0.28);
   line-height: 0;
+  touch-action: manipulation;
 }
 .room-map > img {
   display: block;
   width: 100%;
   height: auto;
+}
+/* 我自己：可以走的小人 */
+.room-map #room-player {
+  position: absolute;
+  width: 14%;
+  height: 33%;
+  transform-origin: 50% 100%;
+  pointer-events: none;
+  will-change: left, top, transform;
+}
+.room-map #room-player i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: url("/img/xiaomiao-stand.png") center bottom / contain no-repeat;
+  filter: drop-shadow(0 8px 12px rgba(10, 14, 30, 0.45));
+}
+.room-map #room-player.walking i {
+  animation: roomBob 0.3s ease-in-out infinite alternate;
+}
+@keyframes roomBob {
+  from { transform: translateY(0); }
+  to { transform: translateY(-3px); }
+}
+/* 靠近物件时的气包 */
+.room-map #room-hint {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: rgba(255, 152, 162, 0.94);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.3;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(255, 152, 162, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+  cursor: pointer;
+}
+.room-map #room-hint.show {
+  opacity: 1;
+  pointer-events: auto;
 }
 .room-map .hot {
   position: absolute;
@@ -107,14 +160,39 @@ comments: false
   70% { box-shadow: 0 0 0 10px rgba(255, 152, 162, 0); }
   100% { box-shadow: 0 0 0 0 rgba(255, 152, 162, 0); }
 }
-@media (max-width: 768px) {
-  .room-map .hot {
-    font-size: 11px;
-    padding: 4px 8px 4px 6px;
-  }
+/* 手机上的方向键 */
+.room-map .dpad {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: none;
+  grid-template-columns: repeat(3, 34px);
+  grid-template-rows: repeat(2, 34px);
+  gap: 5px;
+  z-index: 30;
+}
+.room-map .dpad b {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 24, 40, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 9px;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1;
+  user-select: none;
+  -webkit-user-select: none;
+}
+@media (hover: none), (max-width: 768px) {
+  .room-map .dpad { display: grid; }
+  .room-map .hot { font-size: 11px; padding: 4px 8px 4px 6px; }
   .room-map .hot em { display: none; }
+  .room-map #room-player { width: 18%; height: 30%; }
 }
 </style>
+
+<script src="/js/room-play.js?v=20261107a"></script>
 
 > 屋里能点的：**书桌**（日记）、**书架**（读书笔记）、**窗子**（外面逛过的地方）、**地毯**（今晚听什么）、**门**（出去）。
 
