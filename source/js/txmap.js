@@ -273,23 +273,16 @@ function applyLocation (o) {
   showWelcome()
 }
 
-// 优先 ipinfo（能拿到 IPv4，地址更清楚），不行再换 ipwho.is
-fetch('https://ipinfo.io/json')
+// 只用 ipwho.is（它稳定给 CORS 头，浏览器里不会被拦）
+// ipinfo.io 之前放在前面，但它在浏览器里常返回 406 且不带 CORS 头，
+// 那种错误是浏览器自己打的红字，JS 的 catch 拦不住，只会污染控制台。
+fetch('https://ipwho.is/')
   .then(function (r) { return r.json() })
   .then(function (d) {
-    if (!d || !d.ip) throw new Error('ipinfo failed')
-    var loc = String(d.loc || ',').split(',')
-    applyLocation({ ip: d.ip, country: d.country, region: d.region, city: d.city, lat: parseFloat(loc[0]), lng: parseFloat(loc[1]) })
+    if (!d || d.success === false) throw new Error((d && d.message) || 'ipwho.is failed')
+    applyLocation({ ip: d.ip, country: d.country, region: d.region, city: d.city, lat: d.latitude, lng: d.longitude })
   })
-  .catch(function () {
-    return fetch('https://ipwho.is/')
-      .then(function (r) { return r.json() })
-      .then(function (d) {
-        if (!d || d.success === false) throw new Error((d && d.message) || 'ipwho.is failed')
-        applyLocation({ ip: d.ip, country: d.country, region: d.region, city: d.city, lat: d.latitude, lng: d.longitude })
-      })
-  })
-  .catch(function (error) { console.error('IP 定位都失败了:', error) })
+  .catch(function () { /* 定位拿不到就不显示欢迎语，不往控制台丢红字 */ })
 
 // 计算两个经纬度之间的距离
 function getDistance (e1, n1, e2, n2) {

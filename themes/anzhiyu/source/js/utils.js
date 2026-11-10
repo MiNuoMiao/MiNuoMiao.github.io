@@ -926,7 +926,8 @@ const anzhiyu = {
       return;
     }
     const urlParams = new URLSearchParams(window.location.search);
-    const userId = "8152976493";
+    // 默认歌单（URL 不带 id 时用这个）：自己的
+    const userId = "8560567666";
     const userServer = "netease";
     const anMusicPageMeting = document.getElementById("anMusic-page-meting");
     if (urlParams.get("id") && urlParams.get("server")) {
