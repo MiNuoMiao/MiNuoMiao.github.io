@@ -155,9 +155,8 @@ comments: false
   height: 88px;
   box-sizing: border-box;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(255, 152, 162, 0.35);
-  backdrop-filter: blur(6px);
+  background: transparent;
+  border: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -165,7 +164,16 @@ comments: false
   transition: width 0.5s cubic-bezier(.4,0,.2,1), height 0.45s cubic-bezier(.4,0,.2,1);
 }
 [data-theme="dark"] .lc-bar { background: rgba(255, 255, 255, 0.08); }
-.listen-card.playing .lc-bar { width: calc(100% - 40px); height: 54px; justify-content: flex-start; overflow: visible; bottom: 26px; }
+.listen-card.playing .lc-bar {
+  width: calc(100% - 40px);
+  height: 54px;
+  justify-content: flex-start;
+  overflow: visible;
+  bottom: 26px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 152, 162, 0.35);
+  backdrop-filter: blur(6px);
+}
 .lp-toggle {
   flex: 0 0 auto;
   width: 80px;
@@ -180,10 +188,16 @@ comments: false
   display: flex;
   align-items: center;
   justify-content: center;
+  /* 环画在按钮自己身上：同一个元素，永远同心，不会有亚像素偏心 */
+  box-shadow: 0 0 0 4px rgba(255, 152, 162, 0.28),
+              0 10px 26px rgba(255, 152, 162, 0.35);
   transition: width 0.45s cubic-bezier(.4,0,.2,1), height 0.45s cubic-bezier(.4,0,.2,1),
-              font-size 0.4s ease, filter 0.15s ease;
+              font-size 0.4s ease, filter 0.15s ease, box-shadow 0.35s ease;
 }
-.listen-card.playing .lp-toggle { width: 40px; height: 40px; margin: 0 6px 0 8px; font-size: 12px; }
+.listen-card.playing .lp-toggle {
+  width: 40px; height: 40px; margin: 0 6px 0 8px; font-size: 12px;
+  box-shadow: 0 4px 12px rgba(255, 152, 162, 0.28);
+}
 .lp-toggle:hover { filter: brightness(1.06); }
 .lp-toggle:active { filter: brightness(0.94); }
 .lp-toggle.loading { opacity: 0.65; pointer-events: none; }
