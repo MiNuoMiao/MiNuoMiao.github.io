@@ -177,6 +177,15 @@ if hexo-config('nav_music.enable') == false
               font-size 2rem
               font-weight 700
               color #fff
+            .aplayer-title
+              display inline-block
+              max-width 100%
+              white-space nowrap
+              overflow hidden
+              text-overflow clip
+              vertical-align bottom
+              &.miao-scroll
+                animation miaoTitleScroll 7s ease-in-out infinite alternate
 
           .aplayer-lrc
             height 800%
@@ -309,6 +318,12 @@ if hexo-config('nav_music.enable') == false
         #site-name
           color var(--anzhiyu-white) !important
   #anMusic-page
+    .aplayer-info .aplayer-music
+      .aplayer-title
+        font-size 1.3rem
+        max-width calc(100% - 24px)
+      .aplayer-author
+        font-size 0.95rem
     meting-js 
       .aplayer
         .aplayer-list
@@ -365,16 +380,17 @@ if hexo-config('nav_music.enable') == false
           top 100px
           .aplayer-info
             .aplayer-lrc
-              margin-top 40px
-              height auto
-              max-height 200%
-              min-height 100%
-              mask-image linear-gradient(to bottom, #000, #000, #000, #000, #0000, #0000)
+              margin-top 24px
+              height 168px
+              max-height none
+              min-height 0
+              overflow hidden
+              mask-image linear-gradient(to bottom, #000, #000, #000, #0000, #0000)
               p
-                font-size 17px
+                font-size 15px
                 &.aplayer-lrc-current
                   color white
-                  min-height 45px
+                  min-height 0
             .aplayer-controller
               width 100%
               bottom 100px
@@ -422,3 +438,8 @@ if hexo-config('nav_music.enable') == false
                   right 25px
                   top -90px
 
+@keyframes miaoTitleScroll
+  from
+    transform translateX(0)
+  to
+    transform translateX(var(--miao-shift, -50%))

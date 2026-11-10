@@ -6,3 +6,32 @@
   #anMusicSwitching(title="切换歌单")
     i(class="anzhiyufont anzhiyu-icon-repeat")
   #anMusic-page-meting
+
+script.
+  (function () {
+    function apply(t) {
+      var cur = (t.textContent || '').trim();
+      t.classList.remove('miao-scroll');
+      t.style.removeProperty('--miao-shift');
+      if (!cur) return;
+      requestAnimationFrame(function () {
+        var over = t.scrollWidth - t.clientWidth;
+        if (over > 6) {
+          t.style.setProperty('--miao-shift', '-' + (over + 18) + 'px');
+          t.classList.add('miao-scroll');
+        }
+      });
+    }
+    function start() {
+      var t = document.querySelector('#anMusic-page .aplayer-title');
+      if (!t) { setTimeout(start, 400); return; }
+      apply(t);
+      try {
+        new MutationObserver(function () { apply(t); })
+          .observe(t, { childList: true, characterData: true, subtree: true });
+      } catch (e) {}
+      window.addEventListener('resize', function () { apply(t); });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+    else start();
+  })();

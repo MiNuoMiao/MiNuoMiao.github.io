@@ -105,7 +105,12 @@ hexo.extend.filter.register("before_generate", () => {
       data[key] = cdnSource[type];
     });
 
-    if (cond === "internal") data["main_css"] = "css/index.css";
+    if (cond === "internal") {
+      // 主样式带版本号：按构建日期，每天变一次。
+      // 以前是固定路径，浏览器强缓存 → 改了 CSS 手机和电脑都还是旧的。
+      const cssVer = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+      data["main_css"] = "css/index.css?v=" + cssVer;
+    }
     return data;
   };
 

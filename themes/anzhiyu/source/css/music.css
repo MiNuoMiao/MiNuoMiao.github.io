@@ -85,6 +85,25 @@ body:has(#anMusic-page) #nav-music {
   color: #fff;
 }
 
+/* 标题超长时横向来回滚（JS 会量宽度后加 .miao-scroll） */
+#anMusic-page .aplayer-info .aplayer-music .aplayer-title {
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  vertical-align: bottom;
+}
+
+#anMusic-page .aplayer-info .aplayer-music .aplayer-title.miao-scroll {
+  animation: miaoTitleScroll 7s ease-in-out infinite alternate;
+}
+
+@keyframes miaoTitleScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(var(--miao-shift, -50%)); }
+}
+
 #anMusic-page .aplayer-info .aplayer-lrc {
   height: 800%;
   margin-top: 80px;
@@ -324,12 +343,28 @@ body:has(#anMusic-page) .aplayer .aplayer-info .aplayer-controller .aplayer-time
     top: 100px;
   }
 
+  #anMusic-page .aplayer-info .aplayer-music .aplayer-title {
+    font-size: 1.3rem;
+    max-width: calc(100% - 24px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+  }
+
+  #anMusic-page .aplayer-info .aplayer-music .aplayer-author {
+    font-size: 0.95rem;
+  }
+
   #anMusic-page .aplayer-info .aplayer-lrc {
-    margin-top: 40px;
-    height: auto;
-    max-height: 200%;
-    min-height: 100%;
-    mask-image: linear-gradient(to bottom, #000, #000, #000, #000, #0000, #0000);
+    /* 固定高度：父容器是 fixed + top:100px，用百分比算不出靠谱的高度，
+       结果只剩两行。这里直接给 170px（约 6 行） */
+    margin-top: 26px;
+    height: 170px;
+    max-height: none;
+    min-height: 0;
+    overflow: hidden;
+    mask-image: linear-gradient(to bottom, #000, #000, #000, #0000, #0000);
+    -webkit-mask-image: linear-gradient(to bottom, #000, #000, #000, #0000, #0000);
   }
 
   #anMusic-page .aplayer-info .aplayer-lrc p.aplayer-lrc-current {
