@@ -759,6 +759,23 @@ comments: false
         volume.classList.remove('open')
       }
     })
+    // 同一时间只允许一个 <audio> 在响：音乐馆那个 aplayer 底层也是 audio
+    document.addEventListener('play', function (e) {
+      var t = e.target
+      if (!t || t.tagName !== 'AUDIO' || t === audio) return
+      // 别的播放器开始放 -> 停掉我
+      try { audio.pause() } catch (x) {}
+    }, true)
+    audio.addEventListener('play', function () {
+      // 我开始放 -> 停掉页面上其他所有 audio（含 aplayer）
+      var all = document.querySelectorAll('audio')
+      for (var i = 0; i < all.length; i++) {
+        if (all[i] !== audio && !all[i].paused) {
+          try { all[i].pause() } catch (x) {}
+        }
+      }
+    })
+
     btn.addEventListener('click', refresh)
     document.addEventListener('keydown', function (e) {
       if (e.code !== 'Space') return
