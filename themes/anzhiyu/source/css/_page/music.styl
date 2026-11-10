@@ -519,6 +519,32 @@ if hexo-config('nav_music.enable') == false
                 .aplayer-icon-lrc
                   display none !important
 
+  /* 三颗浮按钮：挪到封面右侧竖排，不再压在歌词上 */
+  #anMusic-page
+    #anMusicSwitching, #anMusicRefreshBtn, #anMusicBtnGetSong
+      position fixed
+      right 12px
+      width 30px
+      height 30px
+      padding 0
+      bottom auto
+      z-index 1003
+      background var(--anzhiyu-white-op)
+      backdrop-filter saturate(180%) blur(20px)
+      -webkit-backdrop-filter blur(20px)
+      border-radius 50%
+      display flex
+      align-items center
+      justify-content center
+      i
+        font-size 14px
+    #anMusicBtnGetSong
+      top 104px
+    #anMusicRefreshBtn
+      top 140px
+    #anMusicSwitching
+      top 176px
+
 @keyframes miaoTitleScroll
   from
     transform translateX(0)
