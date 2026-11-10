@@ -1,11 +1,14 @@
 //get请求
-fetch('https://api.qjqq.cn/api/Local')
-  .then(response => response.json())
+// 这个 IP 接口常常证书失效/超时。失败就安静地不显示欢迎语，
+// 不要往控制台扔红色报错吓人。
+fetch('https://api.qjqq.cn/api/Local', { signal: AbortSignal.timeout(6000) })
+  .then(response => (response.ok ? response.json() : Promise.reject(new Error('http ' + response.status))))
   .then(data => {
+    if (!data || !data.data) throw new Error('bad payload')
     ipLocation = data
     showWelcome()
   })
-  .catch(error => console.error('Error:', error))
+  .catch(() => { /* 接口不可用：跳过欢迎语 */ })
 
 
 function getDistance (e1, n1, e2, n2) {
@@ -314,6 +317,7 @@ function getDistance (e1, n1, e2, n2) {
 
 // 根据获取的IP地址显示欢迎信息
 function showWelcome () {
+  if (!ipLocation || !ipLocation.data) return
   let dist = getDistance(114.305392, 30.593099, ipLocation.data.lng, ipLocation.data.lat) //博主在武汉
   let pos = ipLocation.data.country
   let ip = ipLocation.ip

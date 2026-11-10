@@ -236,6 +236,8 @@ comments: false
 .lp-bar {
   flex: 1 1 auto;
   height: 6px;
+  user-select: none;
+  -webkit-user-select: none;
   touch-action: none;
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.1);
@@ -718,12 +720,31 @@ comments: false
       toggle.classList.remove('loading')
       if (audio.src) skipBroken()
     })
-    bar.addEventListener('click', function (e) {
+    // 进度条：按住就能拖，不是只能点一下
+    var dragging = false
+    function seekTo (clientX) {
       if (!audio.duration) return
       var r = bar.getBoundingClientRect()
-      var p = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width))
+      var p = Math.min(1, Math.max(0, (clientX - r.left) / r.width))
       audio.currentTime = p * audio.duration
+      fill.style.width = (p * 100) + '%'
+      timeEl.textContent = fmt(audio.currentTime)
+    }
+    bar.addEventListener('pointerdown', function (e) {
+      if (!audio.duration) return
+      dragging = true
+      try { bar.setPointerCapture(e.pointerId) } catch (err) {}
+      seekTo(e.clientX)
+      e.preventDefault()
     })
+    bar.addEventListener('pointermove', function (e) {
+      if (dragging) seekTo(e.clientX)
+    })
+    bar.addEventListener('pointerup', function (e) {
+      dragging = false
+      try { bar.releasePointerCapture(e.pointerId) } catch (err) {}
+    })
+    bar.addEventListener('pointercancel', function () { dragging = false })
     volBtn.addEventListener('click', function (e) {
       e.stopPropagation()
       volume.classList.toggle('open')
