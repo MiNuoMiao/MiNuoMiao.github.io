@@ -147,11 +147,13 @@ comments: false
 }
 .lc-bar {
   position: absolute;
-  left: 50%;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
   bottom: 104px;
-  transform: translateX(-50%);
   width: 88px;
   height: 88px;
+  box-sizing: border-box;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.55);
   border: 1px solid rgba(255, 152, 162, 0.35);
@@ -166,8 +168,8 @@ comments: false
 .listen-card.playing .lc-bar { width: calc(100% - 40px); height: 54px; justify-content: flex-start; overflow: visible; bottom: 26px; }
 .lp-toggle {
   flex: 0 0 auto;
-  width: 82px;
-  height: 82px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   border: 0;
   cursor: pointer;
@@ -201,6 +203,7 @@ comments: false
 .lp-bar {
   flex: 1 1 auto;
   height: 6px;
+  touch-action: none;
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.1);
   cursor: pointer;
@@ -282,6 +285,7 @@ comments: false
   cursor: pointer;
   transform: rotate(-90deg);
   transform-origin: center;
+  touch-action: none;   /* 手机上拖音量别把页面一起带下去 */
 }
 .lv-range::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -395,6 +399,10 @@ comments: false
       if (/作词|作曲|编曲|混音|母带|制作人|监制|录音|和声|演唱|出品|发行|统筹|企划/.test(txt)
           && txt.length < 42 && /[：:]/.test(txt)) return
       if (/授权|OST|同人文|版权方|独家|首发|翻自|原曲|原唱/.test(txt) && txt.length < 42) return
+      // B 站那边的来源标注：v本家：av123456、来源：BVxxx、PV/曲绘/压制 之类
+      if (/本家|视频来源|出处|PV[:：]|曲绘|绘图|压制|调音|原版曲|翻自|av\d{6,}|BV[0-9A-Za-z]{8,}/.test(txt) && txt.length < 42) return
+      // 冒号在很靠前的位置 + 整行又不长，基本是「职务：名字」
+      if (/^[^：:]{1,6}[：:]/.test(txt) && txt.length < 20) return
       // 「『XXX』制作出品」「出品人」「发行公司」这类没有冒号的署名
       if (/出品|制作出品|制作发行|发行公司|制作公司|唱片公司/.test(txt) && txt.length < 60) return
       // 版权/著作权声明，含英文写法（Production Company / All rights reserved 之类）

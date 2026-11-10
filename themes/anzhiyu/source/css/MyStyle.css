@@ -37,7 +37,7 @@ h1.post-title,
 
 /* 樱花特效 */
 #canvas_sakura {
-  z-index: 2;
+  z-index: 90;
 }
 
 /* 页底养鱼：铺满整个 footer，水面就是 footer 的顶边 */
@@ -373,4 +373,17 @@ html:not(.float-hidden) #nav-music {
 /* 音乐球恢复主题默认：圆角内裁切 */
 #nav-music {
   overflow: hidden !important;
+}
+
+/* ── 移动端侧边栏：锁住背景滚动，别让滑屏幕带着页面一起走 ── */
+#sidebar-menus {
+  overscroll-behavior: contain;   /* 侧边栏滚到头不要再传给 body */
+  -webkit-overflow-scrolling: touch;
+}
+body:has(#sidebar-menus.open) {
+  overflow: hidden;
+  touch-action: none;
+}
+body:has(#sidebar-menus.open) #sidebar-menus {
+  touch-action: auto;             /* 侧边栏自己还能滚 */
 }
