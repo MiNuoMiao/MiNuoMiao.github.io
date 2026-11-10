@@ -118,6 +118,8 @@ comments: false
   overflow: hidden;
   opacity: 0;
   transition: height 0.5s cubic-bezier(.4,0,.2,1), opacity 0.45s ease 0.1s;
+  -webkit-mask-image: linear-gradient(transparent 0%, #000 14%, #000 86%, transparent 100%);
+  mask-image: linear-gradient(transparent 0%, #000 14%, #000 86%, transparent 100%);
 }
 .listen-card.playing .lc-lyrics { height: 196px; opacity: 1; }
 
@@ -129,20 +131,25 @@ comments: false
 }
 .lc-lyrics-inner {
   padding: 0 1.6rem;
-  transition: transform 0.55s cubic-bezier(.4,0,.2,1);
+  transition: transform 0.26s cubic-bezier(.25,.1,.25,1);
   will-change: transform;
 }
 .lc-line {
-  padding: 4px 0;
+  padding: 6px 0;
   font-size: 15px;
-  line-height: 1.45;
+  line-height: 1.5;
   color: var(--anzhiyu-secondtext);
-  opacity: 0.42;
+  opacity: 0.4;
   transition: opacity 0.3s ease, color 0.3s ease;
   white-space: normal;
   word-break: break-word;
 }
-.lc-line.active { color: var(--anzhiyu-main); opacity: 1; font-weight: 600; }
+/* 当前行不加粗：加粗会让文字变宽、必要时换行，行高一变滚动就"拉扯" */
+.lc-line.active {
+  color: var(--anzhiyu-main);
+  opacity: 1;
+  text-shadow: 0 0 10px rgba(255, 152, 162, 0.45);
+}
 .lc-orig { display: block; }
 .lc-trans {
   display: block;
@@ -354,7 +361,14 @@ comments: false
   opacity: 0.75;
 }
 @media (max-width: 768px) {
-  .listen-card { height: 380px; }
+  .listen-card {
+    height: clamp(380px, 64dvh, 580px);
+  }
+  .listen-card.playing .lc-lyrics {
+    height: auto;
+    top: 112px;
+    bottom: 104px;   /* 让出底部播放器 + 一点间距 */
+  }
   .lc-head { top: 88px; }
   .listen-card.playing .lc-head { top: 18px; }
   .lc-title { font-size: 21px; }
@@ -362,7 +376,6 @@ comments: false
   .lc-artist { font-size: 12px; }
   .lc-teaser { font-size: 13px; }
   .lc-lyrics { top: 112px; }
-  .listen-card.playing .lc-lyrics { height: 176px; }
   .lc-bar { height: 80px; bottom: 88px; }
   .lp-toggle { width: 72px; height: 72px; font-size: 20px; }
   .listen-card.playing .lc-bar {
@@ -495,8 +508,19 @@ comments: false
     lyricsInner.style.transform = 'translateY(0px)'
   }
 
+  // 上下各留半个容器高，首句/末句才能居中；容器高度变了要重设
+  var lyricPadFor = 0
+  function ensureLyricPad () {
+    var wrapH = (lyricsInner.parentElement && lyricsInner.parentElement.clientHeight) || 0
+    if (!wrapH || wrapH === lyricPadFor) return
+    lyricPadFor = wrapH
+    lyricsInner.style.paddingTop = (wrapH / 2) + 'px'
+    lyricsInner.style.paddingBottom = (wrapH / 2) + 'px'
+  }
+
   function syncLyric () {
     if (!lrc.length) return
+    ensureLyricPad()
     var t = audio.currentTime
     var idx = -1
     for (var i = 0; i < lrc.length; i++) {
@@ -508,11 +532,11 @@ comments: false
     activeIdx = idx
     if (idx >= 0 && lineEls[idx]) {
       lineEls[idx].classList.add('active')
-      // 按真实高度算（歌词允许换行、翻译多一行，行高不再是固定值）
+      // 当前行居中：不夹到 0，首句也能停在中间（上面靠 padding 撑出空间）
       var el = lineEls[idx]
       var wrapH = lyricsInner.parentElement.clientHeight || 112
-      var target = el.offsetTop - (wrapH / 2 - el.offsetHeight / 2)
-      lyricsInner.style.transform = 'translateY(' + (-Math.max(0, target)) + 'px)'
+      var target = el.offsetTop - (wrapH - el.offsetHeight) / 2
+      lyricsInner.style.transform = 'translateY(' + (-Math.round(target)) + 'px)'
     }
   }
 
