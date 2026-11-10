@@ -171,7 +171,7 @@ comments: false
   overflow: hidden;
   transition: width 0.5s cubic-bezier(.4,0,.2,1), height 0.45s cubic-bezier(.4,0,.2,1);
 }
-[data-theme="dark"] .lc-bar { background: rgba(255, 255, 255, 0.08); }
+[data-theme="dark"] .listen-card.playing .lc-bar { background: rgba(255, 255, 255, 0.08); }
 .listen-card.playing .lc-bar {
   left: 20px;
   right: 20px;
