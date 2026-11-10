@@ -345,6 +345,8 @@ comments: false
   var LINE_H = 29
 
   var songs = null, loading = null, lastIndex = -1
+  var songsAt = 0                 // 歌单拉到的时刻
+  var SONGS_TTL = 3 * 60 * 1000   // 3 分钟后下次抽歌会重新拉一遍（歌单是会长大的）
   var lrcCache = {}
   var lrc = []
   var lineEls = []
@@ -363,14 +365,17 @@ comments: false
     return m + ':' + (sec < 10 ? '0' : '') + sec
   }
 
-  function loadPlaylist () {
-    if (songs) return Promise.resolve(songs)
+  function loadPlaylist (force) {
+    if (!force && songs && Date.now() - songsAt < SONGS_TTL) return Promise.resolve(songs)
     if (loading) return loading
-    loading = fetch(METING + '?server=' + SERVER + '&type=playlist&id=' + PLAYLIST)
+    loading = fetch(METING + '?server=' + SERVER + '&type=playlist&id=' + PLAYLIST,
+                    { cache: 'no-store' })
       .then(function (r) { return r.json() })
       .then(function (list) {
         if (!Array.isArray(list) || !list.length) throw new Error('歌单是空的')
         songs = list
+        songsAt = Date.now()
+        loading = null
         return songs
       })
       .catch(function (e) { loading = null; throw e })
@@ -594,6 +599,15 @@ comments: false
   }
 
   function refresh () {
+    // 歌单会增删：过期了就先拉最新的，再抽（拉不到就还用旧的）
+    if (songs && Date.now() - songsAt >= SONGS_TTL) {
+      btn.disabled = true
+      loadPlaylist(true).catch(function () {}).then(function () {
+        btn.disabled = false
+        render(false)
+      })
+      return
+    }
     if (!songs) {
       btn.disabled = true
       titleEl.textContent = '正在从音乐馆拉歌单…'
