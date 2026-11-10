@@ -3,6 +3,7 @@
 // 而且和末尾那段新逻辑重复取了一次，所以整段删掉。
 
 
+var ipLocation = null  // 必须声明：没拿到 IP 时 showWelcome 里的 !ipLocation 才不会抛 ReferenceError
 function getDistance (e1, n1, e2, n2) {
   const R = 6371
   const { sin, cos, asin, PI, hypot } = Math
