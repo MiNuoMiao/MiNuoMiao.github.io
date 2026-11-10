@@ -178,7 +178,7 @@ if hexo-config('nav_music.enable') == false
               font-weight 700
               color #fff
             .aplayer-title
-              display inline-block
+              display block
               max-width 100%
               white-space nowrap
               overflow hidden
@@ -186,6 +186,9 @@ if hexo-config('nav_music.enable') == false
               vertical-align bottom
               &.miao-scroll
                 animation miaoTitleScroll 7s ease-in-out infinite alternate
+            .aplayer-author
+              display block
+              margin-top 6px
 
           .aplayer-lrc
             height 800%
@@ -321,9 +324,12 @@ if hexo-config('nav_music.enable') == false
     .aplayer-info .aplayer-music
       .aplayer-title
         font-size 1.3rem
-        max-width calc(100% - 24px)
+        max-width 100%
+        display block
       .aplayer-author
         font-size 0.95rem
+        display block
+        margin-top 4px
     meting-js 
       .aplayer
         .aplayer-list
