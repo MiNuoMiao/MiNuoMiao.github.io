@@ -8,6 +8,9 @@ if hexo-config('css_prefix')
 @import '_global/*'
 @import '_highlight/highlight'
 @import '_page/*'
+// 音乐页样式：`_page/*` 的通配符没有把它包含进来（实测 index.styl 编译结果里
+// 一个 .aplayer-lrc 都没有），所以显式 import 一次。
+@import '_page/music'
 @import '_layout/*'
 @import '_tags/*'
 @import '_mode/*'

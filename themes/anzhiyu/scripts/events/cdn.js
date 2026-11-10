@@ -106,10 +106,14 @@ hexo.extend.filter.register("before_generate", () => {
     });
 
     if (cond === "internal") {
-      // 主样式带版本号：按构建日期，每天变一次。
-      // 以前是固定路径，浏览器强缓存 → 改了 CSS 手机和电脑都还是旧的。
+      // 主样式和内部 js 都带版本号：按构建日期，每天变一次。
+      // 以前是固定路径，浏览器强缓存 → 改了 CSS/JS 手机和电脑都还是旧的。
+      // （utils.js 里的歌词过滤就是因为没版本号，线上一直是旧版）
       const cssVer = new Date().toISOString().slice(0, 10).replace(/-/g, "");
       data["main_css"] = "css/index.css?v=" + cssVer;
+      ["utils", "main", "translate", "local_search"].forEach((k) => {
+        if (typeof data[k] === "string") data[k] = data[k] + "?v=" + cssVer;
+      });
     }
     return data;
   };

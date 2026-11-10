@@ -196,14 +196,18 @@ if hexo-config('nav_music.enable') == false
             mask-image linear-gradient(to bottom, #000, #000, #000, #000, #000, #000, #000, #000, #000, #000, #0000, #0000)
             p
               font-size 20px
-              line-height: 20px !important;
+              // APlayer 默认 height:16px !important，只改 line-height 不改 height 会挤在一起
+              line-height: 26px !important;
+              height: 26px !important;
+              padding: 0 !important;
+              margin: 0 !important;
               height: 20px !important;
               margin: 20px 0 !important;
               color #fff
               &.aplayer-lrc-current {
-                min-height: 20px;
                 color var(--anzhiyu-main)
-                font-weight 600
+                // 不加粗：加粗会把长句挤成两行，行高一变就"拉扯"
+                text-shadow 0 0 10px rgba(255,152,162,.45)
               }
             &::after, &::before
               display none
@@ -408,15 +412,14 @@ if hexo-config('nav_music.enable') == false
                 will-change transform
               p
                 font-size 15px
-                line-height 24px !important
-                margin 4px 0
-                // 行高固定，不因加粗/换行变化，滚动才不抖
-                min-height 24px
+                // 三件套都要钉住：APlayer 默认是 height:16px + line-height:16px + padding:0
+                line-height 26px !important
+                height 26px !important
+                padding 0 !important
+                margin 0 !important
                 &.aplayer-lrc-current
                   color var(--anzhiyu-main)
-                  // 不用 font-weight：加粗会把长句挤成两行，行高一变整块就"拉扯"
                   text-shadow 0 0 12px rgba(255,152,162,.55)
-                  min-height 24px
             .aplayer-controller
               width 100%
               bottom 100px

@@ -98,11 +98,13 @@
         if (rows[i][0] <= t + 0.25) idx = i; else break;
       }
       var ps = box.querySelectorAll("p");
-      var changed = (idx !== lrc.lastIdx);
+      // 注意：这里必须用 ap.lrc —— 原来写的是 hook() 里的局部变量 lrc，
+      // 在这个函数里根本不存在，ReferenceError 被 try/catch 吞掉，高亮就一直不生效。
+      var changed = (idx !== ap.lrc.lastIdx);
       if (changed) {
         for (var j = 0; j < ps.length; j++) ps[j].classList.remove("aplayer-lrc-current");
         if (idx >= 0 && ps[idx]) ps[idx].classList.add("aplayer-lrc-current");
-        lrc.lastIdx = idx;
+        ap.lrc.lastIdx = idx;
       }
 
       // APlayer 自己的滚动用的是它缓存的旧 <p> 引用，我重建 DOM 后那些引用失效，
@@ -110,12 +112,12 @@
       // 把当前行搬到歌词窗的正中间。
       var wrap = box.closest(".aplayer-lrc") || box.parentElement;
       var wrapH = wrap ? wrap.clientHeight : 0;
-      if (wrapH && ps[idx] && (changed || lrc.lastY === undefined)) {
+      if (wrapH && ps[idx] && (changed || ap.lrc.lastY === undefined)) {
         // 让当前行停在歌词窗正中间：translateY = 窗口中线 - 当前行中线
         var rowH = ps[idx].offsetHeight || 24
         var y = (wrapH / 2) - (ps[idx].offsetTop + rowH / 2)
         box.style.transform = "translateY(" + y.toFixed(1) + "px)"
-        lrc.lastY = y
+        ap.lrc.lastY = y
         window.__miaoHl = { wrapH: wrapH, y: Math.round(y), idx: idx, rowH: rowH }
       }
     } catch (e) {}
@@ -140,7 +142,7 @@
       }
       return origUpdate();
     };
-    ap.on("listswitch", function () { lrc.__miaoDirty = true; lrc.lastIdx = -2; lrc.lastY = undefined; });
+    ap.on("listswitch", function () { lrc.__miaoDirty = true; ap.lrc.lastIdx = -2; ap.lrc.lastY = undefined; });
     ap.on("lrcset", function () { lrc.__miaoDirty = true; });
     clean(ap);
 

@@ -387,3 +387,38 @@ body:has(#sidebar-menus.open) {
 body:has(#sidebar-menus.open) #sidebar-menus {
   touch-action: auto;             /* 侧边栏自己还能滚 */
 }
+
+/* ── 音乐馆歌词行（2026-11-11）─────────────────────────────
+   APlayer 默认给 .aplayer-lrc p 写了 height:16px + line-height:16px + padding:0
+   而且是 !important。只改 line-height 不改 height 会把字裁掉、行距忽大忽小，
+   所以这里把四个值一起钉死。 */
+body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-lrc p {
+  line-height: 26px !important;
+  height: 26px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: 20px !important;
+  overflow: visible !important;
+}
+/* 当前行：只上色 + 光晕，不加粗（加粗会把长句挤成两行，行高一变就"拉扯"） */
+body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-lrc p.aplayer-lrc-current {
+  color: var(--anzhiyu-main) !important;
+  font-weight: 400 !important;
+  text-shadow: 0 0 10px rgba(255, 152, 162, .45);
+}
+
+@media (max-width: 768px) {
+  body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-lrc p {
+    line-height: 24px !important;
+    height: 24px !important;
+    font-size: 15px !important;
+  }
+  /* 歌词窗：从现在的位置一直撑到控制栏上方，大屏多显示几行 */
+  body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-lrc {
+    height: auto !important;
+    max-height: calc(100dvh - 540px) !important;
+    min-height: 120px !important;
+    overflow: hidden !important;
+    display: block !important;
+  }
+}

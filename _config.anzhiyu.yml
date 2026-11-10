@@ -1220,7 +1220,7 @@ inject:
     # 自定义css
     # - <link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'">
     - <link rel="stylesheet" href="/css/mouse.css">    # 鼠标样式
-    - <link rel="stylesheet" href="/css/MyStyle.css?v=20261111a">    # 自定义样式
+    - <link rel="stylesheet" href="/css/MyStyle.css?v=20261111d">    # 自定义样式
     # - <link rel="stylesheet" href="/css/music.css">    # 音乐css
   bottom:
     # 自定义js
@@ -1250,10 +1250,11 @@ CDN:
   custom_format: # https://npm.elemecdn.com/${name}@latest/${file}
 
   option:
-    # 样式表带版本号，否则浏览器会一直用缓存（改完看不到变化）
-    main_css: css/index.css?v=20261111b
-    # main:
-    # utils:
+    # 样式表和内部 js 都带版本号，否则浏览器会一直用缓存（改完看不到变化）
+    # ⚠️ 这里会覆盖 cdn.js 自动生成的 asset 值，两边要保持一致
+    main_css: css/index.css?v=20261111c
+    main: js/main.js?v=20261111c
+    utils: js/utils.js?v=20261111e
     # translate:
     # random_friends_post_js:
     # right_click_menu_js:
