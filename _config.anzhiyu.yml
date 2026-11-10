@@ -1251,7 +1251,7 @@ CDN:
 
   option:
     # 样式表带版本号，否则浏览器会一直用缓存（改完看不到变化）
-    main_css: css/index.css?v=20261111a
+    main_css: css/index.css?v=20261111b
     # main:
     # utils:
     # translate:

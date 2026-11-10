@@ -37,8 +37,12 @@
   };
 })();
 
-/* ── APlayer 歌词清洗（第二道）：给署名行打标，交给 CSS 隐藏 ──
-   ap.lrc 不是普通数组（新版 APlayer），改 DOM 最稳。 */
+/* ── APlayer 歌词清洗：直接从数据里删掉署名行 ──
+   以前是给歌词行打标、用 CSS visibility:hidden 藏起来，但有三个后遗症：
+   1) 那些行仍然占着高度 —— 歌词上下一句之间空一大截；
+   2) 当前行常常正好是署名行（作曲/编曲），一隐藏就"没有高亮"；
+   3) APlayer 按行号算滚动位置，行数一变就整体错位。
+   所以改成：过滤 ap.lrc.parsed[0]，再按剩下的行重建 DOM。 */
 (function () {
   if (window.__miaoAplayerLrc) return;
   window.__miaoAplayerLrc = true;
@@ -57,26 +61,84 @@
     return false;
   }
 
-  function markLines() {
+  function clean(ap) {
+    if (!ap || !ap.lrc || !Array.isArray(ap.lrc.parsed) || !ap.lrc.parsed.length) return;
+    var rows = ap.lrc.parsed[0];
+    if (!Array.isArray(rows) || !rows.length) return;
+    var kept = rows.filter(function (row) { return !isCredit(row[1]); });
+    if (kept.length === rows.length) return;   // 没有署名行，不动
+    ap.lrc.parsed[0] = kept;
+    // update() 读的是 lrc.current 这个平行数组，只改 parsed 会「DOM 45 行、索引按 52 算」
+    if (Array.isArray(ap.lrc.current)) ap.lrc.current = kept;
+
     var box = document.querySelector("#anMusic-page .aplayer-lrc-contents") ||
               document.querySelector(".aplayer-lrc-contents");
     if (!box) return;
-    var ps = box.querySelectorAll("p");
-    for (var i = 0; i < ps.length; i++) {
-      var p = ps[i];
-      var credit = isCredit(p.textContent);
-      if (credit && !p.classList.contains("miao-lrc-credit")) {
-        p.classList.add("miao-lrc-credit");
-      } else if (!credit && p.classList.contains("miao-lrc-credit")) {
-        p.classList.remove("miao-lrc-credit");
-      }
-    }
+    box.innerHTML = "";
+    kept.forEach(function (row) {
+      var p = document.createElement("p");
+      p.textContent = row[1];
+      box.appendChild(p);
+    });
+    try { ap.lrc.update(); } catch (e) {}
+    highlight(ap);
   }
 
-  var timer = setInterval(markLines, 400);
-  document.addEventListener("DOMContentLoaded", markLines);
-  var mo = new MutationObserver(function () { markLines(); });
-  if (document.body) mo.observe(document.body, { childList: true, subtree: true });
+  // 重建 DOM 后 APlayer 的 index 可能"正好没变"，就不会重绘高亮。
+  // 这里按当前播放时间自己标一次，随后 APlayer 的 update 会接管。
+  function highlight(ap) {
+    try {
+      var box = document.querySelector("#anMusic-page .aplayer-lrc-contents") ||
+                document.querySelector(".aplayer-lrc-contents");
+      var rows = ap.lrc && ap.lrc.current;
+      if (!box || !Array.isArray(rows) || !rows.length || !ap.audio) return;
+      var t = ap.audio.currentTime || 0;
+      var idx = -1;
+      for (var i = 0; i < rows.length; i++) {
+        if (rows[i][0] <= t + 0.25) idx = i; else break;
+      }
+      var ps = box.querySelectorAll("p");
+      for (var j = 0; j < ps.length; j++) ps[j].classList.remove("aplayer-lrc-current");
+      if (idx >= 0 && ps[idx]) ps[idx].classList.add("aplayer-lrc-current");
+    } catch (e) {}
+  }
+
+  function hook() {
+    var mj = document.querySelector("meting-js");
+    if (!mj || !mj.aplayer) return false;
+    var ap = mj.aplayer;
+    var lrc = ap.lrc;
+    if (!lrc || lrc.__miaoHooked) return true;
+    lrc.__miaoHooked = true;
+
+    // APlayer 每次切歌都会重新赋值 lrc.parsed，光在 lrcset 里过滤会被下一次覆盖。
+    // 所以接管 update()（timeupdate 每次都调它）：切歌后第一次更新时再清一遍。
+    var origUpdate = lrc.update.bind(lrc);
+    lrc.__miaoDirty = true;
+    lrc.update = function () {
+      if (lrc.__miaoDirty) {
+        lrc.__miaoDirty = false;
+        try { clean(ap); } catch (e) {}
+      }
+      return origUpdate();
+    };
+    ap.on("listswitch", function () { lrc.__miaoDirty = true; });
+    ap.on("lrcset", function () { lrc.__miaoDirty = true; });
+    clean(ap);
+
+    // APlayer 的 update() 有自己的 index 缓存，和重建后的 DOM 对不上；
+    // 这里按播放时间自己同步一次高亮，稳过它的判断。
+    if (!lrc.__miaoTicker) {
+      lrc.__miaoTicker = setInterval(function () {
+        if (ap.audio && !ap.audio.paused) highlight(ap);
+      }, 400);
+    }
+    return true;
+  }
+
+  var t = setInterval(function () { if (hook()) clearInterval(t); }, 400);
+  if (document.readyState !== "loading") hook();
+  else document.addEventListener("DOMContentLoaded", hook);
 })();
 
 const anzhiyu = {

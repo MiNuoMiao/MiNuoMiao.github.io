@@ -202,6 +202,8 @@ if hexo-config('nav_music.enable') == false
               color #fff
               &.aplayer-lrc-current {
                 min-height: 20px;
+                color var(--anzhiyu-main)
+                font-weight 600
               }
             &::after, &::before
               display none
@@ -402,8 +404,6 @@ if hexo-config('nav_music.enable') == false
               align-items center
               .aplayer-lrc-contents
                 width 100%
-              p.miao-lrc-credit
-                visibility hidden !important
               p
                 font-size 15px
                 line-height 24px !important
@@ -459,38 +459,9 @@ if hexo-config('nav_music.enable') == false
                   right 25px
                   top -90px
 
-  /* 三颗浮按钮：挪到封面右侧竖排，不再压在歌词上 */
-  #anMusic-page
-    #anMusicSwitching, #anMusicRefreshBtn, #anMusicBtnGetSong
-      position fixed
-      right 12px
-      width 30px
-      height 30px
-      padding 0
-      bottom auto
-      z-index 1003
-      background var(--anzhiyu-white-op)
-      backdrop-filter saturate(180%) blur(20px)
-      -webkit-backdrop-filter blur(20px)
-      border-radius 50%
-      display flex
-      align-items center
-      justify-content center
-      i
-        font-size 14px
-    #anMusicBtnGetSong
-      top 104px
-    #anMusicRefreshBtn
-      top 140px
-    #anMusicSwitching
-      top 176px
-
 @keyframes miaoTitleScroll
   from
     transform translateX(0)
   to
     transform translateX(var(--miao-shift, -50%))
 
-// 歌词里的署名行（作曲/编曲/混音/吉他…）不显示 —— 全局，不限断点
-.aplayer-lrc-contents p.miao-lrc-credit
-  visibility hidden !important
