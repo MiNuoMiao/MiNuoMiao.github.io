@@ -26,7 +26,9 @@ comments: false
       </div>
       <div class="lc-volume" id="lc-volume">
         <button class="lv-btn" id="lv-btn" type="button" aria-label="音量">♪</button>
-        <input class="lv-range" id="lv-range" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="音量大小">
+        <div class="lv-pop" id="lv-pop">
+          <input class="lv-range" id="lv-range" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="音量大小">
+        </div>
       </div>
     </div>
     <audio id="listen-audio" preload="none" crossorigin="anonymous" loop></audio>
@@ -111,13 +113,13 @@ comments: false
 .lc-lyrics {
   position: absolute;
   left: 0; right: 0;
-  top: 116px;
+  top: 146px;
   height: 0;
   overflow: hidden;
   opacity: 0;
   transition: height 0.5s cubic-bezier(.4,0,.2,1), opacity 0.45s ease 0.1s;
 }
-.listen-card.playing .lc-lyrics { height: 112px; opacity: 1; }
+.listen-card.playing .lc-lyrics { height: 88px; opacity: 1; }
 .lc-lyrics-inner {
   padding: 0 1.6rem;
   transition: transform 0.55s cubic-bezier(.4,0,.2,1);
@@ -146,7 +148,7 @@ comments: false
 .lc-bar {
   position: absolute;
   left: 50%;
-  bottom: 56px;
+  bottom: 30px;
   transform: translateX(-50%);
   width: 88px;
   height: 88px;
@@ -161,7 +163,7 @@ comments: false
   transition: width 0.5s cubic-bezier(.4,0,.2,1), height 0.45s cubic-bezier(.4,0,.2,1);
 }
 [data-theme="dark"] .lc-bar { background: rgba(255, 255, 255, 0.08); }
-.listen-card.playing .lc-bar { width: calc(100% - 40px); height: 54px; justify-content: flex-start; }
+.listen-card.playing .lc-bar { width: calc(100% - 40px); height: 54px; justify-content: flex-start; overflow: visible; }
 .lp-toggle {
   flex: 0 0 auto;
   width: 82px;
@@ -224,13 +226,33 @@ comments: false
 .lc-volume {
   flex: 0 0 0;
   width: 0;
-  overflow: hidden;
   opacity: 0;
+  position: relative;
   display: flex;
   align-items: center;
   gap: 6px;
   transition: opacity 0.3s ease 0.25s;
 }
+.lv-pop {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 34px;
+  height: 0;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 6px 18px rgba(255, 152, 162, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: height 0.25s ease, opacity 0.2s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+[data-theme="dark"] .lv-pop { background: rgba(60, 60, 70, 0.95); }
+.lc-volume.open .lv-pop { height: 92px; opacity: 1; pointer-events: auto; }
 .listen-card.playing .lc-volume { flex: 0 0 auto; width: auto; opacity: 1; padding-right: 12px; }
 .lv-btn {
   width: 26px;
@@ -252,16 +274,15 @@ comments: false
 .lv-range {
   -webkit-appearance: none;
   appearance: none;
-  width: 0;
+  width: 78px;
   height: 4px;
   border-radius: 999px;
   background: rgba(255, 152, 162, 0.35);
   outline: none;
-  opacity: 0;
   cursor: pointer;
-  transition: width 0.25s ease, opacity 0.25s ease;
+  transform: rotate(-90deg);
+  transform-origin: center;
 }
-.lc-volume.open .lv-range { width: 58px; opacity: 1; }
 .lv-range::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -301,14 +322,14 @@ comments: false
   .listen-card.playing .lc-title { font-size: 20px; }
   .lc-artist { font-size: 12px; }
   .lc-teaser { font-size: 13px; }
-  .lc-lyrics { top: 104px; }
-  .listen-card.playing .lc-lyrics { height: 96px; }
-  .lc-bar { width: 78px; height: 78px; bottom: 50px; }
+  .lc-lyrics { top: 128px; }
+  .listen-card.playing .lc-lyrics { height: 76px; }
+  .lc-bar { width: 78px; height: 78px; bottom: 24px; }
   .lp-toggle { width: 72px; height: 72px; font-size: 20px; }
   .listen-card.playing .lc-bar { width: calc(100% - 32px); height: 50px; }
   .listen-card.playing .lp-toggle { width: 36px; height: 36px; margin: 0 4px 0 7px; font-size: 11px; }
   .lc-volume { padding-right: 8px; }
-  .lc-volume.open .lv-range { width: 42px; }
+  .lc-volume.open .lv-pop { height: 78px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .listen-card, .lc-head, .lc-lyrics, .lc-bar, .lp-toggle, .lc-lyrics-inner,
@@ -370,7 +391,10 @@ comments: false
           && txt.length < 42 && /[：:]/.test(txt)) return
       if (/授权|OST|同人文|版权方|独家|首发|翻自|原曲|原唱/.test(txt) && txt.length < 42) return
       // 「『XXX』制作出品」「出品人」「发行公司」这类没有冒号的署名
-      if (/出品|制作出品|制作发行|发行公司|制作公司|唱片公司/.test(txt) && txt.length < 32) return
+      if (/出品|制作出品|制作发行|发行公司|制作公司|唱片公司/.test(txt) && txt.length < 60) return
+      // 版权/著作权声明，含英文写法（Production Company / All rights reserved 之类）
+      if (/著作权|版权|保留权利|保留所有权利|Production Company|All rights reserved|Unauthorized/i.test(txt)
+          && txt.length < 70) return
       if (txt.length <= 12 && /[：:]/.test(txt)) return
       // 外文歌词常写成「原文（中文翻译）」，把括号里的翻译拆成单独一行
       var split = splitTranslation(txt)
