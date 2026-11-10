@@ -422,3 +422,20 @@ body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-
     display: block !important;
   }
 }
+
+/* ── 音乐馆标题 / 歌手（2026-11-11 05:55）───────────────
+   music.styl 第 176 行把 .aplayer-author 和 .aplayer-title 一起设成 2rem，
+   所以桌面上歌名和歌手一样大。移动端在 media query 里改过（1.3rem/0.78rem），
+   桌面端没人改 —— 这里补上：标题保持 2rem，歌手小一号。 */
+body[data-type="music"] #anMusic-page meting-js .aplayer-music .aplayer-title {
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  color: #fff !important;
+}
+body[data-type="music"] #anMusic-page meting-js .aplayer-music .aplayer-author {
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+  margin-top: 5px !important;
+  opacity: 0.86;
+  color: #fff !important;
+}
