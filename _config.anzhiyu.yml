@@ -1250,7 +1250,8 @@ CDN:
   custom_format: # https://npm.elemecdn.com/${name}@latest/${file}
 
   option:
-    # main_css:
+    # 样式表带版本号，否则浏览器会一直用缓存（改完看不到变化）
+    main_css: css/index.css?v=20261111a
     # main:
     # utils:
     # translate:

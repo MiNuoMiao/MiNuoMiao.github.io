@@ -14,7 +14,7 @@
       if (!t) return false;
       if (/^[-—–·.。…~～_\s]+$/.test(t)) return false;
       if (/未经著作权人|不得翻唱|翻录|版权|侵权|举报|网易云音乐|QQ音乐|酷狗|酷我|高音质|无损/.test(t)) return false;
-      if (/(作词|作曲|词曲|编曲|混音|母带|制作人|监制|录音|和声|演唱|出品|发行|统筹|企划|吉他|贝斯|鼓|键盘|弦乐|钢琴|打击|人声编辑|录音棚|主唱)[^：:]{0,12}[：:]/.test(t) && t.length < 48) return false;
+      if (/(作词|作曲|词曲|编曲|混音|母带|制作人|监制|录音|和声|演唱|出品|发行|统筹|企划|吉他|贝斯|鼓|键盘|弦乐|钢琴|打击|人声编辑|录音棚|主唱|MMD|视频绘图|曲绘|封面|插画|字幕|翻译|PV|动画|特效|调色|剪辑|导演|摄影|混剪|原曲|翻调|调教|本家|原唱|翻唱)[^：:]{0,12}[：:]/.test(t) && t.length < 48) return false;
       if (/(授权|OST|同人文|版权方|独家|首发|翻自|原曲|原唱)/.test(t) && t.length < 48) return false;
       if (/(出品|制作出品|制作发行|发行公司|制作公司|唱片公司)/.test(t) && t.length < 60) return false;
       if (/(著作权|保留权利|Production Company|All rights reserved|Unauthorized)/i.test(t) && t.length < 70) return false;
@@ -43,7 +43,7 @@
   if (window.__miaoAplayerLrc) return;
   window.__miaoAplayerLrc = true;
 
-  var CREDIT = /(作词|作曲|词曲|编曲|混音|母带|制作人|监制|录音|和声|演唱|出品|发行|统筹|企划|吉他|贝斯|鼓|键盘|弦乐|钢琴|打击|人声编辑|录音棚|主唱)[^：:]{0,12}[：:]/;
+  var CREDIT = /(作词|作曲|词曲|编曲|混音|母带|制作人|监制|录音|和声|演唱|出品|发行|统筹|企划|吉他|贝斯|鼓|键盘|弦乐|钢琴|打击|人声编辑|录音棚|主唱|MMD|视频绘图|曲绘|封面|插画|字幕|翻译|PV|动画|特效|调色|剪辑|导演|摄影|混剪|原曲|翻调|调教|本家|原唱|翻唱)[^：:]{0,12}[：:]/;
   var OTHER = /未经著作权人|不得翻唱|翻录|版权|侵权|举报|网易云音乐|QQ音乐|酷狗|酷我|高音质|无损|Production Company|All rights reserved/i;
   var SYMBOL = /^[-—–·.。…~～_\s]+$/;
 

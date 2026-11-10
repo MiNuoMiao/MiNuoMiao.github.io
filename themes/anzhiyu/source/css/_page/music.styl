@@ -381,83 +381,143 @@ if hexo-config('nav_music.enable') == false
         .aplayer-body
           width 100%
           position fixed
-          margin auto
           left 0
           right 0
-          top 100px
+          top 86px
+          bottom 0
+          height auto
+          display flex
+          flex-direction column
+          /* ① 封面：缩小到 132，居中 */
+          .aplayer-pic
+            position static
+            float none
+            flex 0 0 auto
+            width 132px
+            height 132px
+            margin 0 auto
+            border-radius 14px
+            transition background-image 0.4s ease
+            background-size cover
+            background-color transparent !important
           .aplayer-info
+            flex 1 1 auto
+            display flex
+            flex-direction column
+            min-height 0
+            margin 0 18px
+            border-bottom none
+            height auto
+            /* ② 标题 + 歌手：一块，居中 */
+            .aplayer-music
+              flex 0 0 auto
+              text-align center
+              margin 14px 0 0
+              height auto
+              .aplayer-title
+                display block
+                max-width 100%
+                font-size 1.12rem
+                font-weight 700
+                line-height 1.4
+                white-space nowrap
+                overflow hidden
+                &.miao-scroll
+                  animation miaoTitleScroll 7s ease-in-out infinite alternate
+              .aplayer-author
+                display block
+                margin-top 3px
+                font-size 0.74rem
+                opacity 0.72
+            /* ③ 歌词：中间一块，高度约 10 行；滚动交给 APlayer 自己算（它会把当前句居中） */
             .aplayer-lrc
-              margin-top 16px
-              // 跟屏幕高度走：手机小的也有 8 行，大的不会空一大块
-              height 200px   // 老浏览器（不认 dvh）的兜底
-              height clamp(150px, 30dvh, 300px)
-              max-height none
+              flex 1 1 auto
+              position relative
+              height auto
+              max-height 42vh
               min-height 0
+              margin-top 8px
               overflow hidden
-              mask-image linear-gradient(to bottom, #0000, #000 12%, #000 88%, #0000)
-              // 歌词整体垂直居中：词少的时候不会全挤在顶上，唱完也不显得空
-              display flex
-              flex-direction column
-              justify-content center
-              align-items center
+              mask-image linear-gradient(to bottom, #0000, #000 16%, #000 84%, #0000)
               .aplayer-lrc-contents
                 width 100%
               p.miao-lrc-credit
                 visibility hidden !important
               p
                 font-size 15px
-                line-height 24px !important
-                margin 4px 0
+                line-height 26px !important
+                height auto !important
+                margin 0 !important
+                color var(--font-color)
+                opacity 0.4
+                white-space nowrap
+                overflow hidden
+                text-overflow ellipsis
                 &.aplayer-lrc-current
-                  color var(--anzhiyu-main)
-                  font-weight 600
-                  min-height 0
+                  color var(--anzhiyu-main) !important
+                  opacity 1
+                  font-weight 700
+                  font-size 17px
+                  min-height 26px
+            /* ④ 控制栏：底部一块 */
             .aplayer-controller
+              flex 0 0 auto
+              position static
               width 100%
-              bottom 100px
-              .aplayer-volume-wrap
-                left -66px
-                .aplayer-volume-bar-wrap
-                  bottom 0px
-                  right 7px
+              margin-top auto
+              padding 4px 0 24px
               .aplayer-bar-wrap
-                margin 0 30px
-            .aplayer-controller
+                margin 0 14px
+                .aplayer-bar
+                  height 5px
+                  border-radius 4px
+              .aplayer-volume-wrap
+                display none
               .aplayer-time
-                bottom -40px
+                position static
+                display flex
+                align-items center
+                justify-content space-between
+                height 38px
+                margin 2px 14px 0
+                padding 0
+                bottom auto
                 .aplayer-time-inner
-                  position absolute
-                  width 100%
-                  margin-right 0
-                  margin-top -33px
-                  .aplayer-dtime
-                    position absolute
-                    right 30px
-                  .aplayer-ptime
-                    position absolute
-                    left 35px
-                .aplayer-icon-back
-                  margin auto
-                  right 110px
+                  position static
+                  display flex
+                  gap 3px
+                  margin 0
+                  width auto
+                  .aplayer-ptime, .aplayer-dtime
+                    position static
+                    right auto
+                    left auto
+                    margin 0
+                    font-size 11px
+                    opacity 0.7
+                .aplayer-icon
+                  position static !important
+                  float none
+                  margin 0 !important
+                  width 24px
+                  height 24px
+                  left auto
+                  right auto
+                  top auto
+                  padding 0
                 .aplayer-icon-play
-                  margin auto
-                  right 0
-                  left 0
+                  width 34px
+                  height 34px
+                .aplayer-icon-back
+                  margin-left auto !important
                 .aplayer-icon-forward
-                  margin auto
-                  left 110px
-                  right 0
-                .aplayer-icon-order
-                  position absolute
-                  left 22px
-                .aplayer-icon-loop
-                  position absolute
-                  right 25px
-                .aplayer-icon-menu
-                  display inline
-                  position absolute
-                  right 25px
-                  top -90px
+                  margin-right auto !important
+                .aplayer-icon-order,
+                .aplayer-icon-loop,
+                .aplayer-icon-menu,
+                .aplayer-icon-volume,
+                .aplayer-icon-lrc
+                  display none !important
 
 @keyframes miaoTitleScroll
   from
