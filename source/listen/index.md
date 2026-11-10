@@ -188,15 +188,15 @@ comments: false
   display: flex;
   align-items: center;
   justify-content: center;
-  /* 环画在按钮自己身上：同一个元素，永远同心，不会有亚像素偏心 */
-  box-shadow: 0 0 0 4px rgba(255, 152, 162, 0.28),
-              0 10px 26px rgba(255, 152, 162, 0.35);
+  /* 环画在按钮自己身上：同一个元素，永远同心。
+     注意别再加带偏移的投影（0 10px …）——深色底下会像环歪了/按钮凸起 */
+  box-shadow: 0 0 0 4px rgba(255, 152, 162, 0.28);
   transition: width 0.45s cubic-bezier(.4,0,.2,1), height 0.45s cubic-bezier(.4,0,.2,1),
               font-size 0.4s ease, filter 0.15s ease, box-shadow 0.35s ease;
 }
 .listen-card.playing .lp-toggle {
   width: 40px; height: 40px; margin: 0 6px 0 8px; font-size: 12px;
-  box-shadow: 0 4px 12px rgba(255, 152, 162, 0.28);
+  box-shadow: 0 0 10px rgba(255, 152, 162, 0.25);
 }
 .lp-toggle:hover { filter: brightness(1.06); }
 .lp-toggle:active { filter: brightness(0.94); }
