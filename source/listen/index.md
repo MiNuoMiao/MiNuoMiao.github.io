@@ -1,34 +1,33 @@
 ---
 title: 今晚听什么
 date: 2026-11-07 05:30:00
-updated: 2026-11-10 21:20:00
+updated: 2026-11-10 21:40:00
 comments: false
 ---
 
 <div class="listen-box">
   <div class="listen-label">今晚 · 随机一首</div>
   <div class="listen-card" id="listen-card">
-    <div class="listen-title" id="listen-title">点一下下面那颗按钮</div>
-    <div class="listen-artist" id="listen-artist">从音乐馆的歌单里抽一首</div>
-    <div class="listen-lyric" id="listen-lyric">（抽到哪首就放哪首）</div>
-    <div class="listen-player" id="listen-player">
-      <button class="lp-toggle" id="lp-toggle" type="button" aria-label="播放">▶</button>
-      <div class="lp-bar" id="lp-bar">
-        <div class="lp-fill" id="lp-fill"></div>
-      </div>
+    <div class="lc-head">
+      <div class="listen-title" id="listen-title">点一下下面那颗圆键</div>
+      <div class="listen-artist" id="listen-artist">从音乐馆的歌单里抽一首</div>
+    </div>
+    <div class="lc-lyrics" id="lc-lyrics">
+      <div class="lc-lyrics-inner" id="lc-lyrics-inner"></div>
+    </div>
+    <div class="lc-track" id="lc-track">
+      <div class="lp-bar" id="lp-bar"><div class="lp-fill" id="lp-fill"></div></div>
       <span class="lp-time" id="lp-time">0:00</span>
     </div>
+    <button class="lp-toggle" id="lp-toggle" type="button" aria-label="播放">▶</button>
     <audio id="listen-audio" preload="none" crossorigin="anonymous"></audio>
   </div>
   <button class="listen-btn" id="listen-btn">再抽一首</button>
-  <div class="listen-hint">空格键也可以 · 歌单来自音乐馆</div>
+  <div class="listen-hint">空格键：播放 / 暂停 · 歌单来自音乐馆</div>
 </div>
 
 <style>
-.listen-box {
-  text-align: center;
-  padding: 2.2rem 1rem 2.6rem;
-}
+.listen-box { text-align: center; padding: 2.2rem 1rem 2.6rem; }
 .listen-label {
   display: inline-block;
   font-size: 12px;
@@ -38,77 +37,91 @@ comments: false
   margin-bottom: 1.4rem;
 }
 .listen-card {
+  position: relative;
   max-width: 620px;
+  height: 330px;
   margin: 0 auto 1.6rem;
-  padding: 2.2rem 1.6rem;
   border-radius: 18px;
   background: linear-gradient(160deg, rgba(255, 152, 162, 0.16), rgba(255, 152, 162, 0.04));
   border: 1px solid rgba(255, 152, 162, 0.28);
-  min-height: 190px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.7rem;
+  overflow: hidden;
+  transition: background 0.4s ease;
 }
-.listen-card.turning { animation: listenFade 0.5s ease; }
-@keyframes listenFade {
-  0% { opacity: 0; transform: translateY(8px) scale(0.985); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
+.lc-head {
+  position: absolute;
+  left: 0; right: 0;
+  top: 88px;
+  transform: scale(1);
+  transform-origin: top center;
+  padding: 0 1.6rem;
+  transition: top 0.5s cubic-bezier(.4,0,.2,1), transform 0.5s cubic-bezier(.4,0,.2,1);
+  will-change: top, transform;
+}
+.listen-card.playing .lc-head {
+  top: 36px;
+  transform: scale(0.72);
 }
 .listen-title {
   font-size: 26px;
   font-weight: 700;
   line-height: 1.35;
   color: var(--anzhiyu-fontcolor);
+  transition: font-size 0.4s ease;
 }
 .listen-artist {
+  margin-top: 4px;
   font-size: 14px;
   color: var(--anzhiyu-secondtext);
   letter-spacing: 0.04em;
 }
-.listen-lyric {
-  margin-top: 0.6rem;
+.listen-card.playing .listen-title { font-size: 24px; }
+.lc-lyrics {
+  position: absolute;
+  left: 0; right: 0;
+  top: 120px;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: height 0.5s cubic-bezier(.4,0,.2,1), opacity 0.45s ease 0.1s;
+}
+.listen-card.playing .lc-lyrics { height: 116px; opacity: 1; }
+.lc-lyrics-inner {
+  padding: 0 1.6rem;
+  transition: transform 0.55s cubic-bezier(.4,0,.2,1);
+  will-change: transform;
+}
+.lc-line {
+  height: 29px;
+  line-height: 29px;
   font-size: 15px;
-  line-height: 1.9;
-  min-height: 1.9em;
+  color: var(--anzhiyu-secondtext);
+  opacity: 0.45;
+  transition: opacity 0.3s ease, color 0.3s ease, transform 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lc-line.active {
   color: var(--anzhiyu-main);
-  transition: opacity 0.3s ease;
+  opacity: 1;
+  font-weight: 600;
+  transform: scale(1.03);
 }
-.listen-lyric.empty { opacity: 0.45; }
-.listen-player {
-  margin: 1.1rem auto 0;
-  width: 100%;
-  max-width: 460px;
+.lc-track {
+  position: absolute;
+  left: 74px;
+  right: 20px;
+  bottom: 30px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 14px 8px 8px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(255, 152, 162, 0.35);
-  backdrop-filter: blur(6px);
+  gap: 10px;
+  opacity: 0;
+  transform: scaleX(0.15);
+  transform-origin: left center;
+  transition: opacity 0.4s ease 0.15s, transform 0.5s cubic-bezier(.4,0,.2,1) 0.1s;
+  pointer-events: none;
 }
-[data-theme="dark"] .listen-player { background: rgba(255, 255, 255, 0.08); }
-.listen-player.disabled { opacity: 0.35; pointer-events: none; }
-.lp-toggle {
-  flex: 0 0 auto;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  border: 0;
-  cursor: pointer;
-  font-size: 14px;
-  line-height: 1;
-  color: #fff;
-  background: var(--anzhiyu-main);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.15s ease, filter 0.15s ease;
-}
-.lp-toggle:hover { filter: brightness(1.06); }
-.lp-toggle:active { transform: scale(0.94); }
-.lp-toggle.loading { opacity: 0.6; pointer-events: none; }
+.listen-card.playing .lc-track { opacity: 1; transform: scaleX(1); pointer-events: auto; }
 .lp-bar {
   flex: 1 1 auto;
   height: 6px;
@@ -133,6 +146,43 @@ comments: false
   min-width: 34px;
   text-align: right;
 }
+.lp-toggle {
+  position: absolute;
+  left: 50%;
+  bottom: 62px;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  border: 0;
+  cursor: pointer;
+  font-size: 26px;
+  line-height: 1;
+  color: #fff;
+  background: var(--anzhiyu-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateX(-50%) scale(1);
+  box-shadow: 0 10px 26px rgba(255, 152, 162, 0.4);
+  transition: left 0.5s cubic-bezier(.4,0,.2,1), bottom 0.5s cubic-bezier(.4,0,.2,1),
+              width 0.4s cubic-bezier(.4,0,.2,1), height 0.4s cubic-bezier(.4,0,.2,1),
+              font-size 0.4s ease, transform 0.5s cubic-bezier(.4,0,.2,1),
+              box-shadow 0.4s ease;
+  z-index: 3;
+}
+.lp-toggle:hover { filter: brightness(1.05); }
+.lp-toggle:active { transform: translateX(-50%) scale(0.96); }
+.listen-card.playing .lp-toggle {
+  left: 20px;
+  bottom: 16px;
+  width: 40px;
+  height: 40px;
+  font-size: 13px;
+  transform: translateX(0) scale(1);
+  box-shadow: 0 6px 16px rgba(255, 152, 162, 0.3);
+}
+.listen-card.playing .lp-toggle:active { transform: scale(0.94); }
+.lp-toggle.loading { opacity: 0.65; pointer-events: none; }
 .listen-btn {
   border: 0;
   border-radius: 999px;
@@ -145,11 +195,7 @@ comments: false
   box-shadow: 0 8px 20px rgba(255, 152, 162, 0.35);
   transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
 }
-.listen-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 26px rgba(255, 152, 162, 0.45);
-  filter: brightness(1.04);
-}
+.listen-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(255, 152, 162, 0.45); filter: brightness(1.04); }
 .listen-btn:active { transform: scale(0.97); }
 .listen-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
 .listen-hint {
@@ -159,33 +205,41 @@ comments: false
   opacity: 0.75;
 }
 @media (max-width: 768px) {
-  .listen-title { font-size: 21px; }
-  .listen-card { padding: 1.6rem 1.1rem; }
-  .listen-player { padding: 6px 12px 6px 6px; }
-  .lp-toggle { width: 34px; height: 34px; }
+  .listen-card { height: 300px; }
+  .listen-title { font-size: 22px; }
+  .listen-card.playing .listen-title { font-size: 20px; }
+  .listen-card.playing .lc-head { top: 40px; }
+  .lc-lyrics { top: 108px; }
+  .listen-card.playing .lc-lyrics { height: 100px; }
+  .lp-toggle { width: 74px; height: 74px; bottom: 58px; }
+  .listen-card.playing .lp-toggle { width: 38px; height: 38px; bottom: 14px; left: 16px; }
+  .lc-track { left: 66px; right: 16px; bottom: 26px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .listen-card, .lc-head, .lc-lyrics, .lc-track, .lp-toggle, .lc-lyrics-inner, .lc-line { transition: none !important; }
 }
 </style>
 
 <script>
 (function () {
-  // 歌单来自音乐馆：Meting 接口，server + playlist id 都跟导航里那个一致
   var METING = 'https://api.qijieya.cn/meting/'
   var SERVER = 'netease'
   var PLAYLIST = '8560567666'
+  var LINE_H = 29
+  var LYRIC_LINES = 9      // 一次渲染多少行（前后各留几行）
 
-  var songs = null          // 拉到的歌单
-  var loading = null        // 进行中的请求
-  var lastIndex = -1
+  var songs = null, loading = null, lastIndex = -1
   var lrcCache = {}
-  var curLrc = []           // 当前这手的歌词行 [{t, text}]
-  var lyricTimer = null
+  var lrc = []             // [{t, text}]
+  var lineEls = []
+  var activeIdx = -1
+  var rafId = 0
 
-  var audio, fill, timeEl, toggle, player, bar, titleEl, artistEl, lyricEl, btn
+  var card, audio, toggle, fill, timeEl, bar, titleEl, artistEl, lyricsEl, lyricsInner, btn
 
   function fmt (s) {
     if (!isFinite(s) || s < 0) s = 0
-    var m = Math.floor(s / 60)
-    var sec = Math.floor(s % 60)
+    var m = Math.floor(s / 60), sec = Math.floor(s % 60)
     return m + ':' + (sec < 10 ? '0' : '') + sec
   }
 
@@ -206,63 +260,103 @@ comments: false
   function parseLrc (text) {
     var out = []
     ;(text || '').split('\n').forEach(function (line) {
-      var m = /^\[(\d+):(\d+)(?:[.:](\d+))?\](.*)$/.exec(line.trim())
+      var m = /^\[(\d+):(\d+)(?:[.:](\d+))?\]\s*(.*)$/.exec(line.trim())
       if (!m) return
       var t = parseInt(m[1], 10) * 60 + parseInt(m[2], 10) + (m[3] ? parseInt(m[3], 10) / 100 : 0)
       var txt = (m[4] || '').trim()
-      if (txt && !/^(作词|作曲|编曲|混音|演唱|制作|和声|吉他|贝斯|鼓|母带|录音|监制|出品|发行|策划|统筹|美术|设计|OP|SP)/.test(txt)) {
-        out.push({ t: t, text: txt })
-      }
+      if (!txt) return
+      // 纯符号行（"-"、"—"、"..." 之类）直接丢掉
+      if (/^[-—–·.。…~～_\s]+$/.test(txt)) return
+      // 过滤制作名单：歌名后面常跟一大段署名，歌词区不需要
+      var CREDIT = /^(作词|作曲|词曲|原作词|原作曲|编曲|改编|混音|母带|演唱|原唱|翻唱|制作|制作人|监制|出品|发行|策划|统筹|企划|宣发|视觉|封面|插画|字幕|翻译|和声|伴唱|伴舞|吉他|贝斯|鼓|键盘|弦乐|录音|录音师|后期|混音师|母带师|OP|SP|词|曲|编|混|唱|奏|弹|合声|原曲|原词|原曲作者|词作者|曲作者)[^：:]{0,12}[：:]/
+      if (CREDIT.test(txt)) return
+      // 署名行一般很短又带冒号；纯歌词很少这么短
+      if (txt.length <= 12 && /[：:]/.test(txt)) return
+      out.push({ t: t, text: txt })
     })
     return out
   }
 
+  function renderLyricLines () {
+    lyricsInner.innerHTML = ''
+    lineEls = []
+    if (!lrc.length) {
+      var d = document.createElement('div')
+      d.className = 'lc-line'
+      d.textContent = '纯音乐，请欣赏'
+      lyricsInner.appendChild(d)
+      lineEls.push(d)
+      activeIdx = 0
+      lyricsInner.style.transform = 'translateY(0px)'
+      d.classList.add('active')
+      return
+    }
+    lrc.forEach(function (item) {
+      var d = document.createElement('div')
+      d.className = 'lc-line'
+      d.textContent = item.text
+      lyricsInner.appendChild(d)
+      lineEls.push(d)
+    })
+    activeIdx = -1
+    lyricsInner.style.transform = 'translateY(0px)'
+  }
+
   function syncLyric () {
-    if (!curLrc.length) return
+    if (!lrc.length) return
     var t = audio.currentTime
-    var cur = null
-    for (var i = 0; i < curLrc.length; i++) {
-      if (curLrc[i].t <= t + 0.3) cur = curLrc[i]
+    var idx = -1
+    for (var i = 0; i < lrc.length; i++) {
+      if (lrc[i].t <= t + 0.25) idx = i
       else break
     }
-    if (cur) {
-      lyricEl.textContent = '「' + cur.text + '」'
-      lyricEl.classList.remove('empty')
+    if (idx === activeIdx) return
+    if (activeIdx >= 0 && lineEls[activeIdx]) lineEls[activeIdx].classList.remove('active')
+    activeIdx = idx
+    if (idx >= 0 && lineEls[idx]) {
+      lineEls[idx].classList.add('active')
+      // 让当前行停在歌词窗的第二行位置，下面的往上滚
+      var offset = idx * LINE_H - LINE_H * 1
+      lyricsInner.style.transform = 'translateY(' + (-Math.max(0, offset)) + 'px)'
     }
   }
 
+  function tick () {
+    if (!audio.paused) {
+      var d = audio.duration || 0
+      if (d) {
+        fill.style.width = Math.min(100, (audio.currentTime / d) * 100) + '%'
+        timeEl.textContent = fmt(audio.currentTime)
+      }
+      syncLyric()
+    }
+    rafId = requestAnimationFrame(tick)
+  }
+
   function loadLyric (song) {
-    curLrc = []
-    if (lyricTimer) { clearInterval(lyricTimer); lyricTimer = null }
-    lyricEl.textContent = '「……』'
-    lyricEl.classList.add('empty')
+    lrc = []
+    renderLyricLines()
     if (!song.lrc) return
     var cached = lrcCache[song.lrc]
     var go = function (txt) {
-      curLrc = parseLrc(txt)
-      if (curLrc.length) {
-        // 还没播时先给一句中段的词，别空着
-        var mid = curLrc[Math.floor(curLrc.length * 0.3)]
-        lyricEl.textContent = '「' + mid.text + '」'
-        lyricEl.classList.remove('empty')
-      } else {
-        lyricEl.textContent = '这首没有词'
-      }
-      lyricTimer = setInterval(syncLyric, 400)
+      lrc = parseLrc(txt)
+      renderLyricLines()
+      syncLyric()
     }
     if (cached) { go(cached); return }
     fetch(song.lrc)
       .then(function (r) { return r.text() })
       .then(function (txt) { lrcCache[song.lrc] = txt; go(txt) })
-      .catch(function () { lyricEl.textContent = '这首没有词' })
+      .catch(function () {})
   }
 
   function stopAudio () {
-    if (!audio) return
     try { audio.pause(); audio.currentTime = 0 } catch (e) {}
-    if (fill) fill.style.width = '0%'
-    if (timeEl) timeEl.textContent = '0:00'
-    if (toggle) toggle.textContent = '▶'
+    fill.style.width = '0%'
+    timeEl.textContent = '0:00'
+    toggle.textContent = '▶'
+    card.classList.remove('playing')
+    toggle.classList.remove('loading')
   }
 
   function pick () {
@@ -272,74 +366,74 @@ comments: false
     return songs[i]
   }
 
-  function render () {
-    stopAudio()
+  function render (autoplay) {
     if (!songs) return
+    stopAudio()
     var s = pick()
     titleEl.textContent = s.name || '（无题）'
     artistEl.textContent = '— ' + (s.artist || '未知') + ' —'
     audio.src = s.url
     audio.load()
-    player.classList.remove('disabled')
-    toggle.classList.remove('loading')
     loadLyric(s)
-    var card = document.getElementById('listen-card')
-    card.classList.remove('turning')
-    void card.offsetWidth
-    card.classList.add('turning')
+    if (autoplay) play()
+  }
+
+  function play () {
+    if (!audio.src) return
+    toggle.classList.add('loading')
+    audio.play().then(function () {
+      toggle.classList.remove('loading')
+    }).catch(function () {
+      toggle.classList.remove('loading')
+      titleEl.textContent = '放不出来，换一首试试'
+      artistEl.textContent = '音源可能暂时不可用'
+    })
   }
 
   function refresh () {
     if (!songs) {
       btn.disabled = true
       titleEl.textContent = '正在从音乐馆拉歌单…'
+      artistEl.textContent = '稍等一下'
       loadPlaylist().then(function () {
         btn.disabled = false
-        render()
+        render(false)
       }).catch(function (e) {
         btn.disabled = false
         titleEl.textContent = '歌单没拉到'
         artistEl.textContent = '检查网络后点「再抽一首」重试'
-        lyricEl.textContent = '（' + (e && e.message ? e.message : '请求失败') + '）'
-        lyricEl.classList.add('empty')
       })
       return
     }
-    render()
+    render(false)
   }
 
   function bind () {
+    card = document.getElementById('listen-card')
     audio = document.getElementById('listen-audio')
+    toggle = document.getElementById('lp-toggle')
     fill = document.getElementById('lp-fill')
     timeEl = document.getElementById('lp-time')
-    toggle = document.getElementById('lp-toggle')
-    player = document.getElementById('listen-player')
     bar = document.getElementById('lp-bar')
-    btn = document.getElementById('listen-btn')
     titleEl = document.getElementById('listen-title')
     artistEl = document.getElementById('listen-artist')
-    lyricEl = document.getElementById('listen-lyric')
-    if (!audio || !toggle || !bar || !btn) return false
+    lyricsInner = document.getElementById('lc-lyrics-inner')
+    btn = document.getElementById('listen-btn')
+    if (!card || !audio || !toggle || !bar || !btn) return false
 
     toggle.addEventListener('click', function () {
-      if (!audio.src) return
-      if (audio.paused) {
-        toggle.classList.add('loading')
-        audio.play().then(function () {
-          toggle.classList.remove('loading')
-        }).catch(function () {
-          toggle.classList.remove('loading')
-          lyricEl.textContent = '这首放不出来（音源可能暂时不可用），换一首试试'
-          lyricEl.classList.add('empty')
-        })
-      } else {
-        audio.pause()
-      }
+      if (!audio.src) { refresh(); return }
+      if (audio.paused) play()
+      else audio.pause()
     })
-    audio.addEventListener('play', function () { toggle.textContent = '❚❚' })
+    audio.addEventListener('play', function () {
+      card.classList.add('playing')
+      toggle.textContent = '❚❚'
+      if (!rafId) rafId = requestAnimationFrame(tick)
+    })
     audio.addEventListener('pause', function () { toggle.textContent = '▶' })
-    audio.addEventListener('waiting', function () { toggle.classList.add('loading') })
     audio.addEventListener('playing', function () { toggle.classList.remove('loading') })
+    audio.addEventListener('waiting', function () { toggle.classList.add('loading') })
     audio.addEventListener('ended', function () {
       toggle.textContent = '▶'
       fill.style.width = '0%'
@@ -348,15 +442,9 @@ comments: false
     audio.addEventListener('error', function () {
       toggle.classList.remove('loading')
       if (audio.src) {
-        lyricEl.textContent = '这首放不出来（音源可能暂时不可用），换一首试试'
-        lyricEl.classList.add('empty')
+        titleEl.textContent = '这首放不出来'
+        artistEl.textContent = '音源可能暂时不可用，换一首试试'
       }
-    })
-    audio.addEventListener('timeupdate', function () {
-      var d = audio.duration || 0
-      if (!d) return
-      fill.style.width = Math.min(100, (audio.currentTime / d) * 100) + '%'
-      timeEl.textContent = fmt(audio.currentTime)
     })
     bar.addEventListener('click', function (e) {
       if (!audio.duration) return
@@ -366,10 +454,12 @@ comments: false
     })
     btn.addEventListener('click', refresh)
     document.addEventListener('keydown', function (e) {
-      if (e.code === 'Space' && !/input|textarea/i.test((e.target.tagName || ''))) {
-        e.preventDefault()
-        refresh()
-      }
+      if (e.code !== 'Space') return
+      if (/input|textarea/i.test((e.target.tagName || ''))) return
+      e.preventDefault()
+      if (!audio.src) { refresh(); return }
+      if (audio.paused) play()
+      else audio.pause()
     })
     return true
   }
