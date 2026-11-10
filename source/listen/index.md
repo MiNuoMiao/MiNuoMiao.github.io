@@ -342,9 +342,17 @@ comments: false
   .lc-teaser { font-size: 13px; }
   .lc-lyrics { top: 112px; }
   .listen-card.playing .lc-lyrics { height: 176px; }
-  .lc-bar { width: 78px; height: 78px; bottom: 88px; }
+  /* 手机上父容器宽度常是奇数，margin:auto 会被取整，用 transform 居中才准 */
+  .lc-bar {
+    left: 50%; right: auto; margin: 0;
+    transform: translateX(-50%);
+    width: 80px; height: 80px; bottom: 88px;
+  }
   .lp-toggle { width: 72px; height: 72px; font-size: 20px; }
-  .listen-card.playing .lc-bar { width: calc(100% - 32px); height: 50px; bottom: 20px; }
+  .listen-card.playing .lc-bar {
+    left: 0; right: 0; margin: 0 auto; transform: none;
+    width: calc(100% - 32px); height: 50px; bottom: 20px;
+  }
   .listen-card.playing .lp-toggle { width: 36px; height: 36px; margin: 0 4px 0 7px; font-size: 11px; }
   .lc-volume { padding-right: 8px; }
   .lc-volume.open .lv-pop { height: 78px; }
