@@ -1,14 +1,6 @@
-//get请求
-// 这个 IP 接口常常证书失效/超时。失败就安静地不显示欢迎语，
-// 不要往控制台扔红色报错吓人。
-fetch('https://api.qjqq.cn/api/Local', { signal: AbortSignal.timeout(6000) })
-  .then(response => (response.ok ? response.json() : Promise.reject(new Error('http ' + response.status))))
-  .then(data => {
-    if (!data || !data.data) throw new Error('bad payload')
-    ipLocation = data
-    showWelcome()
-  })
-  .catch(() => { /* 接口不可用：跳过欢迎语 */ })
+// 取 IP + 定位：数据源在文件末尾（ipinfo.io → ipwho.is 兜底）。
+// 原来这里请求的 api.qjqq.cn 证书已失效，每次都会在控制台留一条红色 NET::ERR_CERT_*，
+// 而且和末尾那段新逻辑重复取了一次，所以整段删掉。
 
 
 function getDistance (e1, n1, e2, n2) {
