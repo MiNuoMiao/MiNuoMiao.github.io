@@ -120,6 +120,13 @@ comments: false
   transition: height 0.5s cubic-bezier(.4,0,.2,1), opacity 0.45s ease 0.1s;
 }
 .listen-card.playing .lc-lyrics { height: 196px; opacity: 1; }
+
+/* 未播放时容器里只留按钮：进度条/音量就算宽度 0，
+   也会因为 min-width:auto 撑出内容宽度，把按钮挤出居中 */
+.listen-card:not(.playing) .lc-progress,
+.listen-card:not(.playing) .lc-volume {
+  display: none;
+}
 .lc-lyrics-inner {
   padding: 0 1.6rem;
   transition: transform 0.55s cubic-bezier(.4,0,.2,1);
@@ -204,6 +211,7 @@ comments: false
 .lc-progress {
   flex: 0 1 0;
   width: 0;
+  min-width: 0;
   overflow: hidden;
   display: flex;
   align-items: center;
