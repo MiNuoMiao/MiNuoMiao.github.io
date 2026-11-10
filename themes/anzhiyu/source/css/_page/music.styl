@@ -391,17 +391,17 @@ if hexo-config('nav_music.enable') == false
             .aplayer-lrc
               margin-top 16px
               // 跟屏幕高度走：手机小的也有 8 行，大的不会空一大块
-              height 200px   // 老浏览器（不认 dvh）的兜底
-              height clamp(150px, 30dvh, 300px)
+              height 150px   // 老浏览器（不认 dvh）的兜底
+              // 22dvh：690 高的手机上约 152px，正好卡在控制栏上沿，不压进度条
+              height clamp(110px, 22dvh, 240px)
               max-height none
               min-height 0
               overflow hidden
               mask-image linear-gradient(to bottom, #0000, #000 12%, #000 88%, #0000)
-              // 歌词整体垂直居中：词少的时候不会全挤在顶上，唱完也不显得空
-              display flex
-              flex-direction column
-              justify-content center
-              align-items center
+              // 不再用 flex 居中：内容比窗口高时 flex 会把第一行顶到看不见的地方，
+              // 滚动交给 JS 按当前行位置算 transform。
+              display block
+              position relative
               .aplayer-lrc-contents
                 width 100%
               p
