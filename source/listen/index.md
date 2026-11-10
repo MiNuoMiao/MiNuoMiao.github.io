@@ -60,7 +60,7 @@ comments: false
 .lc-head {
   position: absolute;
   left: 0; right: 0;
-  top: 78px;
+  top: 104px;
   padding: 0 1.4rem;
   transform-origin: top center;
   transition: top 0.5s cubic-bezier(.4,0,.2,1), transform 0.5s cubic-bezier(.4,0,.2,1);
@@ -109,7 +109,7 @@ comments: false
   color: var(--anzhiyu-main);
   opacity: 0.9;
 }
-.listen-card.playing .lc-teaser-row { margin-top: 6px; }
+.listen-card.playing .lc-teaser-row { margin-top: 4px; }
 .lc-lyrics {
   position: absolute;
   left: 0; right: 0;
@@ -148,7 +148,7 @@ comments: false
 .lc-bar {
   position: absolute;
   left: 50%;
-  bottom: 26px;
+  bottom: 104px;
   transform: translateX(-50%);
   width: 88px;
   height: 88px;
@@ -163,7 +163,7 @@ comments: false
   transition: width 0.5s cubic-bezier(.4,0,.2,1), height 0.45s cubic-bezier(.4,0,.2,1);
 }
 [data-theme="dark"] .lc-bar { background: rgba(255, 255, 255, 0.08); }
-.listen-card.playing .lc-bar { width: calc(100% - 40px); height: 54px; justify-content: flex-start; overflow: visible; }
+.listen-card.playing .lc-bar { width: calc(100% - 40px); height: 54px; justify-content: flex-start; overflow: visible; bottom: 26px; }
 .lp-toggle {
   flex: 0 0 auto;
   width: 82px;
@@ -316,7 +316,7 @@ comments: false
 }
 @media (max-width: 768px) {
   .listen-card { height: 380px; }
-  .lc-head { top: 66px; }
+  .lc-head { top: 88px; }
   .listen-card.playing .lc-head { top: 18px; }
   .lc-title { font-size: 21px; }
   .listen-card.playing .lc-title { font-size: 20px; }
@@ -324,9 +324,9 @@ comments: false
   .lc-teaser { font-size: 13px; }
   .lc-lyrics { top: 112px; }
   .listen-card.playing .lc-lyrics { height: 176px; }
-  .lc-bar { width: 78px; height: 78px; bottom: 20px; }
+  .lc-bar { width: 78px; height: 78px; bottom: 88px; }
   .lp-toggle { width: 72px; height: 72px; font-size: 20px; }
-  .listen-card.playing .lc-bar { width: calc(100% - 32px); height: 50px; }
+  .listen-card.playing .lc-bar { width: calc(100% - 32px); height: 50px; bottom: 20px; }
   .listen-card.playing .lp-toggle { width: 36px; height: 36px; margin: 0 4px 0 7px; font-size: 11px; }
   .lc-volume { padding-right: 8px; }
   .lc-volume.open .lv-pop { height: 78px; }
