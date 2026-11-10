@@ -1,7 +1,7 @@
 ---
 title: 今晚听什么
 date: 2026-11-07 05:30:00
-updated: 2026-11-10 21:40:00
+updated: 2026-11-11 20:45:00
 comments: false
 ---
 
@@ -9,21 +9,31 @@ comments: false
   <div class="listen-label">今晚 · 随机一首</div>
   <div class="listen-card" id="listen-card">
     <div class="lc-head">
-      <div class="listen-title" id="listen-title">点一下下面那颗圆键</div>
-      <div class="listen-artist" id="listen-artist">从音乐馆的歌单里抽一首</div>
+      <div class="lc-titleline" id="lc-titleline">
+        <span class="lc-title" id="listen-title">点一下下面那颗圆键</span>
+        <span class="lc-artist" id="listen-artist">从音乐馆的歌单里抽一首</span>
+      </div>
     </div>
     <div class="lc-lyrics" id="lc-lyrics">
       <div class="lc-lyrics-inner" id="lc-lyrics-inner"></div>
     </div>
-    <div class="lc-track" id="lc-track">
-      <div class="lp-bar" id="lp-bar"><div class="lp-fill" id="lp-fill"></div></div>
-      <span class="lp-time" id="lp-time">0:00</span>
+    <div class="lc-bar" id="lc-bar">
+      <button class="lp-toggle" id="lp-toggle" type="button" aria-label="播放">▶</button>
+      <div class="lc-progress" id="lc-progress">
+        <div class="lp-bar" id="lp-bar">
+          <div class="lp-fill" id="lp-fill"></div>
+        </div>
+        <span class="lp-time" id="lp-time">0:00</span>
+      </div>
+      <div class="lc-volume" id="lc-volume">
+        <button class="lv-btn" id="lv-btn" type="button" aria-label="音量">♪</button>
+        <input class="lv-range" id="lv-range" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="音量大小">
+      </div>
     </div>
-    <button class="lp-toggle" id="lp-toggle" type="button" aria-label="播放">▶</button>
-    <audio id="listen-audio" preload="none" crossorigin="anonymous"></audio>
+    <audio id="listen-audio" preload="none" crossorigin="anonymous" loop></audio>
   </div>
   <button class="listen-btn" id="listen-btn">再抽一首</button>
-  <div class="listen-hint">空格键：播放 / 暂停 · 歌单来自音乐馆</div>
+  <div class="listen-hint">空格：播放 / 暂停 · 单曲循环 · 歌单来自音乐馆</div>
 </div>
 
 <style>
@@ -45,46 +55,55 @@ comments: false
   background: linear-gradient(160deg, rgba(255, 152, 162, 0.16), rgba(255, 152, 162, 0.04));
   border: 1px solid rgba(255, 152, 162, 0.28);
   overflow: hidden;
-  transition: background 0.4s ease;
 }
 .lc-head {
   position: absolute;
   left: 0; right: 0;
   top: 88px;
-  transform: scale(1);
+  padding: 0 1.4rem;
   transform-origin: top center;
-  padding: 0 1.6rem;
   transition: top 0.5s cubic-bezier(.4,0,.2,1), transform 0.5s cubic-bezier(.4,0,.2,1);
   will-change: top, transform;
+  overflow: hidden;
 }
-.listen-card.playing .lc-head {
-  top: 36px;
-  transform: scale(0.72);
+.listen-card.playing .lc-head { top: 34px; transform: scale(0.74); }
+.lc-titleline {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.55em;
+  white-space: nowrap;
+  will-change: transform;
 }
-.listen-title {
+.lc-titleline.scrolling { animation: lcMarquee var(--marquee-duration, 14s) linear infinite; justify-content: flex-start; }
+@keyframes lcMarquee {
+  0%, 8% { transform: translateX(0); }
+  92%, 100% { transform: translateX(var(--marquee-shift, -40%)); }
+}
+.lc-title {
   font-size: 26px;
   font-weight: 700;
   line-height: 1.35;
   color: var(--anzhiyu-fontcolor);
-  transition: font-size 0.4s ease;
 }
-.listen-artist {
-  margin-top: 4px;
+.listen-card.playing .lc-title { font-size: 24px; }
+.lc-artist {
   font-size: 14px;
   color: var(--anzhiyu-secondtext);
   letter-spacing: 0.04em;
 }
-.listen-card.playing .listen-title { font-size: 24px; }
+.lc-artist::before { content: "— "; }
+.lc-artist::after { content: " —"; }
 .lc-lyrics {
   position: absolute;
   left: 0; right: 0;
-  top: 120px;
+  top: 118px;
   height: 0;
   overflow: hidden;
   opacity: 0;
   transition: height 0.5s cubic-bezier(.4,0,.2,1), opacity 0.45s ease 0.1s;
 }
-.listen-card.playing .lc-lyrics { height: 116px; opacity: 1; }
+.listen-card.playing .lc-lyrics { height: 112px; opacity: 1; }
 .lc-lyrics-inner {
   padding: 0 1.6rem;
   transition: transform 0.55s cubic-bezier(.4,0,.2,1);
@@ -95,33 +114,67 @@ comments: false
   line-height: 29px;
   font-size: 15px;
   color: var(--anzhiyu-secondtext);
-  opacity: 0.45;
-  transition: opacity 0.3s ease, color 0.3s ease, transform 0.3s ease;
+  opacity: 0.42;
+  transition: opacity 0.3s ease, color 0.3s ease;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.lc-line.active {
-  color: var(--anzhiyu-main);
-  opacity: 1;
-  font-weight: 600;
-  transform: scale(1.03);
-}
-.lc-track {
+.lc-line.active { color: var(--anzhiyu-main); opacity: 1; font-weight: 600; }
+.lc-bar {
   position: absolute;
-  left: 74px;
-  right: 20px;
-  bottom: 30px;
+  left: 50%;
+  bottom: 56px;
+  transform: translateX(-50%);
+  width: 88px;
+  height: 88px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 152, 162, 0.35);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  overflow: hidden;
+  transition: width 0.5s cubic-bezier(.4,0,.2,1), height 0.45s cubic-bezier(.4,0,.2,1),
+              background 0.35s ease;
+}
+[data-theme="dark"] .lc-bar { background: rgba(255, 255, 255, 0.08); }
+.listen-card.playing .lc-bar { width: calc(100% - 40px); height: 54px; justify-content: flex-start; }
+.lp-toggle {
+  flex: 0 0 auto;
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  border: 0;
+  cursor: pointer;
+  font-size: 23px;
+  line-height: 1;
+  color: #fff;
+  background: var(--anzhiyu-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.45s cubic-bezier(.4,0,.2,1), height 0.45s cubic-bezier(.4,0,.2,1),
+              font-size 0.4s ease, filter 0.15s ease;
+}
+.listen-card.playing .lp-toggle { width: 40px; height: 40px; margin: 0 6px 0 8px; font-size: 12px; }
+.lp-toggle:hover { filter: brightness(1.06); }
+.lp-toggle:active { filter: brightness(0.94); }
+.lp-toggle.loading { opacity: 0.65; pointer-events: none; }
+.lc-progress {
+  flex: 0 1 0;
+  width: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
   opacity: 0;
-  transform: scaleX(0.15);
-  transform-origin: left center;
-  transition: opacity 0.4s ease 0.15s, transform 0.5s cubic-bezier(.4,0,.2,1) 0.1s;
+  transition: opacity 0.35s ease 0.2s;
   pointer-events: none;
 }
-.listen-card.playing .lc-track { opacity: 1; transform: scaleX(1); pointer-events: auto; }
+.listen-card.playing .lc-progress { flex: 1 1 auto; width: auto; opacity: 1; pointer-events: auto; }
 .lp-bar {
   flex: 1 1 auto;
   height: 6px;
@@ -129,6 +182,7 @@ comments: false
   background: rgba(0, 0, 0, 0.1);
   cursor: pointer;
   overflow: hidden;
+  min-width: 0;
 }
 [data-theme="dark"] .lp-bar { background: rgba(255, 255, 255, 0.16); }
 .lp-fill {
@@ -146,43 +200,61 @@ comments: false
   min-width: 34px;
   text-align: right;
 }
-.lp-toggle {
-  position: absolute;
-  left: 50%;
-  bottom: 62px;
-  width: 84px;
-  height: 84px;
+.lc-volume {
+  flex: 0 0 0;
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.3s ease 0.25s;
+}
+.listen-card.playing .lc-volume { flex: 0 0 auto; width: auto; opacity: 1; padding-right: 12px; }
+.lv-btn {
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   border: 0;
   cursor: pointer;
-  font-size: 26px;
+  background: transparent;
+  color: var(--anzhiyu-secondtext);
+  font-size: 14px;
   line-height: 1;
-  color: #fff;
-  background: var(--anzhiyu-main);
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: translateX(-50%) scale(1);
-  box-shadow: 0 10px 26px rgba(255, 152, 162, 0.4);
-  transition: left 0.5s cubic-bezier(.4,0,.2,1), bottom 0.5s cubic-bezier(.4,0,.2,1),
-              width 0.4s cubic-bezier(.4,0,.2,1), height 0.4s cubic-bezier(.4,0,.2,1),
-              font-size 0.4s ease, transform 0.5s cubic-bezier(.4,0,.2,1),
-              box-shadow 0.4s ease;
-  z-index: 3;
+  transition: color 0.2s ease;
 }
-.lp-toggle:hover { filter: brightness(1.05); }
-.lp-toggle:active { transform: translateX(-50%) scale(0.96); }
-.listen-card.playing .lp-toggle {
-  left: 20px;
-  bottom: 16px;
-  width: 40px;
-  height: 40px;
-  font-size: 13px;
-  transform: translateX(0) scale(1);
-  box-shadow: 0 6px 16px rgba(255, 152, 162, 0.3);
+.lv-btn:hover { color: var(--anzhiyu-main); }
+.lc-volume.open .lv-btn { color: var(--anzhiyu-main); }
+.lv-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 152, 162, 0.35);
+  outline: none;
+  opacity: 0;
+  cursor: pointer;
+  transition: width 0.25s ease, opacity 0.25s ease;
 }
-.listen-card.playing .lp-toggle:active { transform: scale(0.94); }
-.lp-toggle.loading { opacity: 0.65; pointer-events: none; }
+.lc-volume.open .lv-range { width: 58px; opacity: 1; }
+.lv-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--anzhiyu-main);
+  border: 0;
+  cursor: pointer;
+}
+.lv-range::-moz-range-thumb {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--anzhiyu-main); border: 0; cursor: pointer;
+}
 .listen-btn {
   border: 0;
   border-radius: 999px;
@@ -206,17 +278,23 @@ comments: false
 }
 @media (max-width: 768px) {
   .listen-card { height: 300px; }
-  .listen-title { font-size: 22px; }
-  .listen-card.playing .listen-title { font-size: 20px; }
-  .listen-card.playing .lc-head { top: 40px; }
-  .lc-lyrics { top: 108px; }
-  .listen-card.playing .lc-lyrics { height: 100px; }
-  .lp-toggle { width: 74px; height: 74px; bottom: 58px; }
-  .listen-card.playing .lp-toggle { width: 38px; height: 38px; bottom: 14px; left: 16px; }
-  .lc-track { left: 66px; right: 16px; bottom: 26px; }
+  .lc-head { top: 76px; }
+  .listen-card.playing .lc-head { top: 30px; }
+  .lc-title { font-size: 21px; }
+  .listen-card.playing .lc-title { font-size: 19px; }
+  .lc-artist { font-size: 12px; }
+  .lc-lyrics { top: 104px; }
+  .listen-card.playing .lc-lyrics { height: 96px; }
+  .lc-bar { width: 74px; height: 74px; bottom: 52px; }
+  .lp-toggle { width: 74px; height: 74px; font-size: 21px; }
+  .listen-card.playing .lc-bar { width: calc(100% - 32px); height: 50px; }
+  .listen-card.playing .lp-toggle { width: 36px; height: 36px; margin: 0 4px 0 7px; font-size: 11px; }
+  .lc-volume { padding-right: 8px; }
+  .lc-volume.open .lv-range { width: 42px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .listen-card, .lc-head, .lc-lyrics, .lc-track, .lp-toggle, .lc-lyrics-inner, .lc-line { transition: none !important; }
+  .listen-card, .lc-head, .lc-lyrics, .lc-bar, .lp-toggle, .lc-lyrics-inner,
+  .lc-line, .lc-titleline { transition: none !important; animation: none !important; }
 }
 </style>
 
@@ -226,16 +304,17 @@ comments: false
   var SERVER = 'netease'
   var PLAYLIST = '8560567666'
   var LINE_H = 29
-  var LYRIC_LINES = 9      // 一次渲染多少行（前后各留几行）
 
   var songs = null, loading = null, lastIndex = -1
   var lrcCache = {}
-  var lrc = []             // [{t, text}]
+  var lrc = []
   var lineEls = []
   var activeIdx = -1
   var rafId = 0
+  var marqueeTimer = null
 
-  var card, audio, toggle, fill, timeEl, bar, titleEl, artistEl, lyricsEl, lyricsInner, btn
+  var card, audio, toggle, fill, timeEl, bar, titleEl, artistEl, titleline,
+      lyricsInner, btn, lcBar, volume, volBtn, volRange
 
   function fmt (s) {
     if (!isFinite(s) || s < 0) s = 0
@@ -265,13 +344,17 @@ comments: false
       var t = parseInt(m[1], 10) * 60 + parseInt(m[2], 10) + (m[3] ? parseInt(m[3], 10) / 100 : 0)
       var txt = (m[4] || '').trim()
       if (!txt) return
-      // 纯符号行（"-"、"—"、"..." 之类）直接丢掉
       if (/^[-—–·.。…~～_\s]+$/.test(txt)) return
-      // 过滤制作名单：歌名后面常跟一大段署名，歌词区不需要
-      var CREDIT = /^(作词|作曲|词曲|原作词|原作曲|编曲|改编|混音|母带|演唱|原唱|翻唱|制作|制作人|监制|出品|发行|策划|统筹|企划|宣发|视觉|封面|插画|字幕|翻译|和声|伴唱|伴舞|吉他|贝斯|鼓|键盘|弦乐|录音|录音师|后期|混音师|母带师|OP|SP|词|曲|编|混|唱|奏|弹|合声|原曲|原词|原曲作者|词作者|曲作者)[^：:]{0,12}[：:]/
+      var CREDIT = /^(作词|作曲|词曲|原作词|原作曲|编曲|改编|混音|母带|演唱|原唱|翻唱|制作|制作人|监制|出品|发行|策划|统筹|企划|宣发|视觉|封面|插画|字幕|翻译|和声|伴唱|伴舞|吉他|贝斯|鼓|键盘|弦乐|录音|录音师|录音棚|棚|后期|混音师|母带师|主唱|人声|乐器|打击|鼓组|钢琴|编写|协助|助理|导演|剪辑|调色|MV|Studio|studio|OP|SP|词|曲|编|混|唱|奏|弹|合声|原曲|原词|原曲作者|词作者|曲作者)[^：:]{0,14}[：:]/
       if (CREDIT.test(txt)) return
-      // 署名行一般很短又带冒号；纯歌词很少这么短
       if (txt.length <= 12 && /[：:]/.test(txt)) return
+      // 版权声明 / 站点口号这类整行都不是歌词
+      if (/未经著作权人|不得翻唱|翻录|版权|侵权|举报|网易云音乐|QQ音乐|酷狗|酷我|高音质|无损/.test(txt)) return
+      // 不管开头是什么，只要一行里出现这些职务词 + 冒号 + 不太长，就基本是署名而不是歌词
+      if (/作词|作曲|编曲|混音|母带|制作人|监制|录音|和声|演唱|出品|发行|统筹|企划/.test(txt)
+          && txt.length < 42 && /[：:]/.test(txt)) return
+      // 授权 / OST / 同人文这类介绍行
+      if (/授权|OST|同人文|版权方|独家|首发|翻自|原曲|原唱/.test(txt) && txt.length < 42) return
       out.push({ t: t, text: txt })
     })
     return out
@@ -282,13 +365,12 @@ comments: false
     lineEls = []
     if (!lrc.length) {
       var d = document.createElement('div')
-      d.className = 'lc-line'
+      d.className = 'lc-line active'
       d.textContent = '纯音乐，请欣赏'
       lyricsInner.appendChild(d)
       lineEls.push(d)
       activeIdx = 0
       lyricsInner.style.transform = 'translateY(0px)'
-      d.classList.add('active')
       return
     }
     lrc.forEach(function (item) {
@@ -315,8 +397,7 @@ comments: false
     activeIdx = idx
     if (idx >= 0 && lineEls[idx]) {
       lineEls[idx].classList.add('active')
-      // 让当前行停在歌词窗的第二行位置，下面的往上滚
-      var offset = idx * LINE_H - LINE_H * 1
+      var offset = idx * LINE_H - LINE_H
       lyricsInner.style.transform = 'translateY(' + (-Math.max(0, offset)) + 'px)'
     }
   }
@@ -350,6 +431,25 @@ comments: false
       .catch(function () {})
   }
 
+  // 标题+歌手合成一行；比容器宽就横向循环滚动
+  function fitTitle () {
+    titleline.classList.remove('scrolling')
+    titleline.style.removeProperty('--marquee-shift')
+    titleline.style.removeProperty('--marquee-duration')
+    if (marqueeTimer) { clearTimeout(marqueeTimer); marqueeTimer = null }
+    marqueeTimer = setTimeout(function () {
+      var wrap = titleline.parentElement
+      var overflow = titleline.scrollWidth - wrap.clientWidth
+      if (overflow > 12) {
+        var shift = Math.min(overflow + 24, titleline.scrollWidth * 0.9)
+        var seconds = Math.max(8, shift / 42)
+        titleline.style.setProperty('--marquee-shift', (-shift) + 'px')
+        titleline.style.setProperty('--marquee-duration', seconds.toFixed(1) + 's')
+        titleline.classList.add('scrolling')
+      }
+    }, 120)
+  }
+
   function stopAudio () {
     try { audio.pause(); audio.currentTime = 0 } catch (e) {}
     fill.style.width = '0%'
@@ -371,23 +471,42 @@ comments: false
     stopAudio()
     var s = pick()
     titleEl.textContent = s.name || '（无题）'
-    artistEl.textContent = '— ' + (s.artist || '未知') + ' —'
+    artistEl.textContent = (s.artist || '未知')
+    fitTitle()
     audio.src = s.url
     audio.load()
     loadLyric(s)
     if (autoplay) play()
   }
 
+  // 放不出来就自动换一首，不让用户看到报错
+  var failStreak = 0
+  var retryTimer = null
   function play () {
     if (!audio.src) return
     toggle.classList.add('loading')
     audio.play().then(function () {
       toggle.classList.remove('loading')
+      failStreak = 0
     }).catch(function () {
       toggle.classList.remove('loading')
-      titleEl.textContent = '放不出来，换一首试试'
-      artistEl.textContent = '音源可能暂时不可用'
+      skipBroken()
     })
+  }
+  function skipBroken () {
+    if (failStreak >= 4) {
+      // 连续几首都放不出来才提示（真的是网络/接口的问题）
+      titleEl.textContent = '网络好像不太稳'
+      artistEl.textContent = '过一会儿再点一下试试'
+      fitTitle()
+      failStreak = 0
+      return
+    }
+    failStreak++
+    if (retryTimer) clearTimeout(retryTimer)
+    retryTimer = setTimeout(function () {
+      render(true)
+    }, 260)
   }
 
   function refresh () {
@@ -398,13 +517,14 @@ comments: false
       loadPlaylist().then(function () {
         btn.disabled = false
         render(false)
-      }).catch(function (e) {
+      }).catch(function () {
         btn.disabled = false
         titleEl.textContent = '歌单没拉到'
         artistEl.textContent = '检查网络后点「再抽一首」重试'
       })
       return
     }
+    failStreak = 0
     render(false)
   }
 
@@ -417,8 +537,13 @@ comments: false
     bar = document.getElementById('lp-bar')
     titleEl = document.getElementById('listen-title')
     artistEl = document.getElementById('listen-artist')
+    titleline = document.getElementById('lc-titleline')
     lyricsInner = document.getElementById('lc-lyrics-inner')
     btn = document.getElementById('listen-btn')
+    lcBar = document.getElementById('lc-bar')
+    volume = document.getElementById('lc-volume')
+    volBtn = document.getElementById('lv-btn')
+    volRange = document.getElementById('lv-range')
     if (!card || !audio || !toggle || !bar || !btn) return false
 
     toggle.addEventListener('click', function () {
@@ -428,6 +553,7 @@ comments: false
     })
     audio.addEventListener('play', function () {
       card.classList.add('playing')
+      failStreak = 0
       toggle.textContent = '❚❚'
       if (!rafId) rafId = requestAnimationFrame(tick)
     })
@@ -435,22 +561,34 @@ comments: false
     audio.addEventListener('playing', function () { toggle.classList.remove('loading') })
     audio.addEventListener('waiting', function () { toggle.classList.add('loading') })
     audio.addEventListener('ended', function () {
+      // loop 开着时一般不会触发；关掉 loop 也不会自动跳歌
       toggle.textContent = '▶'
       fill.style.width = '0%'
       timeEl.textContent = '0:00'
     })
     audio.addEventListener('error', function () {
       toggle.classList.remove('loading')
-      if (audio.src) {
-        titleEl.textContent = '这首放不出来'
-        artistEl.textContent = '音源可能暂时不可用，换一首试试'
-      }
+      if (audio.src) skipBroken()
     })
     bar.addEventListener('click', function (e) {
       if (!audio.duration) return
       var r = bar.getBoundingClientRect()
       var p = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width))
       audio.currentTime = p * audio.duration
+    })
+    volBtn.addEventListener('click', function (e) {
+      e.stopPropagation()
+      volume.classList.toggle('open')
+    })
+    volRange.addEventListener('input', function () {
+      audio.volume = Number(volRange.value)
+      volBtn.textContent = Number(volRange.value) === 0 ? '×' : '♪'
+    })
+    volRange.addEventListener('click', function (e) { e.stopPropagation() })
+    document.addEventListener('click', function (e) {
+      if (volume.classList.contains('open') && !volume.contains(e.target)) {
+        volume.classList.remove('open')
+      }
     })
     btn.addEventListener('click', refresh)
     document.addEventListener('keydown', function (e) {
@@ -461,11 +599,13 @@ comments: false
       if (audio.paused) play()
       else audio.pause()
     })
+    window.addEventListener('resize', fitTitle)
     return true
   }
 
   function boot () {
     if (!bind()) { setTimeout(boot, 300); return }
+    audio.volume = Number(volRange.value)
     refresh()
   }
 
