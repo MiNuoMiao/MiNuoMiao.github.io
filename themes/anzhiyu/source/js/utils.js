@@ -1,3 +1,84 @@
+/* ── 歌词过滤：LRC 里混着「作曲：」「编曲：」「混音：」这类署名，不该出现在歌词区 ──
+   在 meting 的 type=lrc 请求返回时洗一遍，APlayer 拿到的就是干净的歌词。 */
+(function () {
+  if (window.__miaoLrcFilter) return;
+  window.__miaoLrcFilter = true;
+  var _fetch = window.fetch;
+  if (!_fetch) return;
+
+  function cleanLrc(txt) {
+    return String(txt || "").split("\n").filter(function (line) {
+      var m = /^\[[^\]]+\]\s*(.*)$/.exec(line.trim());
+      if (!m) return true;
+      var t = (m[1] || "").trim();
+      if (!t) return false;
+      if (/^[-—–·.。…~～_\s]+$/.test(t)) return false;
+      if (/未经著作权人|不得翻唱|翻录|版权|侵权|举报|网易云音乐|QQ音乐|酷狗|酷我|高音质|无损/.test(t)) return false;
+      if (/(作词|作曲|词曲|编曲|混音|母带|制作人|监制|录音|和声|演唱|出品|发行|统筹|企划|吉他|贝斯|鼓|键盘|弦乐|钢琴|打击|人声编辑|录音棚|主唱)[^：:]{0,12}[：:]/.test(t) && t.length < 48) return false;
+      if (/(授权|OST|同人文|版权方|独家|首发|翻自|原曲|原唱)/.test(t) && t.length < 48) return false;
+      if (/(出品|制作出品|制作发行|发行公司|制作公司|唱片公司)/.test(t) && t.length < 60) return false;
+      if (/(著作权|保留权利|Production Company|All rights reserved|Unauthorized)/i.test(t) && t.length < 70) return false;
+      return true;
+    }).join("\n");
+  }
+
+  window.fetch = function (input, init) {
+    var url = typeof input === "string" ? input : (input && input.url) || "";
+    if (url.indexOf("type=lrc") === -1) return _fetch.apply(this, arguments);
+    return _fetch.apply(this, arguments).then(function (res) {
+      if (!res || !res.ok) return res;
+      return res.text().then(function (txt) {
+        return new Response(cleanLrc(txt), {
+          status: 200, statusText: "OK",
+          headers: { "Content-Type": "text/plain; charset=utf-8" }
+        });
+      });
+    });
+  };
+})();
+
+/* ── APlayer 歌词清洗（第二道）：给署名行打标，交给 CSS 隐藏 ──
+   ap.lrc 不是普通数组（新版 APlayer），改 DOM 最稳。 */
+(function () {
+  if (window.__miaoAplayerLrc) return;
+  window.__miaoAplayerLrc = true;
+
+  var CREDIT = /(作词|作曲|词曲|编曲|混音|母带|制作人|监制|录音|和声|演唱|出品|发行|统筹|企划|吉他|贝斯|鼓|键盘|弦乐|钢琴|打击|人声编辑|录音棚|主唱)[^：:]{0,12}[：:]/;
+  var OTHER = /未经著作权人|不得翻唱|翻录|版权|侵权|举报|网易云音乐|QQ音乐|酷狗|酷我|高音质|无损|Production Company|All rights reserved/i;
+  var SYMBOL = /^[-—–·.。…~～_\s]+$/;
+
+  function isCredit(text) {
+    var t = String(text || "").trim();
+    if (!t) return true;
+    if (SYMBOL.test(t)) return true;
+    if (CREDIT.test(t) && t.length < 48) return true;
+    if (OTHER.test(t)) return true;
+    if (/(授权|OST|同人文|版权方|独家|首发|翻自|原曲|原唱)/.test(t) && t.length < 48) return true;
+    return false;
+  }
+
+  function markLines() {
+    var box = document.querySelector("#anMusic-page .aplayer-lrc-contents") ||
+              document.querySelector(".aplayer-lrc-contents");
+    if (!box) return;
+    var ps = box.querySelectorAll("p");
+    for (var i = 0; i < ps.length; i++) {
+      var p = ps[i];
+      var credit = isCredit(p.textContent);
+      if (credit && !p.classList.contains("miao-lrc-credit")) {
+        p.classList.add("miao-lrc-credit");
+      } else if (!credit && p.classList.contains("miao-lrc-credit")) {
+        p.classList.remove("miao-lrc-credit");
+      }
+    }
+  }
+
+  var timer = setInterval(markLines, 400);
+  document.addEventListener("DOMContentLoaded", markLines);
+  var mo = new MutationObserver(function () { markLines(); });
+  if (document.body) mo.observe(document.body, { childList: true, subtree: true });
+})();
+
 const anzhiyu = {
   debounce: (func, wait = 0, immediate = false) => {
     let timeout;
