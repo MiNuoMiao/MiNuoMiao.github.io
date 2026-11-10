@@ -50,7 +50,7 @@ comments: false
 .listen-card {
   position: relative;
   max-width: 620px;
-  height: 330px;
+  height: 420px;
   margin: 0 auto 1.6rem;
   border-radius: 18px;
   background: linear-gradient(160deg, rgba(255, 152, 162, 0.16), rgba(255, 152, 162, 0.04));
@@ -60,13 +60,13 @@ comments: false
 .lc-head {
   position: absolute;
   left: 0; right: 0;
-  top: 84px;
+  top: 78px;
   padding: 0 1.4rem;
   transform-origin: top center;
   transition: top 0.5s cubic-bezier(.4,0,.2,1), transform 0.5s cubic-bezier(.4,0,.2,1);
   will-change: top, transform;
 }
-.listen-card.playing .lc-head { top: 26px; transform: scale(0.74); }
+.listen-card.playing .lc-head { top: 22px; transform: scale(0.82); }
 .lc-row {
   overflow: hidden;
   white-space: nowrap;
@@ -109,17 +109,17 @@ comments: false
   color: var(--anzhiyu-main);
   opacity: 0.9;
 }
-.listen-card.playing .lc-teaser-row { opacity: 0; height: 0; margin-top: 0; pointer-events: none; }
+.listen-card.playing .lc-teaser-row { margin-top: 6px; }
 .lc-lyrics {
   position: absolute;
   left: 0; right: 0;
-  top: 146px;
+  top: 128px;
   height: 0;
   overflow: hidden;
   opacity: 0;
   transition: height 0.5s cubic-bezier(.4,0,.2,1), opacity 0.45s ease 0.1s;
 }
-.listen-card.playing .lc-lyrics { height: 88px; opacity: 1; }
+.listen-card.playing .lc-lyrics { height: 196px; opacity: 1; }
 .lc-lyrics-inner {
   padding: 0 1.6rem;
   transition: transform 0.55s cubic-bezier(.4,0,.2,1);
@@ -148,7 +148,7 @@ comments: false
 .lc-bar {
   position: absolute;
   left: 50%;
-  bottom: 30px;
+  bottom: 26px;
   transform: translateX(-50%);
   width: 88px;
   height: 88px;
@@ -315,16 +315,16 @@ comments: false
   opacity: 0.75;
 }
 @media (max-width: 768px) {
-  .listen-card { height: 300px; }
-  .lc-head { top: 72px; }
-  .listen-card.playing .lc-head { top: 22px; }
+  .listen-card { height: 380px; }
+  .lc-head { top: 66px; }
+  .listen-card.playing .lc-head { top: 18px; }
   .lc-title { font-size: 21px; }
   .listen-card.playing .lc-title { font-size: 20px; }
   .lc-artist { font-size: 12px; }
   .lc-teaser { font-size: 13px; }
-  .lc-lyrics { top: 128px; }
-  .listen-card.playing .lc-lyrics { height: 76px; }
-  .lc-bar { width: 78px; height: 78px; bottom: 24px; }
+  .lc-lyrics { top: 112px; }
+  .listen-card.playing .lc-lyrics { height: 176px; }
+  .lc-bar { width: 78px; height: 78px; bottom: 20px; }
   .lp-toggle { width: 72px; height: 72px; font-size: 20px; }
   .listen-card.playing .lc-bar { width: calc(100% - 32px); height: 50px; }
   .listen-card.playing .lp-toggle { width: 36px; height: 36px; margin: 0 4px 0 7px; font-size: 11px; }
@@ -521,8 +521,8 @@ comments: false
       renderLyricLines()
       syncLyric()
       if (lrc.length) {
-        var pick = lrc[Math.min(lrc.length - 1, Math.floor(lrc.length * 0.25))]
-        setTeaser('「' + pick.text + '」')
+        var line = lrc[Math.min(lrc.length - 1, Math.floor(lrc.length * 0.25))]
+        setTeaser('「' + (line.orig || line.text || '') + '」')
       } else {
         setTeaser('「这首没有词，听听旋律」')
       }
