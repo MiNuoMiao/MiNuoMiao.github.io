@@ -1,7 +1,7 @@
 ---
 title: 今晚听什么
 date: 2026-11-07 05:30:00
-updated: 2026-11-11 20:45:00
+updated: 2026-11-11 22:05:00
 comments: false
 ---
 
@@ -9,10 +9,9 @@ comments: false
   <div class="listen-label">今晚 · 随机一首</div>
   <div class="listen-card" id="listen-card">
     <div class="lc-head">
-      <div class="lc-titleline" id="lc-titleline">
-        <span class="lc-title" id="listen-title">点一下下面那颗圆键</span>
-        <span class="lc-artist" id="listen-artist">从音乐馆的歌单里抽一首</span>
-      </div>
+      <div class="lc-row" id="row-title"><span class="lc-title" id="listen-title">点一下下面那颗圆键</span></div>
+      <div class="lc-row" id="row-artist"><span class="lc-artist" id="listen-artist">从音乐馆的歌单里抽一首</span></div>
+      <div class="lc-row lc-teaser-row" id="row-teaser"><span class="lc-teaser" id="listen-teaser">「抽到哪首就放哪首」</span></div>
     </div>
     <div class="lc-lyrics" id="lc-lyrics">
       <div class="lc-lyrics-inner" id="lc-lyrics-inner"></div>
@@ -59,45 +58,60 @@ comments: false
 .lc-head {
   position: absolute;
   left: 0; right: 0;
-  top: 88px;
+  top: 84px;
   padding: 0 1.4rem;
   transform-origin: top center;
   transition: top 0.5s cubic-bezier(.4,0,.2,1), transform 0.5s cubic-bezier(.4,0,.2,1);
   will-change: top, transform;
-  overflow: hidden;
 }
-.listen-card.playing .lc-head { top: 34px; transform: scale(0.74); }
-.lc-titleline {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 0.55em;
+.listen-card.playing .lc-head { top: 26px; transform: scale(0.74); }
+.lc-row {
+  overflow: hidden;
   white-space: nowrap;
+  display: flex;
+  justify-content: center;
+}
+.lc-row.scrolling { justify-content: flex-start; }
+.lc-row > span {
+  display: inline-block;
   will-change: transform;
 }
-.lc-titleline.scrolling { animation: lcMarquee var(--marquee-duration, 14s) linear infinite; justify-content: flex-start; }
+.lc-row.scrolling > span {
+  animation: lcMarquee var(--marquee-duration, 12s) linear infinite alternate;
+}
 @keyframes lcMarquee {
-  0%, 8% { transform: translateX(0); }
-  92%, 100% { transform: translateX(var(--marquee-shift, -40%)); }
+  from { transform: translateX(0); }
+  to { transform: translateX(var(--marquee-shift, -30%)); }
 }
 .lc-title {
   font-size: 26px;
   font-weight: 700;
-  line-height: 1.35;
+  line-height: 1.4;
   color: var(--anzhiyu-fontcolor);
 }
-.listen-card.playing .lc-title { font-size: 24px; }
+.listen-card.playing .lc-title { font-size: 25px; }
 .lc-artist {
   font-size: 14px;
+  line-height: 1.7;
   color: var(--anzhiyu-secondtext);
   letter-spacing: 0.04em;
 }
 .lc-artist::before { content: "— "; }
 .lc-artist::after { content: " —"; }
+.lc-teaser-row {
+  margin-top: 10px;
+  transition: opacity 0.3s ease, height 0.3s ease;
+}
+.lc-teaser {
+  font-size: 15px;
+  color: var(--anzhiyu-main);
+  opacity: 0.9;
+}
+.listen-card.playing .lc-teaser-row { opacity: 0; height: 0; margin-top: 0; pointer-events: none; }
 .lc-lyrics {
   position: absolute;
   left: 0; right: 0;
-  top: 118px;
+  top: 116px;
   height: 0;
   overflow: hidden;
   opacity: 0;
@@ -136,8 +150,7 @@ comments: false
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  transition: width 0.5s cubic-bezier(.4,0,.2,1), height 0.45s cubic-bezier(.4,0,.2,1),
-              background 0.35s ease;
+  transition: width 0.5s cubic-bezier(.4,0,.2,1), height 0.45s cubic-bezier(.4,0,.2,1);
 }
 [data-theme="dark"] .lc-bar { background: rgba(255, 255, 255, 0.08); }
 .listen-card.playing .lc-bar { width: calc(100% - 40px); height: 54px; justify-content: flex-start; }
@@ -244,12 +257,8 @@ comments: false
 .lv-range::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--anzhiyu-main);
-  border: 0;
-  cursor: pointer;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--anzhiyu-main); border: 0; cursor: pointer;
 }
 .lv-range::-moz-range-thumb {
   width: 12px; height: 12px; border-radius: 50%;
@@ -278,15 +287,16 @@ comments: false
 }
 @media (max-width: 768px) {
   .listen-card { height: 300px; }
-  .lc-head { top: 76px; }
-  .listen-card.playing .lc-head { top: 30px; }
+  .lc-head { top: 72px; }
+  .listen-card.playing .lc-head { top: 22px; }
   .lc-title { font-size: 21px; }
-  .listen-card.playing .lc-title { font-size: 19px; }
+  .listen-card.playing .lc-title { font-size: 20px; }
   .lc-artist { font-size: 12px; }
+  .lc-teaser { font-size: 13px; }
   .lc-lyrics { top: 104px; }
   .listen-card.playing .lc-lyrics { height: 96px; }
-  .lc-bar { width: 74px; height: 74px; bottom: 52px; }
-  .lp-toggle { width: 74px; height: 74px; font-size: 21px; }
+  .lc-bar { width: 78px; height: 78px; bottom: 50px; }
+  .lp-toggle { width: 72px; height: 72px; font-size: 20px; }
   .listen-card.playing .lc-bar { width: calc(100% - 32px); height: 50px; }
   .listen-card.playing .lp-toggle { width: 36px; height: 36px; margin: 0 4px 0 7px; font-size: 11px; }
   .lc-volume { padding-right: 8px; }
@@ -294,7 +304,7 @@ comments: false
 }
 @media (prefers-reduced-motion: reduce) {
   .listen-card, .lc-head, .lc-lyrics, .lc-bar, .lp-toggle, .lc-lyrics-inner,
-  .lc-line, .lc-titleline { transition: none !important; animation: none !important; }
+  .lc-line, .lc-row > span { transition: none !important; animation: none !important; }
 }
 </style>
 
@@ -311,10 +321,12 @@ comments: false
   var lineEls = []
   var activeIdx = -1
   var rafId = 0
-  var marqueeTimer = null
+  var failStreak = 0
+  var retryTimer = null
+  var fitTimers = []
 
-  var card, audio, toggle, fill, timeEl, bar, titleEl, artistEl, titleline,
-      lyricsInner, btn, lcBar, volume, volBtn, volRange
+  var card, audio, toggle, fill, timeEl, bar, titleEl, artistEl, teaserEl,
+      rowTitle, rowArtist, rowTeaser, lyricsInner, btn, volume, volBtn, volRange
 
   function fmt (s) {
     if (!isFinite(s) || s < 0) s = 0
@@ -345,16 +357,11 @@ comments: false
       var txt = (m[4] || '').trim()
       if (!txt) return
       if (/^[-—–·.。…~～_\s]+$/.test(txt)) return
-      var CREDIT = /^(作词|作曲|词曲|原作词|原作曲|编曲|改编|混音|母带|演唱|原唱|翻唱|制作|制作人|监制|出品|发行|策划|统筹|企划|宣发|视觉|封面|插画|字幕|翻译|和声|伴唱|伴舞|吉他|贝斯|鼓|键盘|弦乐|录音|录音师|录音棚|棚|后期|混音师|母带师|主唱|人声|乐器|打击|鼓组|钢琴|编写|协助|助理|导演|剪辑|调色|MV|Studio|studio|OP|SP|词|曲|编|混|唱|奏|弹|合声|原曲|原词|原曲作者|词作者|曲作者)[^：:]{0,14}[：:]/
-      if (CREDIT.test(txt)) return
-      if (txt.length <= 12 && /[：:]/.test(txt)) return
-      // 版权声明 / 站点口号这类整行都不是歌词
       if (/未经著作权人|不得翻唱|翻录|版权|侵权|举报|网易云音乐|QQ音乐|酷狗|酷我|高音质|无损/.test(txt)) return
-      // 不管开头是什么，只要一行里出现这些职务词 + 冒号 + 不太长，就基本是署名而不是歌词
       if (/作词|作曲|编曲|混音|母带|制作人|监制|录音|和声|演唱|出品|发行|统筹|企划/.test(txt)
           && txt.length < 42 && /[：:]/.test(txt)) return
-      // 授权 / OST / 同人文这类介绍行
       if (/授权|OST|同人文|版权方|独家|首发|翻自|原曲|原唱/.test(txt) && txt.length < 42) return
+      if (txt.length <= 12 && /[：:]/.test(txt)) return
       out.push({ t: t, text: txt })
     })
     return out
@@ -414,40 +421,60 @@ comments: false
     rafId = requestAnimationFrame(tick)
   }
 
+  // 一行太长就在自己的行里横向来回滚（每行各自独立）
+  function fitRow (row) {
+    if (!row) return
+    var span = row.firstElementChild
+    if (!span) return
+    row.classList.remove('scrolling')
+    span.style.removeProperty('--marquee-shift')
+    span.style.removeProperty('--marquee-duration')
+    var overflow = span.scrollWidth - row.clientWidth
+    if (overflow > 10) {
+      var shift = overflow + 16
+      var seconds = Math.max(9, shift / 38)
+      span.style.setProperty('--marquee-shift', (-shift) + 'px')
+      span.style.setProperty('--marquee-duration', seconds.toFixed(1) + 's')
+      row.classList.add('scrolling')
+    }
+  }
+
+  function fitAll () {
+    fitTimers.forEach(function (t) { clearTimeout(t) })
+    fitTimers = []
+    ;[rowTitle, rowArtist, rowTeaser].forEach(function (row) {
+      if (!row) return
+      var t = setTimeout(function () { fitRow(row) }, 120)
+      fitTimers.push(t)
+    })
+  }
+
+  function setTeaser (text) {
+    teaserEl.textContent = text
+    fitRow(rowTeaser)
+  }
+
   function loadLyric (song) {
     lrc = []
     renderLyricLines()
-    if (!song.lrc) return
+    if (!song.lrc) { setTeaser('「这首没有词，听听旋律」'); return }
     var cached = lrcCache[song.lrc]
     var go = function (txt) {
       lrc = parseLrc(txt)
       renderLyricLines()
       syncLyric()
+      if (lrc.length) {
+        var pick = lrc[Math.min(lrc.length - 1, Math.floor(lrc.length * 0.25))]
+        setTeaser('「' + pick.text + '」')
+      } else {
+        setTeaser('「这首没有词，听听旋律」')
+      }
     }
     if (cached) { go(cached); return }
     fetch(song.lrc)
       .then(function (r) { return r.text() })
       .then(function (txt) { lrcCache[song.lrc] = txt; go(txt) })
-      .catch(function () {})
-  }
-
-  // 标题+歌手合成一行；比容器宽就横向循环滚动
-  function fitTitle () {
-    titleline.classList.remove('scrolling')
-    titleline.style.removeProperty('--marquee-shift')
-    titleline.style.removeProperty('--marquee-duration')
-    if (marqueeTimer) { clearTimeout(marqueeTimer); marqueeTimer = null }
-    marqueeTimer = setTimeout(function () {
-      var wrap = titleline.parentElement
-      var overflow = titleline.scrollWidth - wrap.clientWidth
-      if (overflow > 12) {
-        var shift = Math.min(overflow + 24, titleline.scrollWidth * 0.9)
-        var seconds = Math.max(8, shift / 42)
-        titleline.style.setProperty('--marquee-shift', (-shift) + 'px')
-        titleline.style.setProperty('--marquee-duration', seconds.toFixed(1) + 's')
-        titleline.classList.add('scrolling')
-      }
-    }, 120)
+      .catch(function () { setTeaser('「这首没有词，听听旋律」') })
   }
 
   function stopAudio () {
@@ -472,16 +499,15 @@ comments: false
     var s = pick()
     titleEl.textContent = s.name || '（无题）'
     artistEl.textContent = (s.artist || '未知')
-    fitTitle()
+    setTeaser('「……」')
+    fitRow(rowTitle)
+    fitRow(rowArtist)
     audio.src = s.url
     audio.load()
     loadLyric(s)
     if (autoplay) play()
   }
 
-  // 放不出来就自动换一首，不让用户看到报错
-  var failStreak = 0
-  var retryTimer = null
   function play () {
     if (!audio.src) return
     toggle.classList.add('loading')
@@ -493,20 +519,21 @@ comments: false
       skipBroken()
     })
   }
+
+  // 放不出来就自动换下一首，别让用户看到报错
   function skipBroken () {
     if (failStreak >= 4) {
-      // 连续几首都放不出来才提示（真的是网络/接口的问题）
       titleEl.textContent = '网络好像不太稳'
       artistEl.textContent = '过一会儿再点一下试试'
-      fitTitle()
+      setTeaser('「先歇一会儿」')
+      fitRow(rowTitle)
+      fitRow(rowArtist)
       failStreak = 0
       return
     }
     failStreak++
     if (retryTimer) clearTimeout(retryTimer)
-    retryTimer = setTimeout(function () {
-      render(true)
-    }, 260)
+    retryTimer = setTimeout(function () { render(true) }, 260)
   }
 
   function refresh () {
@@ -514,6 +541,9 @@ comments: false
       btn.disabled = true
       titleEl.textContent = '正在从音乐馆拉歌单…'
       artistEl.textContent = '稍等一下'
+      setTeaser('「……」')
+      fitRow(rowTitle)
+      fitRow(rowArtist)
       loadPlaylist().then(function () {
         btn.disabled = false
         render(false)
@@ -521,6 +551,9 @@ comments: false
         btn.disabled = false
         titleEl.textContent = '歌单没拉到'
         artistEl.textContent = '检查网络后点「再抽一首」重试'
+        setTeaser('「……」')
+        fitRow(rowTitle)
+        fitRow(rowArtist)
       })
       return
     }
@@ -537,10 +570,12 @@ comments: false
     bar = document.getElementById('lp-bar')
     titleEl = document.getElementById('listen-title')
     artistEl = document.getElementById('listen-artist')
-    titleline = document.getElementById('lc-titleline')
+    teaserEl = document.getElementById('listen-teaser')
+    rowTitle = document.getElementById('row-title')
+    rowArtist = document.getElementById('row-artist')
+    rowTeaser = document.getElementById('row-teaser')
     lyricsInner = document.getElementById('lc-lyrics-inner')
     btn = document.getElementById('listen-btn')
-    lcBar = document.getElementById('lc-bar')
     volume = document.getElementById('lc-volume')
     volBtn = document.getElementById('lv-btn')
     volRange = document.getElementById('lv-range')
@@ -561,7 +596,6 @@ comments: false
     audio.addEventListener('playing', function () { toggle.classList.remove('loading') })
     audio.addEventListener('waiting', function () { toggle.classList.add('loading') })
     audio.addEventListener('ended', function () {
-      // loop 开着时一般不会触发；关掉 loop 也不会自动跳歌
       toggle.textContent = '▶'
       fill.style.width = '0%'
       timeEl.textContent = '0:00'
@@ -599,7 +633,7 @@ comments: false
       if (audio.paused) play()
       else audio.pause()
     })
-    window.addEventListener('resize', fitTitle)
+    window.addEventListener('resize', fitAll)
     return true
   }
 
