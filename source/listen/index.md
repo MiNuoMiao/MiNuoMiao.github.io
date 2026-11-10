@@ -171,7 +171,15 @@ comments: false
   overflow: hidden;
   transition: width 0.5s cubic-bezier(.4,0,.2,1), height 0.45s cubic-bezier(.4,0,.2,1);
 }
-[data-theme="dark"] .listen-card.playing .lc-bar { background: rgba(255, 255, 255, 0.08); }
+/* 深色模式：8% 白在深底上是一条亮灰带，换成压暗的底 + 亮字 */
+[data-theme="dark"] .listen-card.playing .lc-bar {
+  background: rgba(16, 16, 24, 0.72);
+  border-color: rgba(255, 152, 162, 0.28);
+}
+[data-theme="dark"] .listen-card.playing .lp-time,
+[data-theme="dark"] .listen-card.playing .lv-btn {
+  color: var(--anzhiyu-fontcolor);
+}
 .listen-card.playing .lc-bar {
   left: 20px;
   right: 20px;
