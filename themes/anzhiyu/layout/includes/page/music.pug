@@ -32,6 +32,25 @@ script.
       } catch (e) {}
       window.addEventListener('resize', function () { apply(t); });
     }
+    // 歌手行前面那个「- 」是 APlayer 模板自带的前缀，去掉它
+    function cleanAuthor() {
+      var a = document.querySelector('#anMusic-page .aplayer-author');
+      if (!a) return;
+      var raw = a.textContent || '';
+      var fixed = raw.replace(/^\s*[-–—]\s*/, '');
+      if (fixed !== raw) a.textContent = fixed;
+    }
+    function watchAuthor() {
+      var a = document.querySelector('#anMusic-page .aplayer-author');
+      if (!a) { setTimeout(watchAuthor, 500); return; }
+      cleanAuthor();
+      try {
+        new MutationObserver(cleanAuthor)
+          .observe(a, { childList: true, characterData: true, subtree: true });
+      } catch (e) {}
+    }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
     else start();
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watchAuthor);
+    else watchAuthor();
   })();

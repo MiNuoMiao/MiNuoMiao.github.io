@@ -387,16 +387,18 @@ if hexo-config('nav_music.enable') == false
           top 100px
           .aplayer-info
             .aplayer-lrc
-              margin-top 18px
-              // 跟屏幕高度走：小屏不挤、大屏不空
-              height 168px   // 老浏览器（不认 dvh）的兜底
-              height clamp(108px, 22dvh, 240px)
+              margin-top 16px
+              // 跟屏幕高度走：手机小的也有 8 行，大的不会空一大块
+              height 200px   // 老浏览器（不认 dvh）的兜底
+              height clamp(150px, 30dvh, 300px)
               max-height none
               min-height 0
               overflow hidden
-              mask-image linear-gradient(to bottom, #000, #000, #000, #0000, #0000)
+              mask-image linear-gradient(to bottom, #0000, #000 12%, #000 88%, #0000)
               p
-                font-size 14px
+                font-size 15px
+                line-height 24px !important
+                margin 4px 0
                 &.aplayer-lrc-current
                   color white
                   min-height 0
