@@ -744,7 +744,7 @@ const anzhiyu = {
   },
   // 将音乐缓存播放
   cacheAndPlayMusic() {
-    let data = localStorage.getItem("musicData");
+    let data = localStorage.getItem("musicDataV2");
     if (data) {
       data = JSON.parse(data);
       const currentTime = new Date().getTime();
@@ -756,14 +756,14 @@ const anzhiyu = {
     }
 
     // 否则重新从服务器获取数据
-    fetch("/json/music.json")
+    fetch("/json/music.json?v=2", { cache: "no-store" })
       .then(response => response.json())
       .then(songs => {
         const cacheData = {
           timestamp: new Date().getTime(),
           songs: songs,
         };
-        localStorage.setItem("musicData", JSON.stringify(cacheData));
+        localStorage.setItem("musicDataV2", JSON.stringify(cacheData));
         anzhiyu.playMusic(songs);
       });
   },
@@ -914,7 +914,7 @@ const anzhiyu = {
       }
     });
     anMusicRefreshBtn.addEventListener("click", () => {
-      localStorage.removeItem("musicData");
+      localStorage.removeItem("musicDataV2");
       anzhiyu.snackbarShow("已移除相关缓存歌曲");
     });
     anMusicSwitchingBtn.addEventListener("click", () => {
@@ -965,7 +965,7 @@ const anzhiyu = {
     const anMusicPage = document.getElementById("anMusic-page");
     const metingAplayer = anMusicPage.querySelector("meting-js").aplayer;
     const currentTime = new Date().getTime();
-    const cacheData = JSON.parse(localStorage.getItem("musicData")) || { timestamp: 0 };
+    const cacheData = JSON.parse(localStorage.getItem("musicDataV2")) || { timestamp: 0 };
     let songs = [];
 
     if (changeMusicListFlag) {
@@ -978,11 +978,11 @@ const anzhiyu = {
         songs = cacheData.songs;
       } else {
         // 否则重新从服务器获取数据
-        const response = await fetch("/json/music.json");
+        const response = await fetch("/json/music.json?v=2", { cache: "no-store" });
         songs = await response.json();
         cacheData.timestamp = currentTime;
         cacheData.songs = songs;
-        localStorage.setItem("musicData", JSON.stringify(cacheData));
+        localStorage.setItem("musicDataV2", JSON.stringify(cacheData));
       }
     }
 
