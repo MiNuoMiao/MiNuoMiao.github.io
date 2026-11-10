@@ -98,19 +98,24 @@
         if (rows[i][0] <= t + 0.25) idx = i; else break;
       }
       var ps = box.querySelectorAll("p");
-      for (var j = 0; j < ps.length; j++) ps[j].classList.remove("aplayer-lrc-current");
-      if (idx >= 0 && ps[idx]) ps[idx].classList.add("aplayer-lrc-current");
+      var changed = (idx !== lrc.lastIdx);
+      if (changed) {
+        for (var j = 0; j < ps.length; j++) ps[j].classList.remove("aplayer-lrc-current");
+        if (idx >= 0 && ps[idx]) ps[idx].classList.add("aplayer-lrc-current");
+        lrc.lastIdx = idx;
+      }
 
       // APlayer 自己的滚动用的是它缓存的旧 <p> 引用，我重建 DOM 后那些引用失效，
       // transform 一直是 0 —— 当前行被推到看不见的地方。所以滚动也由我自己算：
       // 把当前行搬到歌词窗的正中间。
       var wrap = box.closest(".aplayer-lrc") || box.parentElement;
       var wrapH = wrap ? wrap.clientHeight : 0;
-      if (wrapH && ps[idx]) {
+      if (wrapH && ps[idx] && (changed || lrc.lastY === undefined)) {
         // 让当前行停在歌词窗正中间：translateY = 窗口中线 - 当前行中线
         var rowH = ps[idx].offsetHeight || 24
         var y = (wrapH / 2) - (ps[idx].offsetTop + rowH / 2)
         box.style.transform = "translateY(" + y.toFixed(1) + "px)"
+        lrc.lastY = y
         window.__miaoHl = { wrapH: wrapH, y: Math.round(y), idx: idx, rowH: rowH }
       }
     } catch (e) {}
@@ -135,7 +140,7 @@
       }
       return origUpdate();
     };
-    ap.on("listswitch", function () { lrc.__miaoDirty = true; });
+    ap.on("listswitch", function () { lrc.__miaoDirty = true; lrc.lastIdx = -2; lrc.lastY = undefined; });
     ap.on("lrcset", function () { lrc.__miaoDirty = true; });
     clean(ap);
 
