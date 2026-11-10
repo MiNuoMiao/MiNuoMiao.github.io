@@ -124,17 +124,25 @@ comments: false
   will-change: transform;
 }
 .lc-line {
-  height: 29px;
-  line-height: 29px;
+  padding: 4px 0;
   font-size: 15px;
+  line-height: 1.45;
   color: var(--anzhiyu-secondtext);
   opacity: 0.42;
   transition: opacity 0.3s ease, color 0.3s ease;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
 }
 .lc-line.active { color: var(--anzhiyu-main); opacity: 1; font-weight: 600; }
+.lc-orig { display: block; }
+.lc-trans {
+  display: block;
+  margin-top: 1px;
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: 400;
+  opacity: 0.8;
+}
 .lc-bar {
   position: absolute;
   left: 50%;
@@ -361,10 +369,23 @@ comments: false
       if (/作词|作曲|编曲|混音|母带|制作人|监制|录音|和声|演唱|出品|发行|统筹|企划/.test(txt)
           && txt.length < 42 && /[：:]/.test(txt)) return
       if (/授权|OST|同人文|版权方|独家|首发|翻自|原曲|原唱/.test(txt) && txt.length < 42) return
+      // 「『XXX』制作出品」「出品人」「发行公司」这类没有冒号的署名
+      if (/出品|制作出品|制作发行|发行公司|制作公司|唱片公司/.test(txt) && txt.length < 32) return
       if (txt.length <= 12 && /[：:]/.test(txt)) return
-      out.push({ t: t, text: txt })
+      // 外文歌词常写成「原文（中文翻译）」，把括号里的翻译拆成单独一行
+      var split = splitTranslation(txt)
+      out.push({ t: t, orig: split[0], trans: split[1] || '' })
     })
     return out
+  }
+
+  // 「原文（译文）」/「原文(译文)」-> [原文, 译文]；没有括号就是 [原文, '']
+  function splitTranslation (text) {
+    var m = /^(.*?)[（(]([^（）()]{2,})[）)]\s*$/.exec(text)
+    if (m && m[1].trim() && /[\u3040-\u30ff\u4e00-\u9fa5A-Za-z]/.test(m[2].trim())) {
+      return [m[1].trim(), m[2].trim()]
+    }
+    return [text, '']
   }
 
   function renderLyricLines () {
@@ -383,7 +404,16 @@ comments: false
     lrc.forEach(function (item) {
       var d = document.createElement('div')
       d.className = 'lc-line'
-      d.textContent = item.text
+      var o = document.createElement('span')
+      o.className = 'lc-orig'
+      o.textContent = item.orig
+      d.appendChild(o)
+      if (item.trans) {
+        var tr = document.createElement('span')
+        tr.className = 'lc-trans'
+        tr.textContent = item.trans
+        d.appendChild(tr)
+      }
       lyricsInner.appendChild(d)
       lineEls.push(d)
     })
@@ -404,8 +434,11 @@ comments: false
     activeIdx = idx
     if (idx >= 0 && lineEls[idx]) {
       lineEls[idx].classList.add('active')
-      var offset = idx * LINE_H - LINE_H
-      lyricsInner.style.transform = 'translateY(' + (-Math.max(0, offset)) + 'px)'
+      // 按真实高度算（歌词允许换行、翻译多一行，行高不再是固定值）
+      var el = lineEls[idx]
+      var wrapH = lyricsInner.parentElement.clientHeight || 112
+      var target = el.offsetTop - (wrapH / 2 - el.offsetHeight / 2)
+      lyricsInner.style.transform = 'translateY(' + (-Math.max(0, target)) + 'px)'
     }
   }
 
