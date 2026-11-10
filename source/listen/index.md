@@ -759,22 +759,23 @@ comments: false
         volume.classList.remove('open')
       }
     })
-    // 同一时间只允许一个 <audio> 在响：音乐馆那个 aplayer 底层也是 audio
-    document.addEventListener('play', function (e) {
-      var t = e.target
-      if (!t || t.tagName !== 'AUDIO' || t === audio) return
-      // 别的播放器开始放 -> 停掉我
-      try { audio.pause() } catch (x) {}
-    }, true)
-    audio.addEventListener('play', function () {
-      // 我开始放 -> 停掉页面上其他所有 audio（含 aplayer）
-      var all = document.querySelectorAll('audio')
-      for (var i = 0; i < all.length; i++) {
-        if (all[i] !== audio && !all[i].paused) {
-          try { all[i].pause() } catch (x) {}
+    // 同一时间只允许一个播放器出声。
+    // 注意：音乐球（APlayer）的 <audio> 是离屏创建的——不在 DOM 里，
+    // 所以 querySelectorAll('audio') 抓不到它，它的 play 事件也冒泡不到 document。
+    // 唯一可靠的办法是接管 play() 本身：谁开始放，就把别人停掉。
+    if (!window.__miaoMediaGuard) {
+      window.__miaoMediaGuard = { list: [] }
+      var _play = HTMLMediaElement.prototype.play
+      HTMLMediaElement.prototype.play = function () {
+        var g = window.__miaoMediaGuard
+        if (g.list.indexOf(this) < 0) g.list.push(this)
+        for (var i = 0; i < g.list.length; i++) {
+          var m = g.list[i]
+          if (m !== this && !m.paused) { try { m.pause() } catch (x) {} }
         }
+        return _play.apply(this, arguments)
       }
-    })
+    }
 
     btn.addEventListener('click', refresh)
     document.addEventListener('keydown', function (e) {
