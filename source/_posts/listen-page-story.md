@@ -44,12 +44,12 @@ description: 一页「随机推一首歌」的小玩具，从只有字的卡片�
 
 ## 二｜第二版：直接读那份歌单
 
-你的音乐馆用的是 Meting 接口，一个歌单就是一个 id：
+音乐馆用的是 Meting 那一套接口（地址和歌单 id 是自己的，这里不写出来），一个歌单对应一个 id：
 
 ```js
-var METING = 'https://api.qijieya.cn/meting/'
+// 地址形如 https://<自建>.example/meting/
 // 歌单：41 首，含 name / artist / url / pic / lrc
-GET  {METING}?server=netease&type=playlist&id=8560567666
+GET  {METING}?server=netease&type=playlist&id={playlistId}
 GET  {METING}?server=netease&type=url&id={songid}   // 302 到音频
 GET  {METING}?server=netease&type=lrc&id={songid}   // LRC 文本
 ```
