@@ -327,9 +327,10 @@ if hexo-config('nav_music.enable') == false
         max-width 100%
         display block
       .aplayer-author
-        font-size 0.95rem
+        font-size 0.78rem
         display block
-        margin-top 4px
+        margin-top 3px
+        opacity 0.86
     meting-js 
       .aplayer
         .aplayer-list
@@ -386,14 +387,16 @@ if hexo-config('nav_music.enable') == false
           top 100px
           .aplayer-info
             .aplayer-lrc
-              margin-top 24px
-              height 168px
+              margin-top 18px
+              // 跟屏幕高度走：小屏不挤、大屏不空
+              height 168px   // 老浏览器（不认 dvh）的兜底
+              height clamp(108px, 22dvh, 240px)
               max-height none
               min-height 0
               overflow hidden
               mask-image linear-gradient(to bottom, #000, #000, #000, #0000, #0000)
               p
-                font-size 15px
+                font-size 14px
                 &.aplayer-lrc-current
                   color white
                   min-height 0
