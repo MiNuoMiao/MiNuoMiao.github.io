@@ -492,3 +492,38 @@ body[data-type="music"] #anMusic-page meting-js .aplayer-music .aplayer-author {
     line-height: 30px !important;
   }
 }
+
+/* ── 歌单滚动条 + 进度条：改浅粉（2026-11-13）──────────────────
+   滚动条不在 .aplayer-list 上 —— 那个是 overflow:hidden，查它永远查不到；
+   真正的滚动容器是它里面的 <ol>（overflow-y:auto，宽 780 < 容器 805，
+   右边那 25px 的缝里就是这条竖线）。
+   进度条底轨原来是 #cdcdcd（灰），已播放和滑块是纯白。 */
+body[data-type="music"] #anMusic-page .aplayer-list ol::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+}
+body[data-type="music"] #anMusic-page .aplayer-list ol::-webkit-scrollbar-track {
+  background: rgba(255, 199, 211, 0.16);
+  border-radius: 3px;
+}
+body[data-type="music"] #anMusic-page .aplayer-list ol::-webkit-scrollbar-thumb {
+  background: #FFC7D3;
+  border-radius: 3px;
+}
+body[data-type="music"] #anMusic-page .aplayer-list ol::-webkit-scrollbar-thumb:hover {
+  background: #FFAEC0;
+}
+
+/* 进度条：底轨灰 → 浅粉；已播放 / 缓冲 / 滑块用同色系深一档，层次还在 */
+body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-bar {
+  background: rgba(255, 199, 211, 0.55) !important;
+}
+body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-loaded {
+  background: rgba(255, 174, 192, 0.68) !important;
+}
+body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played {
+  background: #FFAEC0 !important;
+}
+body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played .aplayer-thumb {
+  background: #FFAEC0 !important;
+}
