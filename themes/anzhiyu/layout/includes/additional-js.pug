@@ -1,9 +1,14 @@
 ﻿div
-  script(src=url_for(theme.asset.utils))
-  script(src=url_for(theme.asset.main))
+  //- 内部 js 的版本号：按构建时间精确到分钟。
+  //- 之前靠 cdn.js 拼 ?v= ，但 theme.asset 在渲染时会被还原，四个 js 一直是裸路径，
+  //- 浏览器强缓存 → 改了 utils.js 线上还是旧的。这里直接拼，绕开那个时序。
+  - var __ver = (function(){ var d = new Date(), p = function(n){ return ('0' + n).slice(-2) }; return '' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + p(d.getHours()) + p(d.getMinutes()); })();
+  - var __vurl = function(u){ return url_for(u) + (String(u).indexOf('?') >= 0 ? '&' : '?') + 'v=' + __ver; };
+  script(src=__vurl(theme.asset.utils))
+  script(src=__vurl(theme.asset.main))
 
   if theme.translate.enable
-    script(src=url_for(theme.asset.translate))
+    script(src=__vurl(theme.asset.translate))
 
   if theme.medium_zoom
     script(src=url_for(theme.asset.medium_zoom))

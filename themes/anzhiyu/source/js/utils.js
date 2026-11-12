@@ -71,6 +71,8 @@
     if (/(授权|OST|同人文|版权方|独家|首发|翻自|原唱)/.test(t) && t.length < 48) return true;
     if (SUBTITLE.test(t) && t.length < 48) return true;
     if (/^[（(][^）)]{1,40}[）)]$/.test(t)) return true;            // 整行就是一句括号声明
+    // 没冒号的出品/发行声明，如「'VirtualUnion' 制作出品」
+    if (/(制作出品|制作发行|出品方|出品公司|发行公司|发行统筹|出品人|监制人)/.test(t) && t.length < 40) return true;
     if (index < 8 && time < 15 && LABEL.test(t) && t.length < 60) return true;
     return false;
   }
@@ -167,7 +169,8 @@
     if (!wrapH) return;
     // 上下各留半个窗高：这样首行、末行也能停在正中。
     // 不加这层 padding，第一行只能贴顶（实测距框中心 -307px）。
-    var pad = Math.round(wrapH / 2);
+    // 锚点：当前行停在这个高度上。0.5 = 正中，0.38 = 略偏上（诺喵要「往上提几行」）
+    var pad = Math.round(wrapH * 0.38);
     if (d.box.style.paddingTop !== pad + "px") {
       d.box.style.paddingTop = pad + "px";
       d.box.style.paddingBottom = pad + "px";
@@ -176,7 +179,7 @@
     var rowH = ps[idx].offsetHeight || 26;
     var total = d.box.scrollHeight || 0;
 
-    var y = Math.round(wrapH / 2 - (rowTop + rowH / 2));
+    var y = Math.round(pad - (rowTop + rowH / 2));
 
     // 走 CSS 变量而不是 inline transform：APlayer 每逢 index 变化都会写一次它
     // 自己的 inline transform（按 16px 老行高算），后写者胜 —— 实测移动端会被它
