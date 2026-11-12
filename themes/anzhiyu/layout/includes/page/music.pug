@@ -13,11 +13,15 @@ script.
       var cur = (t.textContent || '').trim();
       t.classList.remove('miao-scroll');
       t.style.removeProperty('--miao-shift');
+      t.style.removeProperty('--miao-dur');
       if (!cur) return;
       requestAnimationFrame(function () {
         var over = t.scrollWidth - t.clientWidth;
         if (over > 6) {
-          t.style.setProperty('--miao-shift', '-' + (over + 18) + 'px');
+          t.style.setProperty('--miao-shift', '-' + (over + 48) + 'px');
+          // 溢出越多，滚得越从容一点；太短就按最短时长
+          var dur = Math.max(8, Math.min(20, 6 + over / 40));
+          t.style.setProperty('--miao-dur', dur.toFixed(1) + 's');
           t.classList.add('miao-scroll');
         }
       });
