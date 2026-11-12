@@ -403,6 +403,13 @@ body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-
   margin: 0 !important;
   font-size: 20px !important;
   overflow: visible !important;
+  /* 非当前行是白色 ~40% 透明：在浅色封面（白/米/浅粉）上等于消失。
+     只加 0.5px 极细描边 + 一层投影，不动颜色、不动布局 ——
+     这是视频字幕那套做法：白字配细黑边，深浅底上都能读。
+     描边不参与布局，所以不会像 font-weight 那样把长句挤成两行。 */
+  -webkit-text-stroke: 0.5px rgba(0, 0, 0, .34);
+  paint-order: stroke fill;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .55);
 }
 /* 歌词滚动位置由 JS 写进 --miao-lrc-y。
    用 !important 是为了压住 APlayer 自己写的 inline transform —— 它按 16px 老行高
@@ -416,7 +423,12 @@ body[data-type="music"] #anMusic-page meting-js .aplayer-lrc-contents {
 body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-lrc p.aplayer-lrc-current {
   color: var(--anzhiyu-main) !important;
   font-weight: 400 !important;
-  text-shadow: 0 0 10px rgba(255, 152, 162, .45);
+  /* 描边要压得住浅色封面：很多封面是白/浅底的，只有粉色光晕会糊成一片。
+     paint-order: stroke fill 让描边画在字形下面（否则 1px 的 stroke 会吃掉字身，看着发瘦），
+     text-stroke 不参与布局，所以不会像 font-weight 那样把长句挤成两行、引发行高抖动。 */
+  -webkit-text-stroke: 0.7px rgba(0, 0, 0, .68);
+  paint-order: stroke fill;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .88), 0 0 2px rgba(0, 0, 0, .55), 0 0 12px rgba(255, 152, 162, .45);
 }
 
 @media (max-width: 768px) {
@@ -425,7 +437,13 @@ body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-
     height: auto !important;
     min-height: 24px !important;
     font-size: 15px !important;
+    -webkit-text-stroke-width: 0.4px !important;
   }
+  /* 小字端描边收窄一点，1.1px 在 15px 字上会有毛边 */
+  body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-lrc p.aplayer-lrc-current {
+    -webkit-text-stroke-width: 0.55px !important;
+  }
+
   /* 歌词窗：从现在的位置一直撑到控制栏上方，大屏多显示几行 */
   body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-lrc {
     height: auto !important;
