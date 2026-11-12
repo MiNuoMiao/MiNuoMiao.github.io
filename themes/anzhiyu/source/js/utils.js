@@ -171,8 +171,11 @@
     if (!wrapH) return;
     // 上下各留半个窗高：这样首行、末行也能停在正中。
     // 不加这层 padding，第一行只能贴顶（实测距框中心 -307px）。
-    // 锚点：当前行停在这个高度上。0.5 = 正中，0.38 = 略偏上（诺喵要「往上提几行」）
-    var pad = Math.round(wrapH * 0.38);
+    var rowH0 = ps[idx].offsetHeight || 26;
+    // 锚点：当前行中心离框顶多远。0.38 是基准；诺喵在 1280x800 下要「再往上移几行」，
+    // 所以再抬 3 行；同时至少留 2 行在顶上，免得小屏（约 190px 高）时贴到上边框。
+    var pad = Math.round(wrapH * 0.38) - Math.round(rowH0 * 3);
+    if (pad < Math.round(rowH0 * 2)) pad = Math.round(rowH0 * 2);
     if (d.box.style.paddingTop !== pad + "px") {
       d.box.style.paddingTop = pad + "px";
       d.box.style.paddingBottom = pad + "px";
@@ -188,7 +191,7 @@
     // 顶歪 23px。MyStyle.css 里用 !important 读这个变量，就能永久压住它。
     d.box.style.setProperty("--miao-lrc-y", y + "px");
     L.lastY = y;
-    window.__miaoHl = { wrapH: wrapH, y: y, idx: idx, domRows: ps.length, total: total };
+    window.__miaoHl = { wrapH: wrapH, pad: pad, y: y, idx: idx, domRows: ps.length, total: total };
   }
 
   function hookOne(mj) {
