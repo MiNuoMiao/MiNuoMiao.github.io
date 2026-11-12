@@ -58,7 +58,11 @@ if (theme.icons && theme.icons.fontawesome_animation_css)
   link(rel="stylesheet", href=url_for(theme.icons.fontawesome_animation_css))
 
 //- main css
-link(rel='stylesheet', href=url_for(theme.asset.main_css))
+//- 版本号按构建时间精确到分钟：theme.asset 在渲染时会被还原成裸路径，靠 cdn.js 拼 ?v= 不生效，
+//- 浏览器强缓存 → 改了主题样式线上还是旧的。
+- var __cver = (function(){ var d = new Date(), p = function(n){ return ('0' + n).slice(-2) }; return '' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + p(d.getHours()) + p(d.getMinutes()); })();
+- var __mainCss = String(theme.asset.main_css);
+link(rel='stylesheet', href=url_for(__mainCss) + (__mainCss.indexOf('?v=') >= 0 ? '' : '?v=' + __cver))
 if (theme.icons && theme.icons.fontawesome)
   link(rel='stylesheet', href=url_for(theme.asset.fontawesome) media="print" onload="this.media='all'")
 

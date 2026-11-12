@@ -3,7 +3,7 @@
   //- 之前靠 cdn.js 拼 ?v= ，但 theme.asset 在渲染时会被还原，四个 js 一直是裸路径，
   //- 浏览器强缓存 → 改了 utils.js 线上还是旧的。这里直接拼，绕开那个时序。
   - var __ver = (function(){ var d = new Date(), p = function(n){ return ('0' + n).slice(-2) }; return '' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + p(d.getHours()) + p(d.getMinutes()); })();
-  - var __vurl = function(u){ return url_for(u) + (String(u).indexOf('?') >= 0 ? '&' : '?') + 'v=' + __ver; };
+  - var __vurl = function(u){ var s = String(u); return url_for(s) + (s.indexOf('?v=') >= 0 ? '' : '?v=' + __ver); };
   script(src=__vurl(theme.asset.utils))
   script(src=__vurl(theme.asset.main))
 
