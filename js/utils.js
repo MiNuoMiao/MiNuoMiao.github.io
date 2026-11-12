@@ -14,7 +14,7 @@
       if (!t) return false;
       if (/^[-—–·.。…~～_\s]+$/.test(t)) return false;
       if (/未经著作权人|不得翻唱|翻录|版权|侵权|举报|网易云音乐|QQ音乐|酷狗|酷我|高音质|无损/.test(t)) return false;
-      if (/(作词|作曲|词曲|编曲|混音|母带|制作人|监制|录音|和声|演唱|出品|发行|统筹|企划|吉他|贝斯|鼓|键盘|弦乐|钢琴|打击|人声编辑|录音棚|主唱|MMD|视频绘图|曲绘|封面|插画|字幕|翻译|PV|动画|特效|调色|剪辑|导演|摄影|混剪|原曲|翻调|调教|本家|原唱|翻唱)[^：:]{0,12}[：:]/.test(t) && t.length < 48) return false;
+      if (/(作词|作曲|词曲|编曲|混音|母带|制作人|监制|录音|和声|演唱|出品|发行|统筹|企划|吉他|贝斯|鼓|键盘|弦乐|钢琴|打击|人声编辑|录音棚|主唱|MMD|视频绘图|曲绘|封面|插画|字幕|翻译|PV|动画|特效|调色|剪辑|导演|摄影|混剪|原曲|翻调|调教|本家|原唱|翻唱|Scoring|Arrangement|Arranged|Composed|Composer|Lyrics|Produced|Producer|Mixed|Mastered|Recorded|Vocal|Harmony)[^：:]{0,40}[：:]/.test(t) && t.length < 48) return false;
       if (/(授权|OST|同人文|版权方|独家|首发|翻自|原曲|原唱)/.test(t) && t.length < 48) return false;
       if (/(出品|制作出品|制作发行|发行公司|制作公司|唱片公司)/.test(t) && t.length < 60) return false;
       if (/(著作权|保留权利|Production Company|All rights reserved|Unauthorized)/i.test(t) && t.length < 70) return false;
@@ -37,128 +37,208 @@
   };
 })();
 
-/* ── APlayer 歌词清洗：直接从数据里删掉署名行 ──
-   以前是给歌词行打标、用 CSS visibility:hidden 藏起来，但有三个后遗症：
-   1) 那些行仍然占着高度 —— 歌词上下一句之间空一大截；
-   2) 当前行常常正好是署名行（作曲/编曲），一隐藏就"没有高亮"；
-   3) APlayer 按行号算滚动位置，行数一变就整体错位。
-   所以改成：过滤 ap.lrc.parsed[0]，再按剩下的行重建 DOM。 */
+/* ── APlayer 歌词清洗 + 居中（2026-11-13 重写）──────────────
+   上一版三个错凑在一起，症状就是「歌词不居中、当前行跑出可视区」：
+   1) 幂等判断用「过滤后长度没变就 return」——可 parsed[0] 早被上一轮改过，
+      第二次进来直接 return，DOM 里的署名行从来没被删掉过（实测仍 81 行）；
+   2) 数据源取 parsed[0]（只是正文那 45 行），而 APlayer 建 DOM 用的是
+      lrc.current（含署名的完整 81 行），两边口径不同，删了也对不上；
+   3) 滚动由 APlayer 自己写 inline transform（按 16px 老行高算），
+      我只在换行时写一次，绝大部分时间被它的值盖着 —— 实测当前行
+      被推到 top:-73，离框中心差 755px。
+   现在：一切以 lrc.current 为准（那才是 APlayer 建 DOM 用的数组），
+   过滤后把 current / parsed[0] / DOM 三处口径一起改；
+   滚动在每次 update 之后立刻把自己算的 Y 写回去，压住 APlayer 的值。 */
 (function () {
   if (window.__miaoAplayerLrc) return;
   window.__miaoAplayerLrc = true;
 
-  var CREDIT = /(作词|作曲|词曲|编曲|混音|母带|制作人|监制|录音|和声|演唱|出品|发行|统筹|企划|吉他|贝斯|鼓|键盘|弦乐|钢琴|打击|人声编辑|录音棚|主唱|MMD|视频绘图|曲绘|封面|插画|字幕|翻译|PV|动画|特效|调色|剪辑|导演|摄影|混剪|原曲|翻调|调教|本家|原唱|翻唱)[^：:]{0,12}[：:]/;
-  var OTHER = /未经著作权人|不得翻唱|翻录|版权|侵权|举报|网易云音乐|QQ音乐|酷狗|酷我|高音质|无损|Production Company|All rights reserved/i;
+  var CREDIT = /(作词|作曲|词曲|编曲|混音|母带|制作人|监制|录音|和声|演唱|出品|发行|统筹|企划|吉他|贝斯|鼓|键盘|弦乐|钢琴|打击|人声编辑|录音棚|主唱|MMD|视频绘图|曲绘|封面|插画|字幕|翻译|PV|动画|特效|调色|剪辑|导演|摄影|混剪|原曲|翻调|调教|本家|原唱|翻唱|谱务|出版|宣发|鸣谢|视觉|字体|美术|策划|音乐制作|混音师|录音师|词|曲|Scoring|Arrangement|Arranged|Composed|Composer|Lyrics|Produced|Producer|Mixed|Mastered|Recorded|Vocal|Harmony)[^：:]{0,40}[：:]/;
+  var OTHER = /未经著作权|著作权权利|不得翻唱|翻录|版权|侵权|举报|网易云音乐|QQ音乐|酷狗|酷我|高音质|无损|Production Company|Distribution Company|Issuance|All rights reserved/i;
   var SYMBOL = /^[-—–·.。…~～_\s]+$/;
+  // 「短标签：内容」这种写法，正片歌词极少用；LRC 的署名行几乎都是它
+  var LABEL = /^[^：:]{1,24}[：:]/;
+  // 副标题行，如「梦枢心相由心生二 ——《月声尽，心灯明》」
+  var SUBTITLE = /[—–]{1,2}\s*《|^《[^》]{1,30}》$/;
 
-  function isCredit(text) {
-    var t = String(text || "").trim();
+  // index / time 用来判「开头几行」：署名行几乎都挤在正片之前
+  function isCredit(text, index, time) {
+    var t = String(text == null ? "" : text).trim();
     if (!t) return true;
     if (SYMBOL.test(t)) return true;
-    if (CREDIT.test(t) && t.length < 48) return true;
+    if (CREDIT.test(t) && t.length < 60) return true;
     if (OTHER.test(t)) return true;
-    if (/(授权|OST|同人文|版权方|独家|首发|翻自|原曲|原唱)/.test(t) && t.length < 48) return true;
+    if (/(授权|OST|同人文|版权方|独家|首发|翻自|原唱)/.test(t) && t.length < 48) return true;
+    if (SUBTITLE.test(t) && t.length < 48) return true;
+    if (/^[（(][^）)]{1,40}[）)]$/.test(t)) return true;            // 整行就是一句括号声明
+    if (index < 8 && time < 15 && LABEL.test(t) && t.length < 60) return true;
     return false;
   }
 
-  function clean(ap) {
-    if (!ap || !ap.lrc || !Array.isArray(ap.lrc.parsed) || !ap.lrc.parsed.length) return;
-    var rows = ap.lrc.parsed[0];
-    if (!Array.isArray(rows) || !rows.length) return;
-    var kept = rows.filter(function (row) { return !isCredit(row[1]); });
-    if (kept.length === rows.length) return;   // 没有署名行，不动
-    ap.lrc.parsed[0] = kept;
-    // update() 读的是 lrc.current 这个平行数组，只改 parsed 会「DOM 45 行、索引按 52 算」
-    if (Array.isArray(ap.lrc.current)) ap.lrc.current = kept;
+  // 每个 APlayer 实例只管自己容器里的 DOM（页面里有两个 meting-js：音乐球 + 音乐页）
+  function domOf(ap) {
+    var c = ap && ap.container;
+    var box = c && c.querySelector ? c.querySelector(".aplayer-lrc-contents") : null;
+    if (!box) box = document.querySelector("#anMusic-page .aplayer-lrc-contents") || document.querySelector(".aplayer-lrc-contents");
+    if (!box) return null;
+    return { box: box, wrap: box.closest(".aplayer-lrc") || box.parentElement };
+  }
 
-    var box = document.querySelector("#anMusic-page .aplayer-lrc-contents") ||
-              document.querySelector(".aplayer-lrc-contents");
-    if (!box) return;
-    box.innerHTML = "";
-    kept.forEach(function (row) {
-      var p = document.createElement("p");
-      p.textContent = row[1];
-      box.appendChild(p);
+  // APlayer 是拿 lrc.current 建 DOM 的；parsed 只是它的分组缓存，口径不同别用
+  function rowsOf(L) {
+    if (Array.isArray(L.current) && L.current.length) return L.current;
+    var out = [];
+    if (Array.isArray(L.parsed)) {
+      for (var i = 0; i < L.parsed.length; i++) {
+        if (Array.isArray(L.parsed[i])) out = out.concat(L.parsed[i]);
+      }
+    }
+    return out;
+  }
+
+  // APlayer 拉歌词时会先塞一行「Loading」占位。这时候动它会把它自己的数据
+  // 搞坏（实测：切歌后 DOM 变成 1 行 "Loading"，之后再也不恢复成真歌词）。
+  var PLACEHOLDER = /^(loading|加载中|歌词加载中|无歌词|暂无歌词|纯音乐|纯音乐，请欣赏|instrumental)[\s.…]*$/i;
+
+  function ensureClean(ap) {
+    var L = ap && ap.lrc;
+    if (!L) return false;
+    var d = domOf(ap);
+    if (!d) return false;
+    var full = rowsOf(L);
+    if (!full.length) return false;
+    // 歌词还没到位（占位行 / 行数太少）就一个字都别碰
+    if (full.length < 4) return false;
+    if (PLACEHOLDER.test(String((full[0] || [])[1] || "").trim())) return false;
+
+    var kept = full.filter(function (row, idx) {
+      return !isCredit(row[1], idx, Number(row[0]) || 0);
     });
-    try { ap.lrc.update(); } catch (e) {}
-    highlight(ap);
-  }
+    // 全被判成署名行 → 说明数据还没准备好，别把歌词清成空
+    if (kept.length < 3) return false;
 
-  // 重建 DOM 后 APlayer 的 index 可能"正好没变"，就不会重绘高亮。
-  // 这里按当前播放时间自己标一次，随后 APlayer 的 update 会接管。
-  function highlight(ap) {
+    var ps = d.box.querySelectorAll("p");
+    var same = ps.length === kept.length && ps.length > 0 && (ps[0].textContent || "") === String(kept[0][1] || "");
+
+    // 口径对齐：APlayer 算索引和建 DOM 用的是同一份 current
+    if (same) { L.current = kept; return true; }
+
+    L.current = kept;
     try {
-      var box = document.querySelector("#anMusic-page .aplayer-lrc-contents") ||
-                document.querySelector(".aplayer-lrc-contents");
-      var rows = ap.lrc && ap.lrc.current;
-      if (!box || !Array.isArray(rows) || !rows.length || !ap.audio) return;
-      var t = ap.audio.currentTime || 0;
-      var idx = -1;
-      for (var i = 0; i < rows.length; i++) {
-        if (rows[i][0] <= t + 0.25) idx = i; else break;
-      }
-      var ps = box.querySelectorAll("p");
-      // 注意：这里必须用 ap.lrc —— 原来写的是 hook() 里的局部变量 lrc，
-      // 在这个函数里根本不存在，ReferenceError 被 try/catch 吞掉，高亮就一直不生效。
-      var changed = (idx !== ap.lrc.lastIdx);
-      if (changed) {
-        for (var j = 0; j < ps.length; j++) ps[j].classList.remove("aplayer-lrc-current");
-        if (idx >= 0 && ps[idx]) ps[idx].classList.add("aplayer-lrc-current");
-        ap.lrc.lastIdx = idx;
-      }
-
-      // APlayer 自己的滚动用的是它缓存的旧 <p> 引用，我重建 DOM 后那些引用失效，
-      // transform 一直是 0 —— 当前行被推到看不见的地方。所以滚动也由我自己算：
-      // 把当前行搬到歌词窗的正中间。
-      var wrap = box.closest(".aplayer-lrc") || box.parentElement;
-      var wrapH = wrap ? wrap.clientHeight : 0;
-      if (wrapH && ps[idx] && (changed || ap.lrc.lastY === undefined)) {
-        // 让当前行停在歌词窗正中间：translateY = 窗口中线 - 当前行中线
-        var rowH = ps[idx].offsetHeight || 24
-        var y = (wrapH / 2) - (ps[idx].offsetTop + rowH / 2)
-        box.style.transform = "translateY(" + y.toFixed(1) + "px)"
-        ap.lrc.lastY = y
-        window.__miaoHl = { wrapH: wrapH, y: Math.round(y), idx: idx, rowH: rowH }
-      }
+      if (Array.isArray(L.parsed) && Array.isArray(L.parsed[0])) L.parsed[0] = kept;
     } catch (e) {}
+
+    d.box.innerHTML = "";
+    for (var i = 0; i < kept.length; i++) {
+      var p = document.createElement("p");
+      p.textContent = kept[i][1];
+      d.box.appendChild(p);
+    }
+    L.index = -1;
+    L.lastIdx = -2;
+    L.lastY = undefined;
+    return true;
   }
 
-  function hook() {
-    var mj = document.querySelector("meting-js");
+  function applyTransform(ap) {
+    var L = ap && ap.lrc;
+    if (!L) return;
+    var d = domOf(ap);
+    if (!d || !d.wrap) return;
+    var rows = L.current;
+    if (!Array.isArray(rows) || !rows.length) return;
+    var ps = d.box.querySelectorAll("p");
+    if (!ps.length) return;
+
+    var t = (ap.audio && ap.audio.currentTime) || 0;
+    var idx = -1;
+    for (var i = 0; i < rows.length && i < ps.length; i++) {
+      if (Number(rows[i][0]) <= t + 0.25) idx = i; else break;
+    }
+
+    if (idx !== L.lastIdx) {
+      for (var j = 0; j < ps.length; j++) ps[j].classList.remove("aplayer-lrc-current");
+      if (idx >= 0 && ps[idx]) ps[idx].classList.add("aplayer-lrc-current");
+      L.lastIdx = idx;
+    }
+    if (idx < 0 || !ps[idx]) return;
+
+    var wrapH = d.wrap.clientHeight || 0;
+    if (!wrapH) return;
+    // 上下各留半个窗高：这样首行、末行也能停在正中。
+    // 不加这层 padding，第一行只能贴顶（实测距框中心 -307px）。
+    var pad = Math.round(wrapH / 2);
+    if (d.box.style.paddingTop !== pad + "px") {
+      d.box.style.paddingTop = pad + "px";
+      d.box.style.paddingBottom = pad + "px";
+    }
+    var rowTop = ps[idx].offsetTop;
+    var rowH = ps[idx].offsetHeight || 26;
+    var total = d.box.scrollHeight || 0;
+
+    var y = Math.round(wrapH / 2 - (rowTop + rowH / 2));
+
+    // 走 CSS 变量而不是 inline transform：APlayer 每逢 index 变化都会写一次它
+    // 自己的 inline transform（按 16px 老行高算），后写者胜 —— 实测移动端会被它
+    // 顶歪 23px。MyStyle.css 里用 !important 读这个变量，就能永久压住它。
+    d.box.style.setProperty("--miao-lrc-y", y + "px");
+    L.lastY = y;
+    window.__miaoHl = { wrapH: wrapH, y: y, idx: idx, domRows: ps.length, total: total };
+  }
+
+  function hookOne(mj) {
     if (!mj || !mj.aplayer) return false;
     var ap = mj.aplayer;
-    var lrc = ap.lrc;
-    if (!lrc || lrc.__miaoHooked) return true;
-    lrc.__miaoHooked = true;
+    var L = ap.lrc;
+    if (!L) return false;
+    if (L.__miaoHooked) return true;
+    L.__miaoHooked = true;
+    L.__miaoDirty = true;
 
-    // APlayer 每次切歌都会重新赋值 lrc.parsed，光在 lrcset 里过滤会被下一次覆盖。
-    // 所以接管 update()（timeupdate 每次都调它）：切歌后第一次更新时再清一遍。
-    var origUpdate = lrc.update.bind(lrc);
-    lrc.__miaoDirty = true;
-    lrc.update = function () {
-      if (lrc.__miaoDirty) {
-        lrc.__miaoDirty = false;
-        try { clean(ap); } catch (e) {}
-      }
-      return origUpdate();
+    var origUpdate = L.update.bind(L);
+    L.update = function () {
+      var r;
+      try {
+        if (L.__miaoDirty && ensureClean(ap)) L.__miaoDirty = false;
+        r = origUpdate();
+      } catch (e) { r = undefined; }
+      // APlayer 刚在上面写了自己的 inline transform，这里必须立刻改回来，
+      // 否则当前行会被它的行高算法推到框外面（实测差 755px）
+      try { applyTransform(ap); } catch (e) {}
+      return r;
     };
-    ap.on("listswitch", function () { lrc.__miaoDirty = true; ap.lrc.lastIdx = -2; ap.lrc.lastY = undefined; });
-    ap.on("lrcset", function () { lrc.__miaoDirty = true; });
-    clean(ap);
 
-    // APlayer 的 update() 有自己的 index 缓存，和重建后的 DOM 对不上；
-    // 这里按播放时间自己同步一次高亮，稳过它的判断。
-    if (!lrc.__miaoTicker) {
-      lrc.__miaoTicker = setInterval(function () {
-        if (ap.audio && !ap.audio.paused) highlight(ap);
+    ap.on("listswitch", function () { L.__miaoDirty = true; L.lastIdx = -2; L.lastY = undefined; });
+    ap.on("lrcset", function () { L.__miaoDirty = true; });
+    ap.on("play", function () { L.__miaoDirty = true; });
+
+    ensureClean(ap);
+    applyTransform(ap);
+
+    if (!L.__miaoTicker) {
+      L.__miaoTicker = setInterval(function () {
+        if (ap.audio && !ap.audio.paused) {
+          // 播放中每 400ms 自查一次：APlayer 切歌/重载会自己重建 DOM，
+          // 只等 dirty 一个时机容易漏（实测漏掉后署名行一直在）
+          try { if (ensureClean(ap)) L.__miaoDirty = false; } catch (e) {}
+          try { applyTransform(ap); } catch (e) {}
+        }
       }, 400);
     }
     return true;
   }
 
-  var t = setInterval(function () { if (hook()) clearInterval(t); }, 400);
-  if (document.readyState !== "loading") hook();
-  else document.addEventListener("DOMContentLoaded", hook);
+  function hookAll() {
+    var all = document.querySelectorAll("meting-js");
+    for (var i = 0; i < all.length; i++) {
+      try { hookOne(all[i]); } catch (e) {}
+    }
+  }
+
+  hookAll();
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", hookAll);
+  // 音乐页的 meting-js 是 JS 动态插进来的（getCustomPlayList），所以要持续盯着
+  setInterval(hookAll, 1500);
 })();
 
 const anzhiyu = {

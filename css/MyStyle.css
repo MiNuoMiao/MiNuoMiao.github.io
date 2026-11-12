@@ -400,6 +400,14 @@ body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-
   font-size: 20px !important;
   overflow: visible !important;
 }
+/* 歌词滚动位置由 JS 写进 --miao-lrc-y。
+   用 !important 是为了压住 APlayer 自己写的 inline transform —— 它按 16px 老行高
+   计算，每逢换行都会覆盖一次，实测把当前行推到可视区外 755px（桌面）/ 23px（手机）。 */
+body[data-type="music"] #anMusic-page meting-js .aplayer-lrc-contents {
+  transform: translateY(var(--miao-lrc-y, 0px)) !important;
+  transition: transform 0.26s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
 /* 当前行：只上色 + 光晕，不加粗（加粗会把长句挤成两行，行高一变就"拉扯"） */
 body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-lrc p.aplayer-lrc-current {
   color: var(--anzhiyu-main) !important;
@@ -416,7 +424,7 @@ body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-
   /* 歌词窗：从现在的位置一直撑到控制栏上方，大屏多显示几行 */
   body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-lrc {
     height: auto !important;
-    max-height: calc(100dvh - 540px) !important;
+    max-height: calc(100dvh - 500px) !important;
     min-height: 120px !important;
     overflow: hidden !important;
     display: block !important;
