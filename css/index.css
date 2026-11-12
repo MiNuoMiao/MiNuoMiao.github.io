@@ -8509,11 +8509,7 @@ body:has(#console.show) #nav-music {
     bottom: 100px;
   }
   #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-controller .aplayer-volume-wrap {
-    left: -66px;
-  }
-  #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-controller .aplayer-volume-wrap .aplayer-volume-bar-wrap {
-    bottom: 0px;
-    right: 7px;
+    display: none !important;
   }
   #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-controller .aplayer-bar-wrap {
     margin: 0 30px;
@@ -9659,11 +9655,7 @@ body:has(#console.show) #nav-music {
     bottom: 100px;
   }
   #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-controller .aplayer-volume-wrap {
-    left: -66px;
-  }
-  #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-controller .aplayer-volume-wrap .aplayer-volume-bar-wrap {
-    bottom: 0px;
-    right: 7px;
+    display: none !important;
   }
   #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-controller .aplayer-bar-wrap {
     margin: 0 30px;
