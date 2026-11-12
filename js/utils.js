@@ -90,15 +90,17 @@
   }
 
   // APlayer 是拿 lrc.current 建 DOM 的；parsed 只是它的分组缓存，口径不同别用
+  // 只读：APlayer 的 parsed 是「每首歌一组」的缓存数组，current 指向当前那组。
+  // 以前这里把 current 和 parsed[0] 都改写成过滤后的结果 —— 那是致命的：
+  // ticker 每 400ms 都把上一首的过滤结果写回 current，APlayer 刚设好的新数据
+  // 立刻被盖成旧数据，于是切歌后歌词永远停在上一首（线上实测复现）。
   function rowsOf(L) {
     if (Array.isArray(L.current) && L.current.length) return L.current;
-    var out = [];
-    if (Array.isArray(L.parsed)) {
-      for (var i = 0; i < L.parsed.length; i++) {
-        if (Array.isArray(L.parsed[i])) out = out.concat(L.parsed[i]);
-      }
+    if (Array.isArray(L.parsed) && L.parsed.length) {
+      var last = L.parsed[L.parsed.length - 1];
+      if (Array.isArray(last) && last.length) return last;
     }
-    return out;
+    return [];
   }
 
   // APlayer 拉歌词时会先塞一行「Loading」占位。这时候动它会把它自己的数据
@@ -125,13 +127,10 @@
     var ps = d.box.querySelectorAll("p");
     var same = ps.length === kept.length && ps.length > 0 && (ps[0].textContent || "") === String(kept[0][1] || "");
 
-    // 口径对齐：APlayer 算索引和建 DOM 用的是同一份 current
-    if (same) { L.current = kept; return true; }
+    // 过滤结果只存在自己的字段里，APlayer 的 current / parsed 一个字节都不动
+    L.__miaoRows = kept;
 
-    L.current = kept;
-    try {
-      if (Array.isArray(L.parsed) && Array.isArray(L.parsed[0])) L.parsed[0] = kept;
-    } catch (e) {}
+    if (same) return true;
 
     d.box.innerHTML = "";
     for (var i = 0; i < kept.length; i++) {
@@ -150,7 +149,7 @@
     if (!L) return;
     var d = domOf(ap);
     if (!d || !d.wrap) return;
-    var rows = L.current;
+    var rows = (Array.isArray(L.__miaoRows) && L.__miaoRows.length) ? L.__miaoRows : L.current;
     if (!Array.isArray(rows) || !rows.length) return;
     var ps = d.box.querySelectorAll("p");
     if (!ps.length) return;
@@ -214,7 +213,7 @@
       return r;
     };
 
-    ap.on("listswitch", function () { L.__miaoDirty = true; L.lastIdx = -2; L.lastY = undefined; });
+    ap.on("listswitch", function () { L.__miaoDirty = true; L.lastIdx = -2; L.lastY = undefined; L.__miaoRows = null; });
     ap.on("lrcset", function () { L.__miaoDirty = true; });
     ap.on("play", function () { L.__miaoDirty = true; });
 
