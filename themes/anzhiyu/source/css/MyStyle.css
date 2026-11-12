@@ -388,6 +388,13 @@ body:has(#sidebar-menus.open) #sidebar-menus {
   touch-action: auto;             /* 侧边栏自己还能滚 */
 }
 
+/* 歌词当前行的强调色（2026-11-13）
+   诺喵从截图里选了这颗玫红 #EC518F，换掉原来的浅粉 var(--anzhiyu-main)（#FF98A2）。
+   只作用于音乐页歌词，不动全站主题色；想再调深浅就改这一个值。 */
+body[data-type="music"] {
+  --miao-lrc-accent: #EC518F;
+}
+
 /* ── 音乐馆歌词行（2026-11-11）─────────────────────────────
    APlayer 默认给 .aplayer-lrc p 写了 height:16px + line-height:16px + padding:0
    而且是 !important。只改 line-height 不改 height 会把字裁掉、行距忽大忽小，
@@ -421,14 +428,14 @@ body[data-type="music"] #anMusic-page meting-js .aplayer-lrc-contents {
 
 /* 当前行：只上色 + 光晕，不加粗（加粗会把长句挤成两行，行高一变就"拉扯"） */
 body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-lrc p.aplayer-lrc-current {
-  color: var(--anzhiyu-main) !important;
+  color: var(--miao-lrc-accent) !important;
   font-weight: 400 !important;
   /* 描边要压得住浅色封面：很多封面是白/浅底的，只有粉色光晕会糊成一片。
      paint-order: stroke fill 让描边画在字形下面（否则 1px 的 stroke 会吃掉字身，看着发瘦），
      text-stroke 不参与布局，所以不会像 font-weight 那样把长句挤成两行、引发行高抖动。 */
   -webkit-text-stroke: 0.7px rgba(0, 0, 0, .68);
   paint-order: stroke fill;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, .88), 0 0 2px rgba(0, 0, 0, .55), 0 0 12px rgba(255, 152, 162, .45);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .88), 0 0 2px rgba(0, 0, 0, .55), 0 0 12px rgba(236, 81, 143, .5);
 }
 
 @media (max-width: 768px) {
