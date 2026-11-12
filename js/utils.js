@@ -73,7 +73,10 @@
     if (/^[（(][^）)]{1,40}[）)]$/.test(t)) return true;            // 整行就是一句括号声明
     // 没冒号的出品/发行声明，如「'VirtualUnion' 制作出品」
     if (/(制作出品|制作发行|出品方|出品公司|发行公司|发行统筹|出品人|监制人)/.test(t) && t.length < 40) return true;
-    if (index < 8 && time < 15 && LABEL.test(t) && t.length < 60) return true;
+    // 判「开头几行」别用秒数当门槛：实测《抱薪救火》那句「后期：TORA」
+    // 时间戳是 15.69s（前面 15 秒是前奏），刚好越过 <15 的线就漏了。
+    // 改成按行位置判：正片歌词几乎不在开头 12 行里用「标签：内容」的写法。
+    if (LABEL.test(t) && t.length < 60 && (index < 12 || time < 30)) return true;
     return false;
   }
 
@@ -220,10 +223,12 @@
 
     if (!L.__miaoTicker) {
       L.__miaoTicker = setInterval(function () {
+        // 清洗无条件跑：暂停时 lrc.update 根本不会被调用（没有 timeupdate），
+        // 只挂在 update 上的清洗就永远等不到执行 —— 实测「进页面没点播放」
+        // 那种状态下，作词/作曲会一直露在歌词区最前面。
+        // ensureClean 幂等（DOM 行数与首行文本都对上就直接返回），成本很低。
+        try { if (ensureClean(ap)) L.__miaoDirty = false; } catch (e) {}
         if (ap.audio && !ap.audio.paused) {
-          // 播放中每 400ms 自查一次：APlayer 切歌/重载会自己重建 DOM，
-          // 只等 dirty 一个时机容易漏（实测漏掉后署名行一直在）
-          try { if (ensureClean(ap)) L.__miaoDirty = false; } catch (e) {}
           try { applyTransform(ap); } catch (e) {}
         }
       }, 400);

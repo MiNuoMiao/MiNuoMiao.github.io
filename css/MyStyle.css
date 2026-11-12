@@ -444,6 +444,8 @@ body[data-type="music"] #anMusic-page meting-js .aplayer-music .aplayer-title {
   font-size: 2rem !important;
   font-weight: 700 !important;
   color: #fff !important;
+  /* 行高钉死：长歌名会把字号往下缩，行高跟着字变就会让整块上下跳 */
+  line-height: 42px !important;
 }
 body[data-type="music"] #anMusic-page meting-js .aplayer-music .aplayer-author {
   font-size: 1rem !important;
@@ -451,4 +453,15 @@ body[data-type="music"] #anMusic-page meting-js .aplayer-music .aplayer-author {
   margin-top: 5px !important;
   opacity: 0.86;
   color: #fff !important;
+}
+
+/* ── 移动端标题（放文件末尾，故意写在后面）──────────────────────
+   上面那条 2rem 的桌面规则不分设备，手机上会变成 32px 起跳；
+   这里用同样 specificity + 更靠后，把手机端按主题原本的 1.3rem 起，
+   再交给 JS 按容器宽度自适应（缩到 18px 为止，还放不下就换行）。 */
+@media (max-width: 768px) {
+  body[data-type="music"] #anMusic-page meting-js .aplayer-music .aplayer-title {
+    font-size: 1.3rem !important;
+    line-height: 30px !important;
+  }
 }
