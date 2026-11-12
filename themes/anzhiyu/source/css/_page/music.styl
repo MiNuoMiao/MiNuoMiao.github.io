@@ -422,11 +422,10 @@ if hexo-config('nav_music.enable') == false
             .aplayer-controller
               width 100%
               bottom 100px
+              // 手机直接用系统音量键就够了，这个按钮纯多余；
+              // 而且实测它和右边的循环键重叠 6px（volume 262..309 / loop 303..335）
               .aplayer-volume-wrap
-                left -66px
-                .aplayer-volume-bar-wrap
-                  bottom 0px
-                  right 7px
+                display none !important
               .aplayer-bar-wrap
                 margin 0 30px
             .aplayer-controller
