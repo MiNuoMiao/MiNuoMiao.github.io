@@ -1252,9 +1252,12 @@ CDN:
   option:
     # 样式表和内部 js 都带版本号，否则浏览器会一直用缓存（改完看不到变化）
     # ⚠️ 这里会覆盖 cdn.js 自动生成的 asset 值，两边要保持一致
-    main_css: css/index.css?v=20261111c
-    main: js/main.js?v=20261111c
-    utils: js/utils.js?v=20261111e
+    # 原来这里硬编码了 main_css / main / utils 三个版本号，会覆盖 cdn.js 自动
+    # 生成的值 —— 每次改完只要漏一处，浏览器就一直用旧缓存（踩过两次）。
+    # 现在全部交回 cdn.js（版本号精确到分钟）。
+    # main_css: css/index.css?v=20261111c
+    # main: js/main.js?v=20261111c
+    # utils: js/utils.js?v=20261111e
     # translate:
     # random_friends_post_js:
     # right_click_menu_js:

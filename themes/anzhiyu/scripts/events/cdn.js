@@ -109,7 +109,11 @@ hexo.extend.filter.register("before_generate", () => {
       // 主样式和内部 js 都带版本号：按构建日期，每天变一次。
       // 以前是固定路径，浏览器强缓存 → 改了 CSS/JS 手机和电脑都还是旧的。
       // （utils.js 里的歌词过滤就是因为没版本号，线上一直是旧版）
-      const cssVer = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+      // 版本号精确到分钟。原来只用 UTC 日期，凌晨部署时 UTC 还停在前一天，
+      // 版本号不变 —— 浏览器继续用旧缓存，这就是反复「改了看不到」的机制性原因。
+      const _d = new Date();
+      const _p2 = (n) => String(n).padStart(2, "0");
+      const cssVer = `${_d.getFullYear()}${_p2(_d.getMonth() + 1)}${_p2(_d.getDate())}${_p2(_d.getHours())}${_p2(_d.getMinutes())}`;
       data["main_css"] = "css/index.css?v=" + cssVer;
       ["utils", "main", "translate", "local_search"].forEach((k) => {
         if (typeof data[k] === "string") data[k] = data[k] + "?v=" + cssVer;
