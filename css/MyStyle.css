@@ -394,7 +394,11 @@ body:has(#sidebar-menus.open) #sidebar-menus {
    所以这里把四个值一起钉死。 */
 body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-lrc p {
   line-height: 26px !important;
-  height: 26px !important;
+  /* 不能写死 height：日文原文＋中文翻译一句会折成两行，
+     盒子只有 26px 就把第二行挤到下一句上面（手机截图里整片叠字）。
+     改成 min-height：单行仍是 26px，折行的自己长高。 */
+  height: auto !important;
+  min-height: 26px !important;
   padding: 0 !important;
   margin: 0 !important;
   font-size: 20px !important;
@@ -418,7 +422,8 @@ body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-
 @media (max-width: 768px) {
   body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-lrc p {
     line-height: 24px !important;
-    height: 24px !important;
+    height: auto !important;
+    min-height: 24px !important;
     font-size: 15px !important;
   }
   /* 歌词窗：从现在的位置一直撑到控制栏上方，大屏多显示几行 */
