@@ -14,15 +14,34 @@ script.
       t.classList.remove('miao-scroll');
       t.style.removeProperty('--miao-shift');
       t.style.removeProperty('--miao-dur');
+      t.style.removeProperty('font-size');
+      t.style.removeProperty('white-space');
+      t.style.removeProperty('line-height');
+      t.style.removeProperty('overflow');
+      t.style.removeProperty('overflow-wrap');
       if (!cur) return;
       requestAnimationFrame(function () {
-        var over = t.scrollWidth - t.clientWidth;
-        if (over > 6) {
-          t.style.setProperty('--miao-shift', '-' + (over + 48) + 'px');
-          // 溢出越多，滚得越从容一点；太短就按最短时长
-          var dur = Math.max(8, Math.min(20, 6 + over / 40));
-          t.style.setProperty('--miao-dur', dur.toFixed(1) + 's');
-          t.classList.add('miao-scroll');
+        // 不滚动、不截断：放不下就把字号往下缩（最小 18px）。
+        // 之前那套 marquee 是把 .aplayer-title 整个元素平移（它自己就是外框），
+        // 看着像"整块在动"，而且任何一帧两头都被硬切。
+        var base = parseFloat(getComputedStyle(t).fontSize) || 32;
+        var cw = t.clientWidth, sw = t.scrollWidth;
+        if (!cw || sw <= cw + 1) return;
+        var fs = Math.max(18, Math.floor(base * cw / sw));
+        t.style.setProperty('font-size', fs + 'px', 'important');
+        // 线性估算偶尔差 1~2px，再校正几次（最多 6 轮，避免死循环）
+        var guard = 0;
+        while (fs > 18 && t.scrollWidth > t.clientWidth + 1 && guard++ < 6) {
+          fs -= 1;
+          t.style.setProperty('font-size', fs + 'px', 'important');
+        }
+        // 缩到 18px 还放不下（那种五六十字的 B 站式标题）：允许换行，
+        // 让字完整待在框里，而不是被 overflow:hidden 一刀切掉。
+        if (t.scrollWidth > t.clientWidth + 1) {
+          t.style.setProperty('white-space', 'normal', 'important');
+          t.style.setProperty('line-height', '24px', 'important');
+          t.style.setProperty('overflow', 'visible', 'important');
+          t.style.setProperty('overflow-wrap', 'anywhere', 'important');
         }
       });
     }
