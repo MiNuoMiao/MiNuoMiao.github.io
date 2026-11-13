@@ -1220,12 +1220,13 @@ inject:
     # 自定义css
     # - <link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'">
     - <link rel="stylesheet" href="/css/mouse.css">    # 鼠标样式
-    - <link rel="stylesheet" href="/css/MyStyle.css?v=20261113n">    # 自定义样式
+    - <link rel="stylesheet" href="/css/MyStyle.css?v=20261113v">    # 自定义样式
     # - <link rel="stylesheet" href="/css/music.css">    # 音乐css
   bottom:
     # 自定义js
     # - <script src="/js/xxx"></script>
     - <script src="/js/sakura.js"></script> # 樱花特效
+    - <script src="/js/miao-player.js?v=20261113v"></script> # 中控台播放器封面歌词叠加层
     - <script async data-pjax src="/js/txmap.js?v=20261111a"></script> # 来访者定位（ipinfo 优先拿 IPv4、ipwho 兜底，带版本号避免缓存）
     # - <script src="/js/fish.js"></script> # 页脚养鱼--F5刷新
 

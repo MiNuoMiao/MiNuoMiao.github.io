@@ -388,11 +388,34 @@ body:has(#sidebar-menus.open) #sidebar-menus {
   touch-action: auto;             /* 侧边栏自己还能滚 */
 }
 
+/* ── 全站隐藏滚动条（2026-11-13）────────────────────────────
+   不保留原生滑块 / 轨道 / 上下三角，也不再自绘；滚轮、触控板、键盘滚动照常生效。
+   webkit 系把整条滚动条压成 0 并 display:none；Firefox 用 scrollbar-width:none；
+   旧 Edge 用 -ms-overflow-style:none。 */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+  background: transparent;
+}
+
 /* 歌词当前行的强调色（2026-11-13）
-   诺喵从截图里选了这颗玫红 #EC518F，换掉原来的浅粉 var(--anzhiyu-main)（#FF98A2）。
+   柔玫瑰粉 #F08092，同主色 #ff98a2 色系；比之前的高饱和玫红更不刺眼。
    只作用于音乐页歌词，不动全站主题色；想再调深浅就改这一个值。 */
 body[data-type="music"] {
-  --miao-lrc-accent: #EC518F;
+  --miao-lrc-accent: #F08092;
 }
 
 /* ── 音乐馆歌词行（2026-11-11）─────────────────────────────
@@ -400,23 +423,27 @@ body[data-type="music"] {
    而且是 !important。只改 line-height 不改 height 会把字裁掉、行距忽大忽小，
    所以这里把四个值一起钉死。 */
 body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-lrc p {
-  line-height: 26px !important;
+  position: relative;
+  line-height: 30px !important;
   /* 不能写死 height：日文原文＋中文翻译一句会折成两行，
-     盒子只有 26px 就把第二行挤到下一句上面（手机截图里整片叠字）。
-     改成 min-height：单行仍是 26px，折行的自己长高。 */
+     盒子只有 30px 就把第二行挤到下一句上面（手机截图里整片叠字）。
+     改成 min-height：单行仍是 30px，折行的自己长高。 */
   height: auto !important;
-  min-height: 26px !important;
-  padding: 0 !important;
+  min-height: 30px !important;
+  padding: 3px 16px !important;
   margin: 0 !important;
-  font-size: 20px !important;
+  font-size: 18px !important;
   overflow: visible !important;
-  /* 非当前行是白色 ~40% 透明：在浅色封面（白/米/浅粉）上等于消失。
-     只加 0.5px 极细描边 + 一层投影，不动颜色、不动布局 ——
-     这是视频字幕那套做法：白字配细黑边，深浅底上都能读。
-     描边不参与布局，所以不会像 font-weight 那样把长句挤成两行。 */
-  /* 2026-11-13：诺喵不要黑边 —— 描边一律不用（黑边啃脏字、白边让字发虚），
-     改用大模糊的深色柔光晕：看着是影子，不是框；浅底上照样把白字托起来。 */
-  text-shadow: 0 0 7px rgba(0, 0, 0, .58), 0 1px 2px rgba(0, 0, 0, .38);
+  /* 两个断点都显式居中：APlayer 容器是 text-align:center，p 本身兜底也居中，
+     避免窄屏长句折行后挂到左边。 */
+  text-align: center !important;
+  /* 非当前行 ~50% 透明度，把视觉权重让给正在唱的那一行；
+     行距从 26 拉到 30，同屏行数更少、不挤。阴影只留一层很淡的中性暗部，
+     去掉旧的暖梅双层晕，避免在棕褐封面上发灰发脏。 */
+  opacity: .5;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .28);
+  transition: opacity .3s ease, color .3s ease, transform .3s ease,
+    font-weight .3s ease;
 }
 /* 歌词滚动位置由 JS 写进 --miao-lrc-y。
    用 !important 是为了压住 APlayer 自己写的 inline transform —— 它按 16px 老行高
@@ -426,31 +453,33 @@ body[data-type="music"] #anMusic-page meting-js .aplayer-lrc-contents {
   transition: transform 0.26s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
-/* 当前行：只上色 + 光晕，不加粗（加粗会把长句挤成两行，行高一变就"拉扯"） */
+/* 当前行：上色 + 半加粗 + 极轻微放大，不加竖条/衬底/圆角。
+   字号只放大 2%，避免长句被挤成两行；字号不换单位、行高不变，行高就不会跟着拉扯。
+   光晕从三层外扩收成一层紧贴字边的近光晕，旧的 14/26px 远晕会在暖封面上糊成一片、
+   加重闪烁感；这里只留一层淡玫瑰柔光。 */
 body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-lrc p.aplayer-lrc-current {
   color: var(--miao-lrc-accent) !important;
-  font-weight: 400 !important;
-  /* 描边要压得住浅色封面：很多封面是白/浅底的，只有粉色光晕会糊成一片。
-     paint-order: stroke fill 让描边画在字形下面（否则 1px 的 stroke 会吃掉字身，看着发瘦），
-     text-stroke 不参与布局，所以不会像 font-weight 那样把长句挤成两行、引发行高抖动。 */
-  /* 2026-11-13 诺喵：「1，不要黑边」—— 只用白边，不碰黑边。
-     白边负责在深色封面上把字"抬"出来；柔影负责在浅色封面上托住它。
-     两个一起上才两头都立得住：只白边在浅底发虚，只柔影在浅底偏淡。 */
-  -webkit-text-stroke: 0.8px rgba(255, 255, 255, .95);
-  paint-order: stroke fill;
-  text-shadow: 0 0 7px rgba(0, 0, 0, .55), 0 1px 3px rgba(0, 0, 0, .45), 0 0 16px rgba(236, 81, 143, .6);
+  font-weight: 600 !important;
+  opacity: 1;
+  transform: scale(1.02);
+  text-shadow: 0 0 10px rgba(240, 128, 146, .32);
 }
 
 @media (max-width: 768px) {
   body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-lrc p {
-    line-height: 24px !important;
+    line-height: 26px !important;
     height: auto !important;
-    min-height: 24px !important;
+    min-height: 26px !important;
     font-size: 15px !important;
   }
 
+  body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-lrc p {
+    text-align: center !important;
+  }
+
   body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-lrc p.aplayer-lrc-current {
-    -webkit-text-stroke-width: 0.65px !important;
+    transform: scale(1.02);
+    padding: 3px 12px !important;
   }
 
   /* 歌词窗：从现在的位置一直撑到控制栏上方，大屏多显示几行 */
@@ -482,10 +511,34 @@ body[data-type="music"] #anMusic-page meting-js .aplayer-music .aplayer-author {
   color: #fff !important;
 }
 
+/* 标题 / 歌手超长：单行不换行，超出后由 JS 复制双份做无缝循环横向滚动。
+   视口（原 span）overflow:hidden；轨道是「文本+间隔+文本+间隔」，
+   动画平移 -50% 正好接上第二份，文字从右侧重新进入，没有跳帧。 */
+body[data-type="music"] #anMusic-page .aplayer-info .aplayer-music .aplayer-title,
+body[data-type="music"] #anMusic-page .aplayer-info .aplayer-music .aplayer-author {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+.miao-mq-track {
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+  will-change: transform;
+}
+.miao-mq-track.is-on {
+  animation: miaoMq linear infinite;
+}
+.miao-mq-copy { flex: none; }
+.miao-mq-gap { flex: none; width: 5em; }
+@keyframes miaoMq {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
 /* ── 移动端标题（放文件末尾，故意写在后面）──────────────────────
    上面那条 2rem 的桌面规则不分设备，手机上会变成 32px 起跳；
-   这里用同样 specificity + 更靠后，把手机端按主题原本的 1.3rem 起，
-   再交给 JS 按容器宽度自适应（缩到 18px 为止，还放不下就换行）。 */
+   这里用同样 specificity + 更靠后，把手机端按主题原本的 1.3rem 起。 */
 @media (max-width: 768px) {
   body[data-type="music"] #anMusic-page meting-js .aplayer-music .aplayer-title {
     font-size: 1.3rem !important;
@@ -493,28 +546,8 @@ body[data-type="music"] #anMusic-page meting-js .aplayer-music .aplayer-author {
   }
 }
 
-/* ── 歌单滚动条 + 进度条：改浅粉（2026-11-13）──────────────────
-   滚动条不在 .aplayer-list 上 —— 那个是 overflow:hidden，查它永远查不到；
-   真正的滚动容器是它里面的 <ol>（overflow-y:auto，宽 780 < 容器 805，
-   右边那 25px 的缝里就是这条竖线）。
-   进度条底轨原来是 #cdcdcd（灰），已播放和滑块是纯白。 */
-body[data-type="music"] #anMusic-page .aplayer-list ol::-webkit-scrollbar {
-  width: 6px;
-  background: transparent;
-}
-body[data-type="music"] #anMusic-page .aplayer-list ol::-webkit-scrollbar-track {
-  background: rgba(255, 199, 211, 0.16);
-  border-radius: 3px;
-}
-body[data-type="music"] #anMusic-page .aplayer-list ol::-webkit-scrollbar-thumb {
-  background: #FFC7D3;
-  border-radius: 3px;
-}
-body[data-type="music"] #anMusic-page .aplayer-list ol::-webkit-scrollbar-thumb:hover {
-  background: #FFAEC0;
-}
-
-/* 进度条：底轨灰 → 浅粉；已播放 / 缓冲 / 滑块用同色系深一档，层次还在 */
+/* 歌单列表的滚动条走上面全站隐藏规则，这里不再单独处理。
+   下面只保留播放进度条配色：底轨灰 → 浅粉；已播放 / 缓冲 / 滑块用白色。 */
 body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-bar {
   background: rgba(255, 199, 211, 0.55) !important;
 }
@@ -522,8 +555,479 @@ body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-loaded {
   background: rgba(255, 174, 192, 0.68) !important;
 }
 body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played {
-  background: #FFAEC0 !important;
+  background: #fff !important;
 }
 body[data-type="music"] #anMusic-page meting-js .aplayer .aplayer-body .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played .aplayer-thumb {
-  background: #FFAEC0 !important;
+  background: #fff !important;
+}
+
+/* ── 浅色模式：仅音乐馆中控台的兴趣点胶囊（2026-11-13）────
+   #console 弹窗是全站共用的 DOM，这里用 body[data-type="music"] 把粉色锁回音乐馆；
+   首页/其他页面控制台胶囊、文章卡片都沿用主题原样，深色模式一行不碰。 */
+[data-theme='light'] body[data-type="music"] .console-card.tags .card-tag-cloud a {
+  border: 1px solid #FFAEC0;
+  background: #FFC0CB;
+}
+
+/* 胶囊悬浮变主题主色（参考底部圆钮 #ff98a2），文字转白；同样只限音乐馆 */
+[data-theme='light'] body[data-type="music"] .console-card.tags .card-tag-cloud a:hover {
+  background: var(--anzhiyu-main) !important;
+  border-color: var(--anzhiyu-main) !important;
+  color: var(--anzhiyu-white) !important;
+}
+
+/* 历史文章列表项：和标签胶囊同一套浅粉底 / 边框，只限音乐馆浅色模式；
+   悬浮同样转主题主色 + 白字。 */
+[data-theme='light'] body[data-type="music"] #console .console-card.history .card-archive-list .card-archive-list-link {
+  border: 1px solid #FFAEC0;
+  background: #FFC0CB;
+}
+[data-theme='light'] body[data-type="music"] #console .console-card.history .card-archive-list .card-archive-list-link:hover {
+  background: var(--anzhiyu-main) !important;
+  border-color: var(--anzhiyu-main) !important;
+  color: var(--anzhiyu-white) !important;
+}
+
+/* 右上角 X 圆钮（中控台关闭）悬浮：底色由浅粉变主题主色。
+   音乐页 music.styl 给 ::after 写了 #ffc0cb !important，这里用带 :hover、
+   特异性更高的规则压住；只在音乐馆浅色模式生效，深色模式不碰。 */
+body[data-type="music"] #center-console:checked + label::after {
+  transition: background 0.25s ease;
+}
+[data-theme='light'] body[data-type="music"] #center-console:checked + label:hover::after {
+  background: var(--anzhiyu-main) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   中控台悬浮播放器（#nav-music）· Mac 小组件版
+   2026-11-13 重做（上一版：灰雾蒙层、歌词压在封面里读不到、控制行塌成 0 高）
+   参考：[HTML+CSS+JS] MAC歌词滚动音乐播放器（B站 BV1xN411D7Vg）
+
+   竖向四段：封面 → 歌词 → 歌名/歌手 → 控制钮 + 进度条
+   - 只作用于「浅色模式 + 中控台展开」；折叠成小球 / 深色模式 / 音乐馆页内播放器一律不动
+   - 歌词滚动走 --miao-lrc-y（utils.js 每 400ms 写），这里用 !important 压住 APlayer 自己写的 inline transform
+   ══════════════════════════════════════════════════════════════ */
+
+/* 主题在 console 展开时把音乐球 display:none 了，这里要显式打开 */
+[data-theme='light'] body:has(#console.show) #nav-music {
+  display: flex !important;
+  width: 400px !important;
+  max-width: 92vw !important;
+  height: auto !important;
+  bottom: auto !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  overflow: visible !important;
+  padding: 0 !important;
+}
+
+/* 卡片本体：浅玻璃 + 大圆角 + 内高光 */
+[data-theme='light'] body:has(#console.show) #nav-music meting-js,
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer {
+  width: 100% !important;
+  height: auto !important;
+  padding: 16px 16px 14px !important;
+  border-radius: 26px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.58)) !important;
+  backdrop-filter: blur(28px) saturate(170%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(170%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.92) !important;
+  box-shadow:
+    0 20px 44px -14px rgba(200, 120, 140, 0.34),
+    0 2px 10px rgba(60, 30, 40, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+  box-sizing: border-box !important;
+}
+
+/* 清掉主题旧残留：黑底、「iPhone」伪元素 */
+[data-theme='light'] body:has(#console.show) #nav-music #console-music-bg {
+  display: none !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-info::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* ── 顶部行：音量条 + 词按钮 ── */
+[data-theme='light'] body:has(#console.show) #nav-music .miao-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  order: 0;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-volume-wrap {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  flex: 1 1 auto !important;
+  width: auto !important;
+  height: 20px !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-volume-wrap .aplayer-icon {
+  width: 16px !important;
+  height: 16px !important;
+  color: #8a6a72 !important;
+  margin: 0 !important;
+  opacity: 0.7 !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-volume-wrap .aplayer-icon svg {
+  width: 16px !important;
+  height: 16px !important;
+  fill: #8a6a72 !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-volume-bar-wrap {
+  flex: 1 1 auto !important;
+  height: 4px !important;
+  background: rgba(150, 110, 120, 0.15) !important;
+  border-radius: 99px !important;
+  overflow: hidden !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-volume-bar-wrap .aplayer-volume-bar {
+  height: 4px !important;
+  background: rgba(232, 106, 142, 0.32) !important;
+  border-radius: 99px !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-volume-bar-wrap .aplayer-volume-bar .aplayer-volume {
+  height: 4px !important;
+  background: #e86a8e !important;
+  border-radius: 99px !important;
+}
+.miao-lyric-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #8a6a72;
+  opacity: 0.65;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+.miao-lyric-toggle:hover { opacity: 1; }
+.miao-lyric-toggle.on { color: #e86a8e; opacity: 1; }
+[data-theme='dark'] body:has(#console.show) #nav-music .miao-lyric-toggle {
+  display: none !important;
+}
+
+/* ── 中部：封面 → 歌词 → 信息（竖向流）── */
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-body {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  order: 1 !important;
+  height: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+}
+
+/* 封面 */
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-pic {
+  width: 100% !important;
+  height: 150px !important;
+  min-height: 0 !important;
+  flex: none !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  position: relative !important;
+  background-size: cover !important;
+  background-position: center !important;
+  box-shadow: 0 8px 22px -8px rgba(120, 80, 90, 0.38) !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-pic img {
+  display: none !important;
+}
+/* 封面上的播放键：Mac 风格不需要（底部有主按钮） */
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-pic .aplayer-button {
+  display: none !important;
+}
+
+/* 歌词窗 */
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer-lrc {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: 100% !important;
+  height: 196px !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  display: block !important;
+  order: 2;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 11%, #000 89%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 11%, #000 89%, transparent 100%);
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer-lrc .aplayer-lrc-contents {
+  transform: translateY(var(--miao-lrc-y, 0px)) !important;
+  transition: transform 0.38s cubic-bezier(0.25, 0.1, 0.25, 1) !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer-lrc p {
+  font-size: 13.5px !important;
+  line-height: 1.85 !important;
+  height: auto !important;
+  min-height: 25px !important;
+  padding: 1px 4px !important;
+  margin: 0 !important;
+  color: rgba(92, 66, 74, 0.38) !important;
+  text-align: center !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 !important;
+  transition: color 0.28s ease, font-size 0.28s ease !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer-lrc p.aplayer-lrc-current {
+  color: #d94a76 !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  text-shadow: 0 2px 10px rgba(217, 74, 118, 0.18) !important;
+}
+
+/* 歌名 / 歌手 */
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-info {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  order: 3 !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-music {
+  width: 100% !important;
+  text-align: center !important;
+  display: block !important;
+  height: auto !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-music .aplayer-title {
+  display: block !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  color: #3d2b31 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  margin: 0 !important;
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-music .aplayer-author {
+  display: block !important;
+  font-size: 11.5px !important;
+  line-height: 1.5 !important;
+  color: rgba(92, 66, 74, 0.5) !important;
+  margin: 3px 0 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
+
+/* ── 控制区：进度条在上、按钮在下 ── */
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-controller {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  align-items: stretch !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-bar-wrap {
+  order: 1;
+  width: 100% !important;
+  height: 5px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  position: static !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-bar-wrap .aplayer-bar {
+  width: 100% !important;
+  height: 4px !important;
+  background: rgba(150, 110, 120, 0.15) !important;
+  border-radius: 99px !important;
+  position: relative !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-bar-wrap .aplayer-bar .aplayer-loaded {
+  height: 4px !important;
+  background: rgba(232, 106, 142, 0.22) !important;
+  border-radius: 99px !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-bar-wrap .aplayer-bar .aplayer-played {
+  height: 4px !important;
+  background: #e86a8e !important;
+  border-radius: 99px !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-bar-wrap .aplayer-bar .aplayer-played .aplayer-thumb {
+  width: 10px !important;
+  height: 10px !important;
+  background: #fff !important;
+  border: 2px solid #e86a8e !important;
+  box-shadow: 0 1px 4px rgba(200, 100, 130, 0.4) !important;
+  margin-top: -3px !important;
+}
+
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-time {
+  order: 2;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 16px !important;
+  position: static !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 40px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-time > * {
+  position: static !important;
+  float: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-time .aplayer-icon {
+  width: 26px !important;
+  height: 26px !important;
+  padding: 0 !important;
+  color: #8a6a72 !important;
+  opacity: 0.75 !important;
+  background: transparent !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-time .aplayer-icon svg {
+  width: 100% !important;
+  height: 100% !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-time .aplayer-icon path {
+  fill: #8a6a72 !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-time .aplayer-icon:hover {
+  opacity: 1 !important;
+}
+/* 主按钮：粉色实心圆 */
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-time .aplayer-icon-play {
+  width: 44px !important;
+  height: 44px !important;
+  padding: 11px !important;
+  border-radius: 50% !important;
+  background: #e86a8e !important;
+  opacity: 1 !important;
+  box-shadow: 0 6px 16px -4px rgba(232, 106, 142, 0.55) !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-time .aplayer-icon-play path {
+  fill: #fff !important;
+}
+/* 时间：进度条那行右侧 */
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-time .aplayer-time-inner {
+  font-size: 10.5px !important;
+  color: rgba(92, 66, 74, 0.45) !important;
+  font-variant-numeric: tabular-nums;
+  display: inline-block !important;
+  position: absolute !important;
+  right: 16px !important;
+  bottom: 52px !important;
+}
+/* 不需要的图标：循环 / 顺序 / 菜单 / 歌词开关 / 音量（音量已在顶部） */
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-icon-loop,
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-icon-order,
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-icon-menu,
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-icon-lrc,
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-list {
+  display: none !important;
+}
+
+/* ── 修补：APlayer 自带的定位 / 主题播放动画的 transform，会和竖排流打架 ── */
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-pic {
+  transform: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-info {
+  width: 100% !important;
+  flex: none !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-controller {
+  position: static !important;
+  width: 100% !important;
+  flex: none !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-music {
+  width: 100% !important;
+  flex: none !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-lrc {
+  flex: none !important;
+}
+
+/* ── 「词」模式：收起封面，歌词区占满整张卡 ── */
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer.miao-lyric-on .aplayer-pic {
+  display: none !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer.miao-lyric-on .aplayer-lrc {
+  height: 360px !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer.miao-lyric-on .aplayer-lrc p {
+  font-size: 14px !important;
+}
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer.miao-lyric-on .aplayer-lrc p.aplayer-lrc-current {
+  font-size: 17.5px !important;
+}
+
+/* ── 兜底：折叠成小球 / 深色模式 / 没开中控台时，不要露出我加的那一行 ── */
+body:not(:has(#console.show)) #nav-music .miao-topbar,
+[data-theme='dark'] body:has(#console.show) #nav-music .miao-topbar {
+  display: none !important;
+}
+/* 深色模式恢复主题原本的播放器：歌词回到底部，别再跟着竖排流走 */
+[data-theme='dark'] body:has(#console.show) #nav-music .aplayer-lrc {
+  position: absolute !important;
+  width: auto !important;
+  height: auto !important;
+  top: auto !important;
+  bottom: 60px !important;
+  left: 100px !important;
+  right: 20px !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+[data-theme='dark'] body:has(#console.show) #nav-music .aplayer-lrc .aplayer-lrc-contents {
+  transform: none !important;
+}
+[data-theme='dark'] body:has(#console.show) #nav-music .aplayer-pic {
+  transform: none !important;
 }

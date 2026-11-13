@@ -441,7 +441,11 @@ comments: false
     ;(text || '').split('\n').forEach(function (line) {
       var m = /^\[(\d+):(\d+)(?:[.:](\d+))?\]\s*(.*)$/.exec(line.trim())
       if (!m) return
-      var t = parseInt(m[1], 10) * 60 + parseInt(m[2], 10) + (m[3] ? parseInt(m[3], 10) / 100 : 0)
+      // 小数位可能是两位厘秒（.01）也可能是三位毫秒（.463），
+      // 必须按实际位数换算：两位 /100、三位 /1000。旧代码统一 /100，
+      // 三位毫秒会被放大 10 倍（.463 → 4.63s），整句时间就跑飞了。
+      var frac = m[3] ? parseInt(m[3], 10) / Math.pow(10, m[3].length) : 0
+      var t = parseInt(m[1], 10) * 60 + parseInt(m[2], 10) + frac
       var txt = (m[4] || '').trim()
       if (!txt) return
       if (/^[-—–·.。…~～_\s]+$/.test(txt)) return
@@ -463,6 +467,8 @@ comments: false
       var split = splitTranslation(txt)
       out.push({ t: t, orig: split[0], trans: split[1] || '' })
     })
+    // 兜底：少数歌词行序不是严格递增，按时间戳排一遍，避免当前行回跳
+    out.sort(function (a, b) { return a.t - b.t })
     return out
   }
 

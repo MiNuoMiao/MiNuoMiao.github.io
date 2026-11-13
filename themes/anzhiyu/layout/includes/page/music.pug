@@ -9,71 +9,91 @@
 
 script.
   (function () {
-    function apply(t) {
-      var cur = (t.textContent || '').trim();
-      t.classList.remove('miao-scroll');
-      t.style.removeProperty('--miao-shift');
-      t.style.removeProperty('--miao-dur');
-      t.style.removeProperty('font-size');
-      t.style.removeProperty('white-space');
-      t.style.removeProperty('line-height');
-      t.style.removeProperty('overflow');
-      t.style.removeProperty('overflow-wrap');
-      if (!cur) return;
+    // 标题 / 歌手：单行不换行。放得下就静态显示；放不下就复制成双份，
+    // 轨道向左平移 -50% 无缝循环，文字从右侧重新进入。
+    function build(el) {
+      el.classList.remove('miao-mq-on');
+      ['font-size', 'white-space', 'line-height', 'overflow', 'overflow-wrap'].forEach(function (p) {
+        el.style.removeProperty(p);
+      });
+      el.innerHTML = '';
+      var copy = document.createElement('span');
+      copy.className = 'miao-mq-copy';
+      var gap = document.createElement('span');
+      gap.className = 'miao-mq-gap';
+      var copy2 = copy.cloneNode(false);
+      copy2.setAttribute('aria-hidden', 'true');
+      var gap2 = gap.cloneNode(false);
+      var track = document.createElement('span');
+      track.className = 'miao-mq-track';
+      track.appendChild(copy);
+      track.appendChild(gap);
+      track.appendChild(copy2);
+      track.appendChild(gap2);
+      el.appendChild(track);
+      return { track: track, copy: copy, copy2: copy2, gap: gap, gap2: gap2 };
+    }
+
+    function measure(el, parts) {
       requestAnimationFrame(function () {
-        // 不滚动、不截断：放不下就把字号往下缩（最小 18px）。
-        // 之前那套 marquee 是把 .aplayer-title 整个元素平移（它自己就是外框），
-        // 看着像"整块在动"，而且任何一帧两头都被硬切。
-        var base = parseFloat(getComputedStyle(t).fontSize) || 32;
-        var cw = t.clientWidth, sw = t.scrollWidth;
-        if (!cw || sw <= cw + 1) return;
-        var fs = Math.max(18, Math.floor(base * cw / sw));
-        t.style.setProperty('font-size', fs + 'px', 'important');
-        // 线性估算偶尔差 1~2px，再校正几次（最多 6 轮，避免死循环）
-        var guard = 0;
-        while (fs > 18 && t.scrollWidth > t.clientWidth + 1 && guard++ < 6) {
-          fs -= 1;
-          t.style.setProperty('font-size', fs + 'px', 'important');
+        var cw = el.clientWidth;
+        var copyW = parts.copy.scrollWidth;
+        if (!cw || copyW <= cw + 1) {
+          // 放得下：只留一份，不滚动
+          parts.copy2.style.display = 'none';
+          parts.gap.style.display = 'none';
+          parts.gap2.style.display = 'none';
+          parts.track.classList.remove('is-on');
+          return;
         }
-        // 缩到 18px 还放不下（那种五六十字的 B 站式标题）：允许换行，
-        // 让字完整待在框里，而不是被 overflow:hidden 一刀切掉。
-        if (t.scrollWidth > t.clientWidth + 1) {
-          t.style.setProperty('white-space', 'normal', 'important');
-          t.style.setProperty('line-height', '24px', 'important');
-          t.style.setProperty('overflow', 'visible', 'important');
-          t.style.setProperty('overflow-wrap', 'anywhere', 'important');
-        }
+        // 速度约 35px/s，保底 6s；双份 + 双侧等距间隔，-50% 正好接上
+        parts.track.style.animationDuration = Math.max(6, copyW / 35) + 's';
+        parts.track.classList.add('is-on');
       });
     }
+
+    function apply(el, stripPrefix) {
+      if (!el) return;
+      var track = el.querySelector('.miao-mq-track');
+      var text;
+      if (track) {
+        // 已挂轨道：文本以缓存为准（现在 textContent 是双份拼接，不能拿来比）
+        text = el.dataset.mqText || '';
+      } else {
+        text = (el.textContent || '').trim();
+        if (stripPrefix) text = text.replace(/^\s*[-–—]\s*/, '');
+      }
+      // 文本没变就不重建 DOM，避免 innerHTML 改动再次触发观察器重入循环
+      if (track && el.dataset.mqText === text) {
+        var copies = el.querySelectorAll('.miao-mq-copy');
+        var gaps = el.querySelectorAll('.miao-mq-gap');
+        measure(el, { track: track, copy: copies[0], copy2: copies[1], gap: gaps[0], gap2: gaps[1] });
+        return;
+      }
+      el.dataset.mqText = text;
+      var parts = build(el);
+      parts.copy.textContent = text;
+      parts.copy2.textContent = text;
+      if (!text) return;
+      measure(el, parts);
+    }
+
+    function watch(selector, stripPrefix) {
+      var el = document.querySelector(selector);
+      if (!el) { setTimeout(function () { watch(selector, stripPrefix); }, 400); return; }
+      apply(el, stripPrefix);
+      try {
+        new MutationObserver(function () { apply(el, stripPrefix); })
+          .observe(el, { childList: true, characterData: true, subtree: true });
+      } catch (e) {}
+      window.addEventListener('resize', function () { apply(el, stripPrefix); });
+    }
+
     function start() {
-      var t = document.querySelector('#anMusic-page .aplayer-title');
-      if (!t) { setTimeout(start, 400); return; }
-      apply(t);
-      try {
-        new MutationObserver(function () { apply(t); })
-          .observe(t, { childList: true, characterData: true, subtree: true });
-      } catch (e) {}
-      window.addEventListener('resize', function () { apply(t); });
+      watch('#anMusic-page .aplayer-title', false);
+      watch('#anMusic-page .aplayer-author', true);
     }
-    // 歌手行前面那个「- 」是 APlayer 模板自带的前缀，去掉它
-    function cleanAuthor() {
-      var a = document.querySelector('#anMusic-page .aplayer-author');
-      if (!a) return;
-      var raw = a.textContent || '';
-      var fixed = raw.replace(/^\s*[-–—]\s*/, '');
-      if (fixed !== raw) a.textContent = fixed;
-    }
-    function watchAuthor() {
-      var a = document.querySelector('#anMusic-page .aplayer-author');
-      if (!a) { setTimeout(watchAuthor, 500); return; }
-      cleanAuthor();
-      try {
-        new MutationObserver(cleanAuthor)
-          .observe(a, { childList: true, characterData: true, subtree: true });
-      } catch (e) {}
-    }
+
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
     else start();
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watchAuthor);
-    else watchAuthor();
   })();
