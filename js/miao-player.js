@@ -334,10 +334,79 @@
     if (nav && nav.classList.contains("playing") !== playing) nav.classList.toggle("playing", playing);
   }
 
+  /* ── 音源瞬时失败：先重试，别急着跳下一首 ──────────────────────
+     APlayer 自己的处理是「一 error 就弹一条白框，2 秒后 skipForward」。
+     但 meting 直链偶发会被服务端 RST 断开（实测同一首隔几秒重试就 200），
+     一 error 就跳会白白跳过好歌。
+     做法：capture 阶段掐断它那条 DOM 监听（stopImmediatePropagation 有效，
+     实测 APlayer 的 notice 不再出现、也没有跳歌），然后自己按退避重试；
+     同一首连续失败 MAX 次才真的跳。 */
+  var ERR_MAX_TRIES = 2;       /* 同一首最多重试 2 次（共 3 次机会） */
+  function guardError(ap) {
+    if (!ap || !ap.audio || ap.__miaoErrGuard) return;
+    ap.__miaoErrGuard = true;
+    var tries = 0;
+    var timer = null;
+
+    function reset() {
+      tries = 0;
+      if (timer) { clearTimeout(timer); timer = null; }
+    }
+
+    ap.audio.addEventListener("error", function (e) {
+      /* 掐断 APlayer 那条（否则它弹提示 + 2 秒后跳歌，我们就没得选了） */
+      try { e.stopImmediatePropagation(); } catch (err) {}
+
+      var list = ap.list;
+      var cur = list && list.audios && list.audios[list.index];
+      if (!cur) return;
+
+      if (tries < ERR_MAX_TRIES) {
+        tries++;
+        var wait = 350 + tries * 450;      /* 350 / 800ms 退避 */
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(function () {
+          timer = null;
+          try {
+            /* 断点：CDN 是在播到一半时断的，那时 audio.currentTime 还是有效值。
+               不记这一下，重试成功后歌会从 0 重新来一遍。 */
+            var seek = 0;
+            try { seek = ap.audio.currentTime || 0; } catch (e2) { seek = 0; }
+
+            /* 关键：重走 meting 接口拿新鲜直链。
+               直接复用旧 src 往往还是同一个过期地址，重试等于白试。 */
+            ap.audio.src = cur.url;
+            ap.audio.load();
+            if (seek > 1) {
+              var onMeta = function () {
+                ap.audio.removeEventListener("loadedmetadata", onMeta);
+                try { ap.audio.currentTime = seek; } catch (e3) {}
+              };
+              ap.audio.addEventListener("loadedmetadata", onMeta);
+            }
+            var pr = ap.audio.play();
+            if (pr && pr.catch) pr.catch(function () {});
+          } catch (err) {}
+        }, wait);
+      } else {
+        /* 真的放不出来：交回 APlayer 原本的行为（跳下一首） */
+        reset();
+        try { ap.skipForward(); if (ap.paused) ap.play(); } catch (err) {}
+      }
+    }, true);
+
+    /* 播起来了 / 换歌了 → 计数清零，避免「第一首失败过就把后面全跳掉」 */
+    ["playing", "canplay"].forEach(function (ev) {
+      ap.audio.addEventListener(ev, reset, true);
+    });
+    if (ap.on) ap.on("listswitch", reset);
+  }
+
   function bindOne(ap) {
     if (!ap || ap.__miaoBound) return;
     ap.__miaoBound = true;
     try { bindDrag(ap); } catch (e) {}
+    try { guardError(ap); } catch (e) {}
     /* ⚠️ 完全接管 APlayer 的歌词更新。
        它按「原始行数」算 index 并自己加 .aplayer-lrc-current、自己写 inline
        translateY(40 * -index)；我们把署名行删掉了（47 → 39），它就会整体错位，
@@ -385,12 +454,29 @@
   }
 
   function scan() {
-    var root = document.getElementById('nav-music');
-    if (!root) return false;
-    var mjs = root.querySelectorAll('meting-js');
     var ok = false;
-    for (var i = 0; i < mjs.length; i++) {
-      if (mjs[i].aplayer) { bindOne(mjs[i].aplayer); syncMusicUI(mjs[i].aplayer); ok = true; }
+    var root = document.getElementById('nav-music');
+    if (root) {
+      var mjs = root.querySelectorAll('meting-js');
+      for (var i = 0; i < mjs.length; i++) {
+        if (mjs[i].aplayer) { bindOne(mjs[i].aplayer); syncMusicUI(mjs[i].aplayer); ok = true; }
+      }
+    }
+    /* 音乐馆页那个实例只挂「音源重试」，绝不 bindOne ——
+       歌词归 utils.js 管，两边都接管会互相打架。 */
+    var page = document.getElementById('anMusic-page');
+    var holder = document.getElementById('anMusic-page-meting');
+    if (page || holder) {
+      var pmjs = page ? page.querySelectorAll('meting-js') : [];
+      if (!pmjs.length) return false;        /* 还没建出来，继续轮询 */
+      var pending = false;
+      for (var j = 0; j < pmjs.length; j++) {
+        if (pmjs[j].aplayer) { try { guardError(pmjs[j].aplayer); } catch (e) {} }
+        else pending = true;
+      }
+      /* aplayer 还没初始化好就别让轮询收工 ——
+         否则这个实例永远挂不上保护（实测就是栽在这里） */
+      if (pending) return false;
     }
     return ok;
   }

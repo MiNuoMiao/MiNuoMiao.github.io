@@ -1592,3 +1592,20 @@ body:has(#console.show) .miao-console-close {
 [data-theme='dark'] body:has(#console.show) #nav-music.playing .aplayer-time .aplayer-icon-play svg path {
   fill: #fff !important;
 }
+
+/* ── APlayer 报错提示：全站藏掉（2026-11-14）─────────────────────
+   音源偶发拿不到（meting 直链 403/404）时，APlayer 会在播放器上方弹一条
+   白底灰字：「An audio error has occurred, player will skip forward in
+   2 seconds.」它自己 2 秒后就会跳下一首，这句通知纯粹是噪音，而且正好压
+   在歌词上。
+   主题原本只在 `#nav-music .aplayer .aplayer-notice` 这一条里藏了它 ——
+   所以中控台折叠成小球时看不到，但音乐馆页 / 中控台展开的大卡里一直露着。
+   这里按类名全站藏，不区分容器。 */
+.aplayer-notice,
+.aplayer .aplayer-notice,
+#nav-music .aplayer-notice,
+#anMusic-page .aplayer-notice,
+#console .aplayer-notice {
+  display: none !important;
+  visibility: hidden !important;
+}
