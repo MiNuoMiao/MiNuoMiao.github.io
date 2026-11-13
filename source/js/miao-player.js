@@ -28,17 +28,25 @@
     '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none">' +
     '<path d="M4 7h10M4 12h16M4 17h7"/></svg>';
 
-  var CREDIT = /(作词|作曲|词曲|编曲|混音|母带|制作人|监制|录音|和声|演唱|出品|发行|统筹|企划|吉他|贝斯|鼓|键盘|弦乐|钢琴|打击|人声编辑|录音棚|主唱|MMD|视频绘图|曲绘|封面|插画|字幕|翻译|PV|动画|特效|调色|剪辑|导演|摄影|混剪|原曲|翻调|调教|本家|原唱|翻唱|策划|作编曲|中文词|中文曲|原文词|英文词|译词|填词|词作|曲作|后期|混缩|混音师|配唱|伴唱|合声|总监|宣发|推广|艺人|鸣谢|特别感谢|谱务|母带师|贝斯手|吉他手|鼓手|键盘手|和音|O\.P\.|S\.P\.|小提琴|大提琴|中提琴|低音提琴|二胡|古筝|琵琶|竹笛|长笛|口琴|萨克斯|小号|长号|圆号|合成器|Program|配器|弦乐编写|视频|人声设计|录音师|混音助理|配唱制作|和声编写)[^：:]{0,14}[：:]/;
+  var CREDIT = /(作词|作曲|词曲|编曲|混音|母带|制作人|监制|录音|和声|演唱|出品|发行|统筹|企划|吉他|贝斯|鼓|键盘|弦乐|钢琴|打击|人声编辑|录音棚|主唱|MMD|视频绘图|曲绘|封面|插画|字幕|翻译|PV|动画|特效|调色|剪辑|导演|摄影|混剪|原曲|翻调|调教|本家|原唱|翻唱|策划|作编曲|中文词|中文曲|原文词|英文词|译词|填词|词作|曲作|后期|混缩|混音师|配唱|伴唱|合声|总监|宣发|推广|艺人|鸣谢|特别感谢|谱务|母带师|贝斯手|吉他手|鼓手|键盘手|和音|O\.P\.|S\.P\.|小提琴|大提琴|中提琴|低音提琴|二胡|古筝|琵琶|竹笛|长笛|口琴|萨克斯|小号|长号|圆号|合成器|Program|配器|弦乐编写|视频|人声设计|录音师|混音助理|配唱制作|和声编写|曲名|歌名|专辑|专辑名|歌姬|歌基|海报|封面设计|视觉|绘图|插画师|制片|出品人|制作方|出品方|发行方|演唱者|念白|独白)[^：:]{0,14}[：:]/;
   var OTHER = /^(出品方|授权|版权|未经著作权人|本作品|OP|SP)\s*[：:]|All rights reserved|Production Company/i;
   var SYMBOL = /^[-—–·.。…~～_\s]+$/;
 
-  function isCredit(text) {
+  /* 开头的「标签：值」形式（曲名：X / 歌姬：Y / 海报：Z …）——
+     光靠关键词表永远补不全（每首歌的写法都不一样）。这类行的共同点是
+     **出现在最前面、冒号前不超过 8 个字、整行不超过 24 字**，而正常歌词
+     极少以「短标签：」开头，所以按位置兜一层。 */
+  /* 开头排除括号：【（( 【[ —— 否则「（旁白：…）」这种歌词会被当成署名行删掉 */
+  var LABEL_LINE = /^[^\s，。！？,.!?：:（(【\[]{1,8}[：:][^\n]{0,20}$/;
+
+  function isCredit(text, idx) {
     var t = String(text == null ? '' : text).trim();
     if (!t) return true;
     if (SYMBOL.test(t)) return true;
     if (CREDIT.test(t) && t.length < 48) return true;
     if (OTHER.test(t)) return true;
     if (/(授权|OST|同人文|版权方|独家|首发|翻自)/.test(t) && t.length < 40) return true;
+    if (typeof idx === 'number' && idx < 10 && t.length <= 24 && LABEL_LINE.test(t)) return true;
     return false;
   }
 
@@ -63,6 +71,18 @@
     p.textContent = s;
   }
 
+  /* 二分：返回最后一个 time<=t 的下标（没有就 -1）。rows 按时间升序。 */
+  function bisect(rows, t, cap) {
+    var n = Math.min(rows.length, cap || rows.length);
+    var lo = 0, hi = n - 1, ans = -1;
+    while (lo <= hi) {
+      var mid = (lo + hi) >> 1;
+      if (Number(rows[mid][0]) <= t) { ans = mid; lo = mid + 1; }
+      else hi = mid - 1;
+    }
+    return ans;
+  }
+
   /* ── 歌词行数据：APlayer 建 DOM 用的是 lrc.current（含署名的完整行） ── */
   function rowsOf(lrc) {
     if (Array.isArray(lrc.current) && lrc.current.length) return lrc.current;
@@ -84,7 +104,7 @@
     if (!full.length) return null;
     var kept = [];
     for (var i = 0; i < full.length; i++) {
-      if (!isCredit(full[i] && full[i][1])) kept.push(full[i]);
+      if (!isCredit(full[i] && full[i][1], i)) kept.push(full[i]);
     }
     if (!kept.length) kept = full;   // 整首都是"署名"（纯音乐标题之类）就不过滤
 
@@ -119,10 +139,27 @@
   }
 
   /* ── 主循环：高亮 + 居中滚动 + 倒计时，200ms 一次 ── */
+
+  /* APlayer 的音量条原生是竖的：它把音量写在 .aplayer-volume 的 inline
+     `height: NN%` 上，宽度固定 20px。我们把它改成横条之后，那个百分比必须
+     映射成 width 才看得见 —— 之前漏了这一步，所以音量条一直是空的。 */
+  function syncVolume(ap) {
+    var el = ap.container.querySelector('.aplayer-volume');
+    if (!el) return;
+    var v = (ap.audio && typeof ap.audio.volume === 'number') ? ap.audio.volume : 1;
+    if (!isFinite(v)) v = 1;
+    var pct = Math.round(v * 1000) / 10;
+    var want = pct + '%';
+    if (el.style.width !== want) el.style.width = want;
+    // APlayer 每次改音量会重写 height 百分比，这里压回 2px
+    if (el.style.height !== '2px') el.style.height = '2px';
+  }
+
   function tick(ap) {
     if (!ap || !ap.audio) return;
 
     updateCountdown(ap);   // 先做：不依赖歌词
+    syncVolume(ap);        // 音量填充：高度百分比 → 宽度（竖条逻辑改成横条）
 
     var lrcBox = ap.container.querySelector('.aplayer-lrc');
     var contents = ap.container.querySelector('.aplayer-lrc-contents');
@@ -144,11 +181,8 @@
 
     var t = ap.audio.currentTime || 0;
 
-    /* 当前行 */
-    var idx = -1;
-    for (var i = 0; i < rows.length && i < ps.length; i++) {
-      if (Number(rows[i][0]) <= t + 0.2) idx = i; else break;
-    }
+    /* 当前行：二分查找（抄 lyrics-scrolling 的做法，行长几百行也只是 log n） */
+    var idx = bisect(rows, t + 0.2, ps.length);
     if (idx !== ap.__miaoIdx) {
       for (var j = 0; j < ps.length; j++) ps[j].classList.remove('aplayer-lrc-current');
       if (idx >= 0 && ps[idx]) ps[idx].classList.add('aplayer-lrc-current');
@@ -159,20 +193,15 @@
     if (lrcBox) {
       var winH = lrcBox.clientHeight;
       if (winH > 0) {
-        var want;
-        if (idx < 0 || !ps[idx]) {
-          /* 这首歌还没唱到第一句（前奏 / 刚切歌）：回顶部。
-             不归零的话会停在上一首算出来的位置，看着就是「歌词跑出去了」。 */
-          want = '0px';
-        } else {
-          var rowTop = ps[idx].offsetTop;
-          var rowH = ps[idx].offsetHeight || 34;
-          var total = contents.scrollHeight || 0;
-          var y = winH / 2 - (rowTop + rowH / 2);
-          if (y > 0) y = 0;                                      // 首行不越出顶部
-          if (total && y < winH - total) y = winH - total;        // 末行不越出底部
-          want = Math.round(y) + 'px';
-        }
+        /* 参照 lyrics-scrolling：把当前行钉死在窗口的一个锚点上（他们写的是
+           index * -30 + 150，150 就是容器半高）。这里不夹取首尾 —— 超出窗口的
+           部分交给 overflow: hidden 裁掉，所以第一句和最后一句也照样停在中间。 */
+        var cur = (idx >= 0 && ps[idx]) ? idx : 0;
+        var rowTop = ps[cur].offsetTop;
+        var rowH = ps[cur].offsetHeight || 34;
+        var anchor = winH * 0.5;
+        var y = anchor - (rowTop + rowH / 2);
+        var want = Math.round(y) + 'px';
         if (contents.style.getPropertyValue('--miao-lrc-y') !== want) {
           contents.style.setProperty('--miao-lrc-y', want);
         }
@@ -289,6 +318,22 @@
     });
   }
 
+  /* 「♪」#consoleMusic 的激活态，必须跟着**真实播放状态**走。两个坑叠在一起：
+     1) 主题的 listenNavMusicPause 找到第一个 APlayer 就 clearInterval 了，
+        Pjax 换页后新实例没人监听 play/pause；
+     2) Pjax 会把整个 #console 换成新节点（实测 consoleSameNode === false），
+        .on 类跟着旧 DOM 一起丢掉，而 initConsoleState 只恢复「⇄」那颗
+        （按 html.hide-aside）—— ♪ 就一直白着，明明音乐在播。
+     所以这里按实例绑事件，并且让 tick 顺手校正（值没变就不碰 DOM，不会引抖动）。 */
+  function syncMusicUI(ap) {
+    var playing = !!(ap && ap.audio && !ap.audio.paused);
+    try { window.anzhiyu_musicPlaying = playing; } catch (e) {}
+    var item = document.getElementById("consoleMusic");
+    if (item && item.classList.contains("on") !== playing) item.classList.toggle("on", playing);
+    var nav = document.getElementById("nav-music");
+    if (nav && nav.classList.contains("playing") !== playing) nav.classList.toggle("playing", playing);
+  }
+
   function bindOne(ap) {
     if (!ap || ap.__miaoBound) return;
     ap.__miaoBound = true;
@@ -302,6 +347,14 @@
       ap.lrc.__miaoOverridden = true;
       ap.lrc.update = function () {};
     }
+
+    /* ♪ 跟随真实播放状态（换页后新实例也要有人管） */
+    if (ap.on && !ap.__miaoMusicBound) {
+      ap.__miaoMusicBound = true;
+      ap.on("play", function () { syncMusicUI(ap); });
+      ap.on("pause", function () { syncMusicUI(ap); });
+    }
+    syncMusicUI(ap);
 
     bindToggle(ap);
     syncCover(ap);
@@ -337,35 +390,12 @@
     var mjs = root.querySelectorAll('meting-js');
     var ok = false;
     for (var i = 0; i < mjs.length; i++) {
-      if (mjs[i].aplayer) { bindOne(mjs[i].aplayer); ok = true; }
+      if (mjs[i].aplayer) { bindOne(mjs[i].aplayer); syncMusicUI(mjs[i].aplayer); ok = true; }
     }
     return ok;
   }
-
-  /* 中控台右上角的关闭钮：主题原本只能点遮罩关，
-     这里补一颗主题色的圆钮（颜色走 --miao-lrc-accent）。 */
-  function ensureCloseBtn() {
-    var con = document.getElementById("console");
-    if (!con || con.querySelector(".miao-console-close")) return;
-    var b = document.createElement("button");
-    b.type = "button";
-    b.className = "miao-console-close";
-    b.setAttribute("aria-label", "\u5173\u95ed\u4e2d\u63a7\u53f0");
-    b.innerHTML =
-      '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
-      '<path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
-    b.addEventListener("click", function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (window.anzhiyu && typeof window.anzhiyu.hideConsole === "function") window.anzhiyu.hideConsole();
-      else con.classList.remove("show");
-    });
-    con.appendChild(b);
-  }
-
   function start() {
     scan();
-    ensureCloseBtn();
     var tries = 0;
     var t = setInterval(function () {
       if (scan() || ++tries > 200) clearInterval(t);
@@ -378,7 +408,7 @@
         var mjs = root.querySelectorAll('meting-js');
         for (var i = 0; i < mjs.length; i++) {
           var ap = mjs[i].aplayer;
-          if (ap && ap.__miaoBound) { try { tick(ap); } catch (e) {} }
+          if (ap && ap.__miaoBound) { try { tick(ap); } catch (e) {} try { syncMusicUI(ap); } catch (e) {} }
         }
       }, 200);
     }

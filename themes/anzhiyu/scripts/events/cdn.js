@@ -10,6 +10,29 @@ const path = require("path");
 
 hexo.extend.filter.register("before_generate", () => {
   const themeConfig = hexo.theme.config;
+
+  /* inject 里手写的静态资源版本号，跟着构建时间走（北京时间、精确到分钟）。
+     以前是手改 ?v=，改一次漏一次 —— 浏览器就一直吃旧 js/css，
+     表现就是「我明明改好了，你那边没变」。这里直接按构建时间重写。 */
+  const bjNow = new Date(Date.now() + 8 * 3600 * 1000);
+  const p2 = n => String(n).padStart(2, "0");
+  const buildVer =
+    String(bjNow.getUTCFullYear()) +
+    p2(bjNow.getUTCMonth() + 1) +
+    p2(bjNow.getUTCDate()) +
+    p2(bjNow.getUTCHours()) +
+    p2(bjNow.getUTCMinutes());
+  if (themeConfig.inject) {
+    ["head", "bottom"].forEach(k => {
+      const arr = themeConfig.inject[k];
+      if (!Array.isArray(arr)) return;
+      themeConfig.inject[k] = arr.map(line =>
+        typeof line === "string"
+          ? line.replace(/(\/css\/MyStyle\.css|\/js\/miao-player\.js)\?v=\d+/, "$1?v=" + buildVer)
+          : line
+      );
+    });
+  }
   const { CDN } = themeConfig;
 
   const thirdPartySrc = hexo.render.renderSync({ path: path.join(hexo.theme_dir, "/plugins.yml"), engine: "yaml" });
