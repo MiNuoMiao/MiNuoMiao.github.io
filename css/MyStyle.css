@@ -596,441 +596,524 @@ body[data-type="music"] #center-console:checked + label::after {
 }
 [data-theme='light'] body[data-type="music"] #center-console:checked + label:hover::after {
   background: var(--anzhiyu-main) !important;
-}
+}/* ══════════════════════════════════════════════════════════════
+   中控台播放器（#nav-music）· Mac 小组件 · 双形态  v4（2026-11-13）
+   形态：
+     · 默认 = 横版：顶栏（音量＋词钮）→ 封面＋歌名 → 三颗钮 → 细进度＋倒计时
+     · .miao-lyric-on = 歌词版：顶栏同 → 大歌词窗 → 歌名 → 三颗钮 → 进度＋倒计时
+   「词」按钮的图形由 miao-player.js 换成三条杠（APlayer 原生那个是唱片，
+   在 15px 下看着像个音箱），所以这里按 stroke 画，不用 fill。
 
-/* ══════════════════════════════════════════════════════════════
-   中控台悬浮播放器（#nav-music）· Mac 小组件版
-   2026-11-13 重做（上一版：灰雾蒙层、歌词压在封面里读不到、控制行塌成 0 高）
-   参考：[HTML+CSS+JS] MAC歌词滚动音乐播放器（B站 BV1xN411D7Vg）
-
-   竖向四段：封面 → 歌词 → 歌名/歌手 → 控制钮 + 进度条
-   - 只作用于「浅色模式 + 中控台展开」；折叠成小球 / 深色模式 / 音乐馆页内播放器一律不动
-   - 歌词滚动走 --miao-lrc-y（utils.js 每 400ms 写），这里用 !important 压住 APlayer 自己写的 inline transform
+   ⚠️ 前提（主题原生，别改）：只在窄屏中控台里出现
+      body:has(#console.show) #nav-music { display:none }   ← 宽屏隐藏
+      @media (max-width:1200px) { ... display:block }        ← 窄屏显示
+   ⚠️ 不搬 DOM。全部用绝对定位重排，每个元素以「整张卡片」为坐标系。
+   ⚠️ 行高必须 40px。APlayer 的滚动写死
+      container.style.transform = "translateY(" + 40 * -index + "px)"
+      按别的行高排，每滚一行就偏一点（实测 25px 时偏 15px/行）。
    ══════════════════════════════════════════════════════════════ */
 
-/* 主题在 console 展开时把音乐球 display:none 了，这里要显式打开 */
-[data-theme='light'] body:has(#console.show) #nav-music {
-  display: flex !important;
-  width: 400px !important;
-  max-width: 92vw !important;
-  height: auto !important;
-  bottom: auto !important;
-  background: transparent !important;
-  border: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  overflow: visible !important;
-  padding: 0 !important;
-}
+@media screen and (max-width: 1200px) {
+  /* ── 卡片本体：520 × 236 ── */
+  [data-theme='light'] body:has(#console.show) #nav-music {
+    display: block !important;
+    width: calc(100vw - 40px) !important;
+    max-width: 600px !important;
+    height: 236px !important;
+    left: 50% !important;
+    top: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: rgba(255, 255, 255, 0.86) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+    backdrop-filter: blur(28px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.82) !important;
+    border-radius: 30px !important;
+    box-shadow: 0 30px 70px rgba(120, 88, 108, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+    overflow: hidden !important;
+    opacity: 1 !important;
+    z-index: 10000;
+    transition: height 0.34s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music:active {
+    transform: translate(-50%, -50%) !important;
+  }
+  /* 歌词态：更高 */
+  [data-theme='light'] body:has(#console.show) #nav-music.miao-lyric-on {
+    height: 520px !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music #console-music-bg,
+  [data-theme='light'] body:has(#console.show) #nav-music #nav-music-hoverTips,
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-list {
+    display: none !important;
+  }
 
-/* 卡片本体：浅玻璃 + 大圆角 + 内高光 */
-[data-theme='light'] body:has(#console.show) #nav-music meting-js,
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer {
-  width: 100% !important;
-  height: auto !important;
-  padding: 16px 16px 14px !important;
-  border-radius: 26px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 10px !important;
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.58)) !important;
-  backdrop-filter: blur(28px) saturate(170%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(170%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.92) !important;
-  box-shadow:
-    0 20px 44px -14px rgba(200, 120, 140, 0.34),
-    0 2px 10px rgba(60, 30, 40, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
-  box-sizing: border-box !important;
-}
+  /* ── 从 .aplayer 到 .aplayer-controller：铺满卡片，构成统一坐标系 ── */
+  [data-theme='light'] body:has(#console.show) #nav-music meting-js,
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer {
+    position: absolute !important;
+    inset: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    display: block !important;
+    overflow: visible !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-body,
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-info,
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-controller {
+    position: absolute !important;
+    inset: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    display: block !important;
+    overflow: visible !important;
+    cursor: default !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-info::after {
+    display: none !important;
+  }
 
-/* 清掉主题旧残留：黑底、「iPhone」伪元素 */
-[data-theme='light'] body:has(#console.show) #nav-music #console-music-bg {
-  display: none !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-info::after {
-  content: none !important;
-  display: none !important;
-}
+  /* ══ 顶栏：音量 ══
+     细、淡、无圆点 —— 之前是 3px 实心粉线贯穿顶部，太抢眼 */
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-volume-wrap {
+    display: flex !important;
+    position: absolute !important;
+    transform: none !important;   /* 原生带 translateX(-50%)，不归零就左偏 */
+    left: 20px !important;
+    top: 16px !important;
+    right: 72px !important;
+    bottom: auto !important;
+    width: auto !important;
+    height: 22px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    align-items: center !important;
+    gap: 10px !important;
+    z-index: 3;
+    cursor: pointer !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-icon-volume-down {
+    display: flex !important;
+    position: static !important;
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+    border: none !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-icon-volume-down svg,
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-icon-volume-down svg path {
+    width: 15px !important;
+    height: 15px !important;
+    fill: rgba(58, 48, 56, 0.42) !important;
+  }
+  /* 竖着弹出的那条改成横着一整条，常显 */
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-volume-bar-wrap {
+    position: static !important;
+    flex: 1 1 auto !important;
+    width: auto !important;
+    height: 12px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    overflow: visible !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+  /* 填充块：原生是竖条、音量写在 inline height 上；横排后由 miao-player.js
+     把那个百分比映射成 width（这里只负责压成 2px 高的横条） */
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-volume {
+    position: static !important;
+    height: 2px !important;
+    min-height: 2px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(90deg, rgba(236, 81, 143, 0.3), rgba(236, 81, 143, 0.62)) !important;
+    transition: width 0.08s linear !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-volume-bar {
+    position: static !important;
+    width: 100% !important;
+    height: 2px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 999px !important;
+    background: rgba(58, 48, 56, 0.1) !important;
+    overflow: hidden !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-volume-bar-inner {
+    height: 2px !important;
+    border-radius: 999px !important;
+    background: transparent !important;
+  }
+  /* 音量条上那个小圆点：不要了（太抢眼，拖动靠整条轨道就够） */
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-volume-bar-inner .aplayer-thumb {
+    display: none !important;
+  }
 
-/* ── 顶部行：音量条 + 词按钮 ── */
-[data-theme='light'] body:has(#console.show) #nav-music .miao-topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  order: 0;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-volume-wrap {
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  position: static !important;
-  top: auto !important;
-  left: auto !important;
-  transform: none !important;
-  margin: 0 !important;
-  flex: 1 1 auto !important;
-  width: auto !important;
-  height: 20px !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-volume-wrap .aplayer-icon {
-  width: 16px !important;
-  height: 16px !important;
-  color: #8a6a72 !important;
-  margin: 0 !important;
-  opacity: 0.7 !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-volume-wrap .aplayer-icon svg {
-  width: 16px !important;
-  height: 16px !important;
-  fill: #8a6a72 !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-volume-bar-wrap {
-  flex: 1 1 auto !important;
-  height: 4px !important;
-  background: rgba(150, 110, 120, 0.15) !important;
-  border-radius: 99px !important;
-  overflow: hidden !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-volume-bar-wrap .aplayer-volume-bar {
-  height: 4px !important;
-  background: rgba(232, 106, 142, 0.32) !important;
-  border-radius: 99px !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-volume-bar-wrap .aplayer-volume-bar .aplayer-volume {
-  height: 4px !important;
-  background: #e86a8e !important;
-  border-radius: 99px !important;
-}
-.miao-lyric-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  flex: none;
-  padding: 0;
-  border: none;
-  background: transparent;
-  color: #8a6a72;
-  opacity: 0.65;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-.miao-lyric-toggle:hover { opacity: 1; }
-.miao-lyric-toggle.on { color: #e86a8e; opacity: 1; }
-[data-theme='dark'] body:has(#console.show) #nav-music .miao-lyric-toggle {
-  display: none !important;
-}
+  /* ══ 顶栏：词钮（三条杠，图形由 JS 写入） ══ */
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon.aplayer-icon-lrc {
+    display: flex !important;
+    position: absolute !important;
+    right: 18px !important;
+    top: 11px !important;
+    left: auto !important;
+    bottom: auto !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    background: rgba(58, 48, 56, 0.055) !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+    z-index: 4;
+    cursor: pointer !important;
+    transition: background 0.2s ease !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon.aplayer-icon-lrc:hover {
+    background: rgba(58, 48, 56, 0.12) !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon.aplayer-icon-lrc.miao-on {
+    background: rgba(236, 81, 143, 0.14) !important;
+  }
+  /* 三条杠是 stroke 画的，别用 fill */
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon.aplayer-icon-lrc svg {
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0 !important;
+    fill: none !important;
+    stroke: rgba(58, 48, 56, 0.6) !important;
+    stroke-width: 1.9 !important;
+    stroke-linecap: round !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon.aplayer-icon-lrc svg path {
+    fill: none !important;
+    stroke: rgba(58, 48, 56, 0.6) !important;
+    stroke-width: 1.9 !important;
+    stroke-linecap: round !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon.aplayer-icon-lrc.miao-on svg,
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon.aplayer-icon-lrc.miao-on svg path {
+    stroke: #EC518F !important;
+  }
 
-/* ── 中部：封面 → 歌词 → 信息（竖向流）── */
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-body {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 12px !important;
-  order: 1 !important;
-  height: auto !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  background: transparent !important;
-}
+  /* ══ 封面（默认态） ══ */
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-pic {
+    position: absolute !important;
+    left: 20px !important;
+    top: 58px !important;
+    width: 112px !important;
+    height: 112px !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    border-radius: 16px !important;
+    background-size: cover !important;
+    box-shadow: 0 12px 28px rgba(120, 80, 100, 0.24) !important;
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+    z-index: 2;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-pic img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 16px !important;
+    transition: none !important;
+    animation: none !important;
+  }
+  /* 封面干净，不要盖在上面的播放键 */
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-pic .aplayer-button {
+    display: none !important;
+  }
 
-/* 封面 */
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-pic {
-  width: 100% !important;
-  height: 150px !important;
-  min-height: 0 !important;
-  flex: none !important;
-  border-radius: 16px !important;
-  overflow: hidden !important;
-  position: relative !important;
-  background-size: cover !important;
-  background-position: center !important;
-  box-shadow: 0 8px 22px -8px rgba(120, 80, 90, 0.38) !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-pic img {
-  display: none !important;
-}
-/* 封面上的播放键：Mac 风格不需要（底部有主按钮） */
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-pic .aplayer-button {
-  display: none !important;
-}
+  /* ══ 歌名 / 歌手（默认态：封面右侧） ══ */
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-music {
+    position: absolute !important;
+    left: 148px !important;
+    right: 20px !important;
+    top: 62px !important;
+    bottom: auto !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 4px !important;
+    text-align: left !important;
+    overflow: hidden !important;
+    z-index: 2;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-music .aplayer-title {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;   /* 主题给的是 300px，卡片宽了以后会留一大片空 */
+    /* 字号走变量：JS 按容器宽度逐级缩（18→12），inline font-size 打不过 !important */
+    font-size: var(--miao-tt, 18px) !important;
+    font-weight: 700 !important;
+    line-height: 25px !important;
+    color: #3a3238 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-music .aplayer-author {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    font-size: 12px !important;
+    line-height: 17px !important;
+    color: rgba(58, 50, 56, 0.5) !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
 
-/* 歌词窗 */
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer-lrc {
-  position: relative !important;
-  top: auto !important;
-  left: auto !important;
-  right: auto !important;
-  bottom: auto !important;
-  width: 100% !important;
-  height: 196px !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-  display: block !important;
-  order: 2;
-  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 11%, #000 89%, transparent 100%);
-  mask-image: linear-gradient(180deg, transparent 0%, #000 11%, #000 89%, transparent 100%);
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer-lrc .aplayer-lrc-contents {
-  transform: translateY(var(--miao-lrc-y, 0px)) !important;
-  transition: transform 0.38s cubic-bezier(0.25, 0.1, 0.25, 1) !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  /* 音乐馆页用 margin-top:80px 做首行居中，挪到这个 196px 的小窗里
-     会让整段下沉 80px（实测当前行偏离中心 46px） */
-  margin: 0 !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer-lrc p {
-  font-size: 13.5px !important;
-  line-height: 1.85 !important;
-  height: auto !important;
-  min-height: 25px !important;
-  padding: 1px 4px !important;
-  margin: 0 !important;
-  color: rgba(92, 66, 74, 0.38) !important;
-  text-align: center !important;
-  white-space: normal !important;
-  word-break: break-word !important;
-  text-shadow: none !important;
-  -webkit-text-stroke: 0 !important;
-  transition: color 0.28s ease, font-size 0.28s ease !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer-lrc p.aplayer-lrc-current {
-  color: #d94a76 !important;
-  font-size: 16px !important;
-  font-weight: 600 !important;
-  text-shadow: 0 2px 10px rgba(217, 74, 118, 0.18) !important;
-}
+  /* ══ 歌词窗：默认收起，歌词态展开（304px 高） ══ */
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-lrc {
+    position: absolute !important;
+    left: 16px !important;
+    right: 16px !important;
+    top: 58px !important;
+    width: auto !important;
+    height: 304px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: none !important;
+    opacity: 1 !important;
+    overflow: hidden !important;
+    border-radius: 18px !important;
+    background: rgba(58, 48, 56, 0.045) !important;
+    box-shadow: inset 0 0 0 1px rgba(58, 48, 56, 0.05) !important;
+    z-index: 2;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 86%, transparent 100%) !important;
+    mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 86%, transparent 100%) !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music.miao-lyric-on .aplayer-lrc {
+    display: block !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-lrc::after {
+    display: none !important;
+  }
+  /* 居中偏移 = (窗高 304 − 行高 40) / 2 = 132 */
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-lrc .aplayer-lrc-contents {
+    margin-top: 132px !important;
+    padding: 0 !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-lrc p {
+    height: 40px !important;
+    line-height: 40px !important;
+    min-height: 40px !important;
+    margin: 0 !important;
+    padding: 0 16px !important;
+    font-size: 15px !important;
+    color: rgba(58, 48, 56, 0.4) !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    transition: color 0.28s ease !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-lrc p.aplayer-lrc-current {
+    color: #EC518F !important;
+    font-weight: 600 !important;
+  }
 
-/* 歌名 / 歌手 */
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-info {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 10px !important;
-  order: 3 !important;
-  height: auto !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-  background: transparent !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-music {
-  width: 100% !important;
-  text-align: center !important;
-  display: block !important;
-  height: auto !important;
-  overflow: hidden !important;
-  margin: 0 !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-music .aplayer-title {
-  display: block !important;
-  font-size: 15px !important;
-  font-weight: 600 !important;
-  line-height: 1.4 !important;
-  color: #3d2b31 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  margin: 0 !important;
-  text-shadow: none !important;
-  -webkit-text-stroke: 0 !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-music .aplayer-author {
-  display: block !important;
-  font-size: 11.5px !important;
-  line-height: 1.5 !important;
-  color: rgba(92, 66, 74, 0.5) !important;
-  margin: 3px 0 0 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  text-shadow: none !important;
-  opacity: 1 !important;
-}
+  /* ══ 三颗圆钮 ══
+     ⚠️ .aplayer-time 必须 display:contents。它原生带 transform（居中用的），
+     而 transform 会让它成为 absolute 子元素的包含块 —— 于是里面每颗按钮
+     都相对它定位、不再相对卡片（实测整体左偏 174px）。 */
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time {
+    display: contents !important;
+    transform: none !important;
+  }
+  /* ⚠️ 只给「上/播放/下」三颗，不能写成 .aplayer-time .aplayer-icon ——
+     那样 order/loop/menu/音量/词钮会一起被套上，撑成灰胶囊糊在按钮下面 */
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon-back,
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon-play,
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon-forward {
+    position: absolute !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    background: rgba(58, 48, 56, 0.07) !important;
+    box-shadow: none !important;
+    border: none !important;
+    transition: transform 0.18s ease, background 0.18s ease !important;
+    z-index: 3;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon-back:hover,
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon-play:hover,
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon-forward:hover {
+    transform: translateY(-1px) !important;
+    background: rgba(58, 48, 56, 0.13) !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon-back svg,
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon-play svg,
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon-forward svg,
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon-back svg path,
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon-play svg path,
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon-forward svg path {
+    width: 15px !important;
+    height: 15px !important;
+    margin: 0 !important;
+    fill: #4a4048 !important;
+  }
+  /* 上一首 / 下一首：40px，垂直中心与播放键对齐（123+54/2 = 130+40/2 = 150） */
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-icon-back,
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-icon-forward {
+    top: 130px !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+  }
+  /* 三颗整组居中：总宽 40+14+54+14+40 = 162，左边缘 = 50% − 81px。
+     不能用固定 px —— 卡片宽度是 100vw−40 流式的，固定值在窄屏会整体偏右。 */
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-icon-back {
+    left: calc(50% - 81px) !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-icon-forward {
+    left: calc(50% + 41px) !important;
+  }
+  /* 中间那颗：粉色实心、大一号（54px，top 123 → 中心 150，与两侧齐） */
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon.aplayer-icon-play {
+    left: calc(50% - 27px) !important;
+    top: 123px !important;
+    transform: none !important;
+    width: 54px !important;
+    height: 54px !important;
+    min-width: 54px !important;
+    background: #EC518F !important;
+    box-shadow: 0 10px 24px rgba(236, 81, 143, 0.36) !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon-play:hover {
+    transform: none !important;
+    background: #e24683 !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon-play svg,
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time .aplayer-icon-play svg path {
+    width: 17px !important;
+    height: 17px !important;
+    fill: #fff !important;
+  }
+  /* 这一版不要的：顺序 / 循环 / 菜单 */
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-icon-order,
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-icon-loop,
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-icon-menu {
+    display: none !important;
+  }
 
-/* ── 控制区：进度条在上、按钮在下 ── */
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-controller {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 10px !important;
-  width: 100% !important;
-  height: auto !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  align-items: stretch !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-bar-wrap {
-  order: 1;
-  width: 100% !important;
-  height: 5px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  position: static !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-bar-wrap .aplayer-bar {
-  width: 100% !important;
-  height: 4px !important;
-  background: rgba(150, 110, 120, 0.15) !important;
-  border-radius: 99px !important;
-  position: relative !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-bar-wrap .aplayer-bar .aplayer-loaded {
-  height: 4px !important;
-  background: rgba(232, 106, 142, 0.22) !important;
-  border-radius: 99px !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-bar-wrap .aplayer-bar .aplayer-played {
-  height: 4px !important;
-  background: #e86a8e !important;
-  border-radius: 99px !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-bar-wrap .aplayer-bar .aplayer-played .aplayer-thumb {
-  width: 10px !important;
-  height: 10px !important;
-  background: #fff !important;
-  border: 2px solid #e86a8e !important;
-  box-shadow: 0 1px 4px rgba(200, 100, 130, 0.4) !important;
-  margin-top: -3px !important;
-}
+  /* ══ 倒计时（内容由 miao-player.js 写入，如 -04:06） ══ */
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-time-inner {
+    position: absolute !important;
+    left: auto !important;
+    right: 24px !important;
+    top: auto !important;
+    bottom: 22px !important;
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 11px !important;
+    line-height: 14px !important;
+    min-width: 46px !important;
+    text-align: right !important;
+    color: rgba(58, 50, 56, 0.42) !important;
+    font-variant-numeric: tabular-nums !important;
+    letter-spacing: 0.02em !important;
+    z-index: 3;
+  }
 
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-time {
-  order: 2;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 16px !important;
-  position: static !important;
-  width: 100% !important;
-  height: auto !important;
-  min-height: 40px !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-time > * {
-  position: static !important;
-  float: none !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  margin: 0 !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-time .aplayer-icon {
-  width: 26px !important;
-  height: 26px !important;
-  padding: 0 !important;
-  color: #8a6a72 !important;
-  opacity: 0.75 !important;
-  background: transparent !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-time .aplayer-icon svg {
-  width: 100% !important;
-  height: 100% !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-time .aplayer-icon path {
-  fill: #8a6a72 !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-time .aplayer-icon:hover {
-  opacity: 1 !important;
-}
-/* 主按钮：粉色实心圆 */
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-time .aplayer-icon-play {
-  width: 44px !important;
-  height: 44px !important;
-  padding: 11px !important;
-  border-radius: 50% !important;
-  background: #e86a8e !important;
-  opacity: 1 !important;
-  box-shadow: 0 6px 16px -4px rgba(232, 106, 142, 0.55) !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-time .aplayer-icon-play path {
-  fill: #fff !important;
-}
-/* 时间：进度条那行右侧 */
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-time .aplayer-time-inner {
-  font-size: 10.5px !important;
-  color: rgba(92, 66, 74, 0.45) !important;
-  font-variant-numeric: tabular-nums;
-  display: inline-block !important;
-  position: absolute !important;
-  right: 16px !important;
-  bottom: 52px !important;
-}
-/* 不需要的图标：循环 / 顺序 / 菜单 / 歌词开关 / 音量（音量已在顶部） */
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-icon-loop,
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-icon-order,
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-icon-menu,
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-icon-lrc,
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-list {
-  display: none !important;
-}
+  /* ══ 底部细进度条：给右侧的倒计时留出 74px，不再和它重叠 ══ */
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-bar-wrap {
+    position: absolute !important;
+    left: 24px !important;
+    right: 100px !important;
+    top: auto !important;
+    bottom: 26px !important;
+    width: auto !important;
+    height: 10px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    z-index: 3;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-bar {
+    height: 3px !important;
+    border-radius: 999px !important;
+    background: rgba(58, 48, 56, 0.11) !important;
+    overflow: visible !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-loaded {
+    display: block !important;
+    height: 3px !important;
+    border-radius: 999px !important;
+    background: rgba(58, 48, 56, 0.18) !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-played {
+    height: 3px !important;
+    border-radius: 999px !important;
+    background: rgba(236, 81, 143, 0.72) !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music .aplayer-thumb {
+    display: inline-block !important;
+    width: 9px !important;
+    height: 9px !important;
+    margin-top: -3px !important;
+    margin-left: -4.5px !important;
+    background: #EC518F !important;
+    border: none !important;
+    border-radius: 50% !important;
+    box-shadow: 0 1px 4px rgba(236, 81, 143, 0.4) !important;
+  }
 
-/* ── 修补：APlayer 自带的定位 / 主题播放动画的 transform，会和竖排流打架 ── */
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-pic {
-  transform: none !important;
-  animation: none !important;
-  transition: none !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-info {
-  width: 100% !important;
-  flex: none !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-controller {
-  position: static !important;
-  width: 100% !important;
-  flex: none !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-music {
-  width: 100% !important;
-  flex: none !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer .aplayer-lrc {
-  flex: none !important;
-}
-
-/* ── 「词」模式：收起封面，歌词区占满整张卡 ── */
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer.miao-lyric-on .aplayer-pic {
-  display: none !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer.miao-lyric-on .aplayer-lrc {
-  height: 360px !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer.miao-lyric-on .aplayer-lrc p {
-  font-size: 14px !important;
-}
-[data-theme='light'] body:has(#console.show) #nav-music .aplayer.miao-lyric-on .aplayer-lrc p.aplayer-lrc-current {
-  font-size: 17.5px !important;
-}
-
-/* ── 兜底：折叠成小球 / 深色模式 / 没开中控台时，不要露出我加的那一行 ── */
-body:not(:has(#console.show)) #nav-music .miao-topbar,
-[data-theme='dark'] body:has(#console.show) #nav-music .miao-topbar {
-  display: none !important;
-}
-/* 深色模式恢复主题原本的播放器：歌词回到底部，别再跟着竖排流走 */
-[data-theme='dark'] body:has(#console.show) #nav-music .aplayer-lrc {
-  position: absolute !important;
-  width: auto !important;
-  height: auto !important;
-  top: auto !important;
-  bottom: 60px !important;
-  left: 100px !important;
-  right: 20px !important;
-  -webkit-mask-image: none !important;
-  mask-image: none !important;
-}
-[data-theme='dark'] body:has(#console.show) #nav-music .aplayer-lrc .aplayer-lrc-contents {
-  transform: none !important;
-}
-[data-theme='dark'] body:has(#console.show) #nav-music .aplayer-pic {
-  transform: none !important;
+  /* ══ 歌词态（图2）：封面收起，歌词窗占主位 ══ */
+  [data-theme='light'] body:has(#console.show) #nav-music.miao-lyric-on .aplayer-pic {
+    display: none !important;
+  }
+  /* 歌名挪到歌词窗下面 */
+  [data-theme='light'] body:has(#console.show) #nav-music.miao-lyric-on .aplayer-music {
+    left: 24px !important;
+    right: 24px !important;
+    top: 372px !important;
+    align-items: flex-start !important;
+    text-align: left !important;
+  }
+  /* 三颗钮下移，仍居中；播放键 top 420 → 中心 447，两侧 427 → 中心 447 */
+  [data-theme='light'] body:has(#console.show) #nav-music.miao-lyric-on .aplayer-icon-back,
+  [data-theme='light'] body:has(#console.show) #nav-music.miao-lyric-on .aplayer-icon-forward {
+    top: 427px !important;
+  }
+  [data-theme='light'] body:has(#console.show) #nav-music.miao-lyric-on .aplayer-time .aplayer-icon.aplayer-icon-play {
+    top: 420px !important;
+  }
 }

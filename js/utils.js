@@ -241,6 +241,10 @@
   function hookAll() {
     var all = document.querySelectorAll("meting-js");
     for (var i = 0; i < all.length; i++) {
+      // ⚠️ 只服务音乐馆页（#anMusic-page）。中控台那个播放器（#nav-music）不归这里管：
+      // 它有自己的 DOM 和 APlayer 原生滚动，这里那套（重置 index、加 50px padding、
+      // 写 --miao-lrc-y）会把它打断 —— 实测中控台歌词的 transform 永远是 0，不滚。
+      if (all[i].closest("#nav-music")) continue;
       try { hookOne(all[i]); } catch (e) {}
     }
   }
