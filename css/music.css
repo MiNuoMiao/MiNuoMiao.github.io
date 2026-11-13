@@ -85,23 +85,31 @@ body:has(#anMusic-page) #nav-music {
   color: #fff;
 }
 
-/* 标题超长时横向来回滚（JS 会量宽度后加 .miao-scroll） */
-#anMusic-page .aplayer-info .aplayer-music .aplayer-title {
-  display: inline-block;
-  max-width: 100%;
+/* 标题 / 歌手：单行不换行，超出后由 JS 挂上 .miao-mq-track 做无缝循环横向滚动。
+   视口（原 span）overflow:hidden；轨道里是「文本 + 间隔 + 文本 + 间隔」双份，
+   动画平移 -50% 正好接上第二份，没有跳帧。 */
+#anMusic-page .aplayer-info .aplayer-music .aplayer-title,
+#anMusic-page .aplayer-info .aplayer-music .aplayer-author {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: clip;
-  vertical-align: bottom;
 }
 
-#anMusic-page .aplayer-info .aplayer-music .aplayer-title.miao-scroll {
-  animation: miaoTitleScroll 7s ease-in-out infinite alternate;
+.miao-mq-track {
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+  will-change: transform;
 }
+.miao-mq-track.is-on {
+  animation: miaoMq linear infinite;
+}
+.miao-mq-copy { flex: none; }
+.miao-mq-gap { flex: none; width: 5em; }
 
-@keyframes miaoTitleScroll {
+@keyframes miaoMq {
   from { transform: translateX(0); }
-  to { transform: translateX(var(--miao-shift, -50%)); }
+  to   { transform: translateX(-50%); }
 }
 
 #anMusic-page .aplayer-info .aplayer-lrc {
