@@ -1248,3 +1248,73 @@ body:has(#console.show) #center-console:checked + label::after {
 [data-theme='light'] body:has(#console.show) #nav-music .aplayer-icon-forward svg {
   transform: rotate(180deg);
 }
+
+/* ══════════════════════════════════════════════════════════════
+   中控台 · 拖动与关闭（2026-11-14 凌晨）
+   ══════════════════════════════════════════════════════════════ */
+
+/* 6) 滚动锁：只锁 body 不够 —— 实测 html 仍是 overflow:auto，
+      在 iPad / 窄屏上滚的是 documentElement，背景照样跟着跑。 */
+html:has(#console.show) {
+  overflow: hidden !important;
+  height: 100% !important;
+}
+body:has(#console.show) {
+  overflow: hidden !important;
+  touch-action: none;
+}
+
+/* 7) 拖动热区
+   进度条视觉 3px、音量条视觉 2px，容器也只有 12px 高 —— 鼠标勉强能点，
+   手指根本点不到（这就是「拖不动」的真实原因）。
+   用伪元素把热区上下各撑 12px（合计 36px），**不动任何布局**。 */
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer-bar-wrap::before,
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer-volume-bar-wrap::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  right: -6px;
+  top: -12px;
+  bottom: -12px;
+}
+/* 伪元素要相对它自己定位 —— 音量条原生是 static */
+[data-theme='light'] body:has(#console.show) #nav-music .aplayer-volume-bar-wrap {
+  position: relative !important;
+}
+
+/* 8) 中控台右上角的关闭钮（主题原本只有「点遮罩关闭」） */
+.miao-console-close {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: var(--miao-lrc-accent, #F08092);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(240, 128, 146, 0.3);
+  z-index: 10;
+  transition: transform 0.18s ease, background 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.miao-console-close svg {
+  width: 17px;
+  height: 17px;
+  display: block;
+}
+body:has(#console.show) .miao-console-close {
+  display: flex;
+}
+.miao-console-close:hover {
+  background: #e46e82;
+  transform: scale(1.06);
+}
+.miao-console-close:active {
+  transform: scale(0.94);
+}

@@ -227,9 +227,72 @@
     if (f !== t) a.textContent = f;
   }
 
+  /* ── 自己接管拖动（进度条 / 音量条）──
+     为什么不能用 APlayer 自带的：
+       · 音量条：它的公式是竖向的（(底边 - clientY) / 高度），
+         我们把它改成了横条，沿着横线拖时 clientY 几乎不变 → 永远算出 100%；
+       · 进度条：实测点 80% 位置跳到 26%，它的取值基准和我们的布局对不上。
+     capture 阶段拦截 + stopPropagation，APlayer 自己的处理不再跑。 */
+  function bindDrag(ap) {
+    var fire = function (el, type, x, y) {
+      try {
+        el.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, clientX: x, clientY: y }));
+      } catch (e) {}
+    };
+    var attach = function (el, onStart) {
+      if (!el || el.dataset.miaoDrag === "1") return;
+      el.dataset.miaoDrag = "1";
+      var start = function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var x0 = e.clientX != null ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+        onStart(x0);
+        var move = function (ev) {
+          var x = ev.clientX != null ? ev.clientX : (ev.touches && ev.touches[0] ? ev.touches[0].clientX : 0);
+          onStart(x);
+        };
+        var up = function () {
+          document.removeEventListener("mousemove", move, true);
+          document.removeEventListener("mouseup", up, true);
+          document.removeEventListener("touchmove", move, true);
+          document.removeEventListener("touchend", up, true);
+        };
+        document.addEventListener("mousemove", move, true);
+        document.addEventListener("mouseup", up, true);
+        document.addEventListener("touchmove", move, { capture: true, passive: false });
+        document.addEventListener("touchend", up, true);
+      };
+      el.addEventListener("mousedown", start, true);
+      el.addEventListener("touchstart", start, { capture: true, passive: false });
+    };
+    var ratio = function (el, clientX) {
+      var r = el.getBoundingClientRect();
+      if (!r.width) return 0;
+      var p = (clientX - r.left) / r.width;
+      return p < 0 ? 0 : p > 1 ? 1 : p;
+    };
+
+    /* 进度条 */
+    var bar = ap.container.querySelector(".aplayer-bar-wrap");
+    attach(bar, function (x) {
+      var dur = ap.audio && ap.audio.duration;
+      if (!dur || !isFinite(dur)) return;
+      var t = dur * ratio(bar, x);
+      try { if (typeof ap.seek === "function") ap.seek(t); else ap.audio.currentTime = t; } catch (e) {}
+    });
+
+    /* 音量条（横排）*/
+    var vol = ap.container.querySelector(".aplayer-volume-bar-wrap");
+    attach(vol, function (x) {
+      var p = ratio(vol, x);
+      try { if (typeof ap.volume === "function") ap.volume(p); else ap.audio.volume = p; } catch (e) {}
+    });
+  }
+
   function bindOne(ap) {
     if (!ap || ap.__miaoBound) return;
     ap.__miaoBound = true;
+    try { bindDrag(ap); } catch (e) {}
     /* ⚠️ 完全接管 APlayer 的歌词更新。
        它按「原始行数」算 index 并自己加 .aplayer-lrc-current、自己写 inline
        translateY(40 * -index)；我们把署名行删掉了（47 → 39），它就会整体错位，
@@ -279,8 +342,30 @@
     return ok;
   }
 
+  /* 中控台右上角的关闭钮：主题原本只能点遮罩关，
+     这里补一颗主题色的圆钮（颜色走 --miao-lrc-accent）。 */
+  function ensureCloseBtn() {
+    var con = document.getElementById("console");
+    if (!con || con.querySelector(".miao-console-close")) return;
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "miao-console-close";
+    b.setAttribute("aria-label", "\u5173\u95ed\u4e2d\u63a7\u53f0");
+    b.innerHTML =
+      '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+      '<path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+    b.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (window.anzhiyu && typeof window.anzhiyu.hideConsole === "function") window.anzhiyu.hideConsole();
+      else con.classList.remove("show");
+    });
+    con.appendChild(b);
+  }
+
   function start() {
     scan();
+    ensureCloseBtn();
     var tries = 0;
     var t = setInterval(function () {
       if (scan() || ++tries > 200) clearInterval(t);
