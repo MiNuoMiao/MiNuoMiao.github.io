@@ -65,21 +65,27 @@
     }
   }
 
+  // 返回 true 表示「找到了 aplayer 并且处理过」
   function scan() {
     var root = document.getElementById('nav-music');
-    if (!root) return;
+    if (!root) return false;
     var aps = root.querySelectorAll('.aplayer');
     for (var i = 0; i < aps.length; i++) setup(aps[i]);
+    return aps.length > 0;
   }
 
+  // ⚠️ 线上实测：底部注入的脚本执行时，meting-js 还没把 .aplayer 造出来，
+  // 只扫一次会永远错过（本地因为时序不同看着是好的）。
+  // 所以这里持续轮询 —— 每次只是两次 querySelectorAll，成本可以忽略）。
   function start() {
-    scan();
-    var root = document.getElementById('nav-music');
-    if (root) {
-      try {
-        new MutationObserver(function () { scan(); }).observe(root, { childList: true, subtree: true });
-      } catch (e) {}
-    }
+    if (scan()) return;
+    var tries = 0;
+    var timer = setInterval(function () {
+      tries++;
+      if (scan() || tries > 200) clearInterval(timer);   // 200 × 300ms = 60 秒，够了
+    }, 300);
+    // pjax 换页后再兜一次
+    document.addEventListener('pjax:complete', function () { setTimeout(scan, 200); });
   }
 
   if (document.readyState === 'loading') {

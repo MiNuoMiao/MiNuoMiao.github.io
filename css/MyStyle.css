@@ -783,6 +783,9 @@ body[data-type="music"] #center-console:checked + label::after {
   transition: transform 0.38s cubic-bezier(0.25, 0.1, 0.25, 1) !important;
   padding-left: 0 !important;
   padding-right: 0 !important;
+  /* 音乐馆页用 margin-top:80px 做首行居中，挪到这个 196px 的小窗里
+     会让整段下沉 80px（实测当前行偏离中心 46px） */
+  margin: 0 !important;
 }
 [data-theme='light'] body:has(#console.show) #nav-music .aplayer-lrc p {
   font-size: 13.5px !important;
